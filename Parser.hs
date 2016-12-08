@@ -3,6 +3,7 @@ module Parser where
 
 import Control.Applicative
 import Data.Char
+import Data.List
 
 newtype Parser a = Parser (ReadS a)
 
@@ -47,3 +48,10 @@ letter = satisfy isAlpha
 -- non-negative integer
 nat :: Parser Int
 nat = read <$> some digit
+
+string :: String -> Parser String
+string str = Parser matchStr
+  where
+    matchStr t
+      | str `isPrefixOf` t = [(str, drop (length str) t)]
+      | otherwise = []
