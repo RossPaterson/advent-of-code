@@ -29,6 +29,9 @@ runParser (Parser p) s = case [x | (x, t) <- p s, null t] of
     x:_ -> x
     _ -> error ("no parse: " ++ show s)
 
+count :: Int -> Parser a -> Parser [a]
+count n p = sequence (replicate n p)
+
 sepBy1 :: Parser a -> Parser sep -> Parser [a]
 sepBy1 p sep = (:) <$> p <*> many (sep *> p)
 
