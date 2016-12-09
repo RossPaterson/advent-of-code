@@ -55,3 +55,7 @@ string str = Parser matchStr
     matchStr t
       | str `isPrefixOf` t = [(str, drop (length str) t)]
       | otherwise = []
+
+-- accept the rest of the input
+rest :: Parser String
+rest = Parser $ \ s -> [(s, [])]
