@@ -1,4 +1,4 @@
--- Simple applicative parser combinators (compatible with Parsec)
+-- Simple applicative parser combinators (mostly compatible with Parsec)
 module Parser where
 
 import Control.Applicative
@@ -18,6 +18,11 @@ instance Applicative Parser where
 instance Alternative Parser where
     empty = Parser (const [])
     Parser px <|> Parser py = Parser $ \ s -> px s ++ py s
+
+instance Monad Parser where
+    return = pure
+    Parser px >>= f =
+        Parser $ \ s -> [(y, u) | (x, t) <- px s, let Parser q = f x, (y, u) <- q t]
 
 runParser :: Parser a -> String -> a
 runParser (Parser p) s = case [x | (x, t) <- p s, null t] of
@@ -45,6 +50,9 @@ digit = satisfy isDigit
 letter :: Parser Char
 letter = satisfy isAlpha
 
+anyChar :: Parser Char
+anyChar = satisfy (const True)
+
 -- non-negative integer
 nat :: Parser Int
 nat = read <$> some digit
@@ -55,7 +63,3 @@ string str = Parser matchStr
     matchStr t
       | str `isPrefixOf` t = [(str, drop (length str) t)]
       | otherwise = []
-
--- accept the rest of the input
-rest :: Parser String
-rest = Parser $ \ s -> [(s, [])]
