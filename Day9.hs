@@ -14,10 +14,10 @@ parseString = runParser $ many (marker <|> single)
         char '('
         len <- nat
         char 'x'
-        count <- nat
+        n <- nat
         char ')'
-        str <- sequence (replicate len anyChar)
-        return (Repeat count str)
+        str <- count len anyChar
+        return (Repeat n str)
     single = Single <$> satisfy (/= '(')
 
 expand :: Input -> String
