@@ -26,3 +26,7 @@ choose n [] = []
 choose n (x:xs) =
     [(x:ys, rest) | (ys, rest) <- choose (n-1) xs] ++
     [(ys, x:rest) | (ys, rest) <- choose n xs]
+
+-- eliminate eadjacent repetitions
+uniq :: Eq a => [a] -> [a]
+uniq = map head . group
