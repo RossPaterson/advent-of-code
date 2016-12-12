@@ -60,6 +60,9 @@ anyChar = satisfy (const True)
 nat :: Parser Int
 nat = read <$> some digit
 
+int :: Parser Int
+int = negate <$ char '-' <*> nat <|> nat
+
 string :: String -> Parser String
 string str = Parser matchStr
   where
