@@ -14,3 +14,15 @@ frequency xs = [(head g, length g) | g <- group (sort xs)]
 -- unique elements of the input list, in decreasing order of frequency
 mostCommon :: Ord a => [a] -> [a]
 mostCommon xs = map snd (sort [(-n, w) | (w, n) <- frequency xs])
+
+-- repeatedly apply the function until it doesn't produce a new value
+whileJust :: (a -> Maybe a) -> a -> a
+whileJust f x = maybe x (whileJust f) (f x)
+
+-- possible choices of n elements from a list
+choose :: Int -> [a] -> [([a], [a])]
+choose 0 xs = [([], xs)]
+choose n [] = []
+choose n (x:xs) =
+    [(x:ys, rest) | (ys, rest) <- choose (n-1) xs] ++
+    [(ys, x:rest) | (ys, rest) <- choose n xs]
