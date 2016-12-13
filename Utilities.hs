@@ -1,6 +1,8 @@
 module Utilities where
 
 import Data.List
+import Data.Set (Set)
+import qualified Data.Set as Set
 
 -- groups n xs partitions xs into groups of size n, with the possible
 -- exception of the last one, which is non-empty.
@@ -30,3 +32,12 @@ choose n (x:xs) =
 -- eliminate eadjacent repetitions
 uniq :: Eq a => [a] -> [a]
 uniq = map head . group
+
+-- breadth-first search
+bfs :: Ord a => (a -> [a]) -> a -> [[a]]
+bfs f x0 = map fst (iterate step ([x0], Set.singleton x0))
+  where
+    step (xs, seen) = foldr add ([], seen) (concatMap f xs)
+    add x (xs, seen)
+      | Set.member x seen = (xs, seen)
+      | otherwise = (x:xs, Set.insert x seen)
