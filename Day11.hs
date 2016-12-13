@@ -1,183 +1,166 @@
 module Day11 where
 
 import Utilities
-import Data.Bits
 import Data.List
 import Data.Maybe
-import Data.Word
-import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.Map (Map)
+import qualified Data.Map as Map
+import Data.Hashable
 import Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
 import Data.Graph.AStar
 
-type Element = String
-
-data Object e = Gen e | Chip e
+data Object = Gen String | Chip String
   deriving (Show, Eq, Ord)
-type Floor e = [Object e]
-data State e = State { elevator :: Int, contents :: [Floor e] }
+type Input = [[Object]]
+
+generators :: [Object] -> [String]
+generators os = [e | Gen e <- os]
+
+microchips :: [Object] -> [String]
+microchips os = [e | Chip e <- os]
+
+type FloorNo = Int -- 0..3
+data State = State { elevator :: FloorNo, ordered_gcs :: [(FloorNo, FloorNo)] }
   deriving (Show, Eq, Ord)
-type ExtState = State String
 
-instance Functor Object where
-    fmap f (Gen e) = Gen (f e)
-    fmap f (Chip e) = Chip (f e)
+topFloor :: FloorNo
+topFloor = 3
 
--- Replace element names with 0..
+instance Hashable State where
+    hashWithSalt salt (State elev gcs) = salt + foldr shift elev gcs
+      where
+        shift (g, c) h = h*16 + g*4 + c
 
-normalize :: ExtState -> State Int
-normalize (State elev objects) = State elev objects'
-  where
-    objects' = map (map (fmap replace)) objects
-    replace e = fromJust (elemIndex e es)
-    es = elements (State elev objects)
+showState :: State -> String
+showState (State elev gcs) = unlines [
+    "F" ++ show (f+1) ++ (if f == elev then " E " else " . ") ++
+        showFloor f gcs |
+    f <- reverse [0..topFloor]]
 
-elements :: Ord e => State e -> [e]
-elements =
-    Set.toList . Set.unions . map (Set.fromList . map element) . contents
-
-element :: Object e -> e
-element (Gen e) = e
-element (Chip e) = e
-
--- testing of floors
-
-generators :: Ord e => Floor e -> [e]
-generators objects = sort [e | Gen e <- objects]
-
-microchips :: Ord e => Floor e -> [e]
-microchips objects = sort [e | Chip e <- objects]
-
-safeState :: State Int -> Bool
-safeState = all safeFloor . contents
-
-safeFloor :: Floor Int -> Bool
-safeFloor objects = null gens || null (chips \\ gens)
-  where
-    gens = generators objects
-    chips = microchips objects
+showFloor :: FloorNo -> [(FloorNo, FloorNo)] -> String
+showFloor f gcs = unwords [
+    (if f == g then "G" else ".") ++ (if f == c then "C" else ".") |
+    (g, c) <- gcs]
 
 -- finished if all objects on top floor
-finished :: State Int -> Bool
-finished = all null . init . contents
+-- (uses the fact that pairs are ordered)
+finished :: State -> Bool
+finished (State _ (gc:gcs)) = gc == (topFloor, topFloor)
+finished (State _ []) = True
+
+mkState :: Input -> State
+mkState floors =
+    State 0 (toFloors (map generators floors) (map microchips floors))
+
+toFloors :: Ord a => [[a]] -> [[a]] -> [(FloorNo, FloorNo)]
+toFloors gss css = sort (Map.elems (Map.intersectionWith (,) gens chips))
+  where
+    gens = Map.fromList [(g, f) | (f, gs) <- zip [0..] gss, g <- gs]
+    chips = Map.fromList [(c, f) | (f, cs) <- zip [0..] css, c <- cs]
+
+type Element = Int -- index of gcs list of a state
+type Floor = ([Element], [Element]) -- (gens, chips)
+
+sizeFloor :: Floor -> Int
+sizeFloor (gens, chips) = length gens + length chips
+
+-- list of objects on each floor
+elementsToFloors :: [(FloorNo, FloorNo)] -> [Floor]
+elementsToFloors gcs =
+    [([e | (e, (g, _)) <- egcs, g == f], [e | (e, (_, c)) <- egcs, c == f]) |
+        f <- [0..topFloor]]
+  where
+    egcs = zip [0..] gcs
+
+floorsToElements :: [Floor] -> [(FloorNo, FloorNo)]
+floorsToElements floors = toFloors (map fst floors) (map snd floors)
+
+safeFloor :: Floor -> Bool
+safeFloor (gens, chips) = null gens || null (chips \\ gens)
 
 -- lower bound on number of steps to finish
-heuristic :: State Int -> Int
-heuristic (State e objects) =
-    -- sum [n*length os | (n, os) <- zip [0..] (reverse objects)] - 1
-    sum [max 1 (2*n-3) | n <- scanl1 (+) (map length (init objects))]
+heuristic :: State -> Int
+heuristic (State _ gcs) =
+    sum [max 1 (2*n-3) | n <- scanl1 (+) (init counts)]
+  where
+    counts = map sizeFloor (elementsToFloors gcs)
 
 -- possible moves from state
 
-moves :: State Int -> [State Int]
-moves s = move_up s ++ move_down s
-
-move_up :: State Int -> [State Int]
-move_up (State e objects)
-  | e >= length objects = []
-  | otherwise = [State e' (below ++ this' : next' : above) | (this', next') <- simpleMoves this next]
+moves :: State -> [State]
+moves (State elev gcs) =
+    uniq $ sort [State elev' (floorsToElements floors') |
+        (carry, rest) <- choose12 this, safeFloor rest,
+        (elev', floors') <-
+           [(elev+1, below ++ rest:above') | above' <- move_to carry above] ++
+           [(elev-1, below' ++ rest:above) |
+               below' <- map reverse (move_to carry (reverse below))]]
   where
-    e' = e+1
-    (below, this:next:above) = splitAt (e-1) objects
+    (below, this:above) = splitAt elev (elementsToFloors gcs)
 
-move_down :: State Int -> [State Int]
-move_down (State e objects)
-  | e == 1 = []
-  | otherwise = [State e' (below ++ next' : this' : above) | (this', next') <- simpleMoves this next]
+move_to :: Floor -> [Floor] -> [[Floor]]
+move_to (gs1, cs1) ((gs2, cs2):rest)
+  | safeFloor next = [next:rest]
   where
-    e' = e-1
-    (below, next:this:above) = splitAt (e-2) objects
+    next = (gs1 ++ gs2, cs1 ++ cs2)
+move_to _ _ = []
 
-simpleMoves :: Floor Int -> Floor Int -> [(Floor Int, Floor Int)]
-simpleMoves src dest =
-    [(src', dest') |
-        n <- [1,2], (picks, src') <- choose n src,
-        safeFloor src',
-        let dest' = picks ++ dest,
-        safeFloor dest']
+-- choose 1 or 2 objects from a floor
+choose12 :: Floor -> [(Floor, Floor)]
+choose12 (gs, cs) =
+    [((gs_sel, cs_sel), (gs_rest, cs_rest)) |
+        (gs_sel, gs_rest) <- choose 1 gs,
+        (cs_sel, cs_rest) <- choose 1 cs] ++
+    [((gs_sel, []), (gs_rest, cs)) |
+        n <- [1, 2], (gs_sel, gs_rest) <- choose n gs] ++
+    [(([], cs_sel), (gs, cs_rest)) |
+        n <- [1, 2], (cs_sel, cs_rest) <- choose n cs]
 
--- Compact representation of state:
--- bits 0-7: number of elements
--- bits 8-9: position of elevator (F1 = 0)
--- bits 10-11: position of E1 generator
--- bits 12-13: position of E1 microchip
-type IntState = Word64
-
-encodeState :: State Int -> Word64
-encodeState s@(State elev objects) =
-    fromIntegral n .|.
-    (fromIntegral (elev-1) `shiftL` 4) .|.
-    orAll (map orAll (zipWith (map . encode) [0..] objects))
-  where
-    orAll = foldr (.|.) 0
-    n = length (elements s)
-    encode f (Gen e) = fromIntegral f `shiftL` (4*e + 6)
-    encode f (Chip e) = fromIntegral f `shiftL` (4*e + 8)
-
-decodeState :: Word64 -> State Int
-decodeState bits = State elev objects
-  where
-    n = fromIntegral (bits .&. 0xf)
-    elev = fromIntegral ((bits `shiftR` 4) .&. 0x3) + 1
-    objects = [decodeFloor f | f <- [0..3]]
-    decodeFloor f = concat [decode f e | e <- [0..n-1]]
-    decode f e =
-        (if fromIntegral (slice .&. 0x3) == f
-            then (Gen e:) else id) $
-        (if fromIntegral ((slice `shiftR` 2) .&. 0x3) == f
-            then (Chip e:) else id) $
-        []
-      where
-        slice = bits `shiftR` (4*e + 6)
-
-solve :: ExtState -> Int
+solve :: Input -> Int
 solve = length . fromJust .
-    aStar (HashSet.fromList . map encodeState . moves . decodeState)
-          (const (const 1))
-          (heuristic . decodeState)
-          (finished . decodeState) .
-    encodeState . normalize
+    aStar (HashSet.fromList . moves) (const (const 1)) heuristic finished .
+    mkState
 
-testState :: ExtState
-testState = State 1 [
+testInput :: Input
+testInput = [
     -- The first floor contains a hydrogen-compatible microchip and
     -- a lithium-compatible microchip.
-    [Chip "H", Chip "L"],
+    [Chip "hydrogen", Chip "lithium"],
     -- The second floor contains a hydrogen generator.
-    [Gen "H"],
+    [Gen "hydrogen"],
     -- The third floor contains a lithium generator.
-    [Gen "L"],
+    [Gen "lithium"],
     -- The fourth floor contains nothing relevant.
     []]
 
-initState :: ExtState
-initState = State 1 [
+initInput :: Input
+initInput = [
     -- The first floor contains a thulium generator, a thulium-compatible
     -- microchip, a plutonium generator, and a strontium generator.
-    [Gen "Th", Chip "Th", Gen "Pu", Gen "Sr"],
+    [Gen "thulium", Chip "thulium", Gen "plutonium", Gen "strontium"],
     -- The second floor contains a plutonium-compatible microchip and a
     --  strontium-compatible microchip.
-    [Chip "Pu", Chip "Sr"],
+    [Chip "plutonium", Chip "strontium"],
     -- The third floor contains a promethium generator, 
     -- a promethium-compatible microchip, a ruthenium generator, and 
     -- a ruthenium-compatible microchip.
-    [Gen "Pm", Chip "Pm", Gen "Ru", Chip "Ru"],
+    [Gen "promethium", Chip "promethium", Gen "ruthenium", Chip "ruthenium"],
     -- The fourth floor contains nothing relevant.
     []]
 
 puzzle1 :: IO ()
-puzzle1 = print (solve initState)
+puzzle1 = print (solve initInput)
 
-initState2 :: ExtState
-initState2 = State 1 ((extras++floor1):rest)
+initInput2 :: Input
+initInput2 = (extras++floor1):rest
   where
-    floor1:rest = contents initState
+    floor1:rest = initInput
     -- An elerium generator.
     -- An elerium-compatible microchip.
     -- A dilithium generator.
     -- A dilithium-compatible microchip
-    extras = [Gen "EL", Chip "EL", Gen "DL", Chip "DL"]
+    extras = [Gen "elerium", Chip "elerium", Gen "dilithium", Chip "dilithium"]
 
 puzzle2 :: IO ()
-puzzle2 = print (solve initState2)
+puzzle2 = print (solve initInput2)
