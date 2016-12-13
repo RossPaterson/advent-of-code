@@ -21,7 +21,7 @@ example = unlines
 
 solve :: Int -> Point -> Int
 solve magic goal =
-    length $ takeWhile (not . elem goal) $ bfs (neighbours magic) start
+    length $ takeWhile (not . elem goal) $ bfs (neighbours magic) [start]
 
 test :: IO ()
 test = print (solve 10 (7, 4))
@@ -33,4 +33,4 @@ puzzle1 :: IO ()
 puzzle1 = print (solve input (31, 39))
 
 puzzle2 :: IO ()
-puzzle2 = print $ sum $ map length $ take 51 $ bfs (neighbours input) start
+puzzle2 = print $ sum $ map length $ take 51 $ bfs (neighbours input) [start]

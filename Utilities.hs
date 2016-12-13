@@ -34,10 +34,13 @@ uniq :: Eq a => [a] -> [a]
 uniq = map head . group
 
 -- breadth-first search
-bfs :: Ord a => (a -> [a]) -> a -> [[a]]
-bfs f x0 = map fst (iterate step ([x0], Set.singleton x0))
+-- bfs f xs!!k contains all the unique values reachable from xs via f
+-- in k steps and no fewer.
+bfs :: Ord a => (a -> [a]) -> [a] -> [[a]]
+bfs f = map fst . iterate step . new_level Set.empty
   where
-    step (xs, seen) = foldr add ([], seen) (concatMap f xs)
+    step (xs, seen) = new_level seen (concatMap f xs)
+    new_level seen = foldr add ([], seen)
     add x (xs, seen)
       | Set.member x seen = (xs, seen)
       | otherwise = (x:xs, Set.insert x seen)
