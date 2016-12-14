@@ -35,9 +35,10 @@ uniq = map head . group
 
 -- breadth-first search
 -- bfs f xs!!k contains all the unique values reachable from xs via f
--- in k steps and no fewer.
+-- in k steps and no fewer.  All these lists are non-empty (so the
+-- whole list is finite if the number of reachable values is finite).
 bfs :: Ord a => (a -> [a]) -> [a] -> [[a]]
-bfs f = map fst . iterate step . new_level Set.empty
+bfs f = map fst . takeWhile (not . null) . iterate step . new_level Set.empty
   where
     step (xs, seen) = new_level seen (concatMap f xs)
     new_level seen = foldr add ([], seen)
