@@ -38,7 +38,7 @@ uniq = map head . group
 -- in k steps and no fewer.  All these lists are non-empty (so the
 -- whole list is finite if the number of reachable values is finite).
 bfs :: Ord a => (a -> [a]) -> [a] -> [[a]]
-bfs f = map fst . takeWhile (not . null) . iterate step . new_level Set.empty
+bfs f = takeWhile (not . null) . map fst . iterate step . new_level Set.empty
   where
     step (xs, seen) = new_level seen (concatMap f xs)
     new_level seen = foldr add ([], seen)
