@@ -2,13 +2,8 @@ module Day11 where
 
 import Utilities
 import Data.List
-import Data.Maybe
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Hashable
-import Data.HashSet (HashSet)
-import qualified Data.HashSet as HashSet
-import Data.Graph.AStar
 
 data Object = Gen String | Chip String
   deriving (Show, Eq, Ord)
@@ -26,11 +21,6 @@ data State = State { elevator :: FloorNo, ordered_gcs :: [(FloorNo, FloorNo)] }
 
 topFloor :: FloorNo
 topFloor = 3
-
-instance Hashable State where
-    hashWithSalt salt (State elev gcs) = salt + foldr shift elev gcs
-      where
-        shift (g, c) h = h*16 + g*4 + c
 
 showState :: State -> String
 showState (State elev gcs) = unlines [
@@ -79,13 +69,6 @@ floorsToElements floors = toFloors (map fst floors) (map snd floors)
 safeFloor :: Floor -> Bool
 safeFloor (gens, chips) = null gens || null (chips \\ gens)
 
--- lower bound on number of steps to finish
-heuristic :: State -> Int
-heuristic (State _ gcs) =
-    sum [max 1 (2*n-3) | n <- scanl1 (+) (init counts)]
-  where
-    counts = map sizeFloor (elementsToFloors gcs)
-
 -- possible moves from state
 
 moves :: State -> [State]
@@ -118,9 +101,7 @@ choose12 (gs, cs) =
         n <- [1, 2], (cs_sel, cs_rest) <- choose n cs]
 
 solve :: Input -> Int
-solve = length . fromJust .
-    aStar (HashSet.fromList . moves) (const (const 1)) heuristic finished .
-    mkState
+solve rs = length $ takeWhile (not . any finished) $ bfs moves $ [mkState rs]
 
 testInput :: Input
 testInput = [
