@@ -24,14 +24,14 @@ getDisc = runParser $
 position :: Int -> Disc -> Int
 position t (Disc n npos t0 pos0) = (t - t0 + n + pos0) `mod` npos
 
-data Mod = Mod { remainder :: Int, cycle_size :: Int }
+data Mod = Mod { remainder :: Integer, cycle_size :: Integer }
   deriving Show
 
 -- position t d == 0 <=> t == t0 - n - pos0 (mod npos)
 
 -- Mod i n denotes position i in n-cycle.  0 <= i < n
 mkMod :: Int -> Int -> Mod
-mkMod i n = Mod (i `mod` n) n
+mkMod i n = Mod (toInteger (i `mod` n)) (toInteger n)
 
 positionToMod :: Disc -> Mod
 positionToMod (Disc n npos t0 pos0) = mkMod (t0 - n - pos0) npos
@@ -45,7 +45,7 @@ chineseRemainder = foldr1 match . sortBy (comparing cycle_size)
     match (Mod i p) (Mod j n) =
         Mod (head [m | k <- [0..p-1], let m = j + k*n, m `mod` p == i]) (p*n)
 
-solve1 :: Input -> Int
+solve1 :: Input -> Integer
 solve1 = remainder . chineseRemainder . map positionToMod
 
 test = "Disc #1 has 5 positions; at time=0, it is at position 4.\nDisc #2 has 2 positions; at time=0, it is at position 1.\n"
@@ -55,7 +55,7 @@ test = "Disc #1 has 5 positions; at time=0, it is at position 4.\nDisc #2 has 2 
 addDisc :: Int -> Int -> [Disc] -> [Disc]
 addDisc npos pos0 discs = discs ++ [Disc (length discs + 1) npos 0 pos0]
 
-solve2 :: Input -> Int
+solve2 :: Input -> Integer
 solve2 = solve1 . addDisc 11 0
 
 puzzle1 = do
