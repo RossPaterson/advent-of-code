@@ -21,6 +21,10 @@ mostCommon xs = map snd (sort [(-n, w) | (w, n) <- frequency xs])
 whileJust :: (a -> Maybe a) -> a -> a
 whileJust f x = maybe x (whileJust f) (f x)
 
+-- apply a function n times
+times :: Int -> (a -> a) -> a -> a
+times n f x = foldr id x (replicate n f)
+
 -- possible choices of n elements from a list
 choose :: Int -> [a] -> [([a], [a])]
 choose 0 xs = [([], xs)]

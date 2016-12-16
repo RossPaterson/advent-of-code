@@ -1,5 +1,6 @@
 module Day14 where
 
+import Utilities
 import Data.List
 import Data.Maybe
 import Data.Hash.MD5 -- from MissingH package
@@ -28,7 +29,7 @@ puzzle1 :: IO ()
 puzzle1 = print (fst (keys salt hash1!!63))
 
 hash2  :: String -> String
-hash2 x = foldr id x (replicate 2017 hash1)
+hash2 = times 2017 hash1
 
 test2 = take 64 (keys "abc" hash2)
 
