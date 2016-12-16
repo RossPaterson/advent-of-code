@@ -9,6 +9,11 @@ import qualified Data.Set as Set
 groups :: Int -> [a] -> [[a]]
 groups n = takeWhile (not . null) . map (take n) . iterate (drop n)
 
+-- combine adjacent pairs, halving the size of the list
+pairWith :: (a -> a -> a) -> [a] -> [a]
+pairWith f (x1:x2:xs) = f x1 x2:pairWith f xs
+pairWith f xs = xs
+
 -- unique elements of the input list, paired with their number of occurrences
 frequency :: Ord a => [a] -> [(a, Int)]
 frequency xs = [(head g, length g) | g <- group (sort xs)]
