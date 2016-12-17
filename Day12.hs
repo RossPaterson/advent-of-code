@@ -42,7 +42,7 @@ value (Value n) _ = n
 value (Reg r) regs = regs!r
 
 zeroRegisters :: Registers
-zeroRegisters = Map.fromList [(r, 0) | r <- [minBound..maxBound]]
+zeroRegisters = Map.fromList [(r, 0) | r <- allValues]
 
 initState :: State
 initState = State 0 zeroRegisters

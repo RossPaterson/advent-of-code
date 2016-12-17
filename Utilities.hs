@@ -4,6 +4,9 @@ import Data.List
 import Data.Set (Set)
 import qualified Data.Set as Set
 
+allValues :: (Bounded a, Enum a) => [a]
+allValues = [minBound..maxBound]
+
 -- groups n xs partitions xs into groups of size n, with the possible
 -- exception of the last one, which is non-empty.
 groups :: Int -> [a] -> [[a]]
@@ -38,7 +41,7 @@ choose n (x:xs) =
     [(x:ys, rest) | (ys, rest) <- choose (n-1) xs] ++
     [(ys, x:rest) | (ys, rest) <- choose n xs]
 
--- eliminate eadjacent repetitions
+-- eliminate adjacent repetitions
 uniq :: Eq a => [a] -> [a]
 uniq = map head . group
 
