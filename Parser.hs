@@ -26,8 +26,9 @@ instance Monad Parser where
 
 runParser :: Parser a -> String -> a
 runParser (Parser p) s = case [x | (x, t) <- p s, null t] of
-    x:_ -> x
-    _ -> error ("no parse: " ++ show s)
+    [] -> error ("no parse: " ++ show s)
+    [x] -> x
+    _ -> error ("ambiguous parse: " ++ show s)
 
 count :: Int -> Parser a -> Parser [a]
 count n p = sequence (replicate n p)
