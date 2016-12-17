@@ -15,7 +15,7 @@ expansion bs = bs ++ concat (zipWith (:) bits (cycle [bs', bs]))
   where
     bs' = reverse (map not bs)
 
--- A091067
+-- A038189 (ones in positions A091067)
 bits :: Bits
 bits = [oddPart n `mod` 4 == 3 | n <- [1..]]
 
