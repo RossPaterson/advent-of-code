@@ -41,15 +41,14 @@ moves passcode (State pos path) =
     [State pos' (path ++ [d]) |
         d <- open passcode path, pos' <- maybeToList (move d pos)]
 
-moves2 :: String -> State -> [State]
-moves2 passcode state
-  | finished state = []
-  | otherwise = moves passcode state
-
 solve :: String -> String
 solve passcode =
     showPath $ history $ head $ filter finished $
-        concat $ bfs (moves passcode) [start]
+        concat $ simple_bfs (moves passcode) [start]
+
+-- duplicates cannot occur in this application
+simple_bfs :: (a -> [a]) -> [a] -> [[a]]
+simple_bfs f = takeWhile (not . null) . iterate (concatMap f)
 
 test1 = solve "ihgpwlah"
 test2 = solve "kglvqrro"
@@ -60,6 +59,13 @@ input = "qljzarfv"
 puzzle1 :: IO ()
 puzzle1 = putStrLn (solve input)
 
+-- Part Two
+
+moves2 :: String -> State -> [State]
+moves2 passcode state
+  | finished state = []
+  | otherwise = moves passcode state
+
 test4 = solve2 "ihgpwlah"
 test5 = solve2 "kglvqrro"
 test6 = solve2 "ulqzkmiv"
@@ -67,7 +73,7 @@ test6 = solve2 "ulqzkmiv"
 solve2 :: String -> Int
 solve2 passcode =
     length $ history $ last $ filter finished $
-        concat $ bfs (moves2 passcode) [start]
+        concat $ simple_bfs (moves2 passcode) [start]
 
 puzzle2 :: IO ()
 puzzle2 = print (solve2 input)
