@@ -1,6 +1,8 @@
 module Day17 where
 
 import Utilities
+import Control.Monad
+import Data.Functor
 import Data.Maybe
 import Data.Hash.MD5(md5s, Str(..)) -- from MissingH package
 
@@ -19,14 +21,11 @@ open passcode path = [d | (d, c) <- zip allValues hash, c >= 'b']
 data Position = Pos Int Int
   deriving (Show, Eq, Ord)
 
-when :: Bool -> a -> Maybe a
-when b x = if b then Just x else Nothing
-
 move :: Direction -> Position -> Maybe Position
-move U (Pos x y) = when (y > 0) (Pos x (y-1))
-move D (Pos x y) = when (y < 3) (Pos x (y+1))
-move L (Pos x y) = when (x > 0) (Pos (x-1) y)
-move R (Pos x y) = when (x < 3) (Pos (x+1) y)
+move U (Pos x y) = guard (y > 0) $> Pos x (y-1)
+move D (Pos x y) = guard (y < 3) $> Pos x (y+1)
+move L (Pos x y) = guard (x > 0) $> Pos (x-1) y
+move R (Pos x y) = guard (x < 3) $> Pos (x+1) y
 
 data State = State { position :: Position, history :: Path }
   deriving (Show, Eq, Ord)
@@ -49,7 +48,7 @@ moves2 passcode state
 
 solve :: String -> String
 solve passcode =
-    showPath $ history $ head $ dropWhile (not . finished) $
+    showPath $ history $ head $ filter finished $
         concat $ bfs (moves passcode) [start]
 
 test1 = solve "ihgpwlah"
@@ -58,6 +57,7 @@ test3 = solve "ulqzkmiv"
 
 input = "qljzarfv"
 
+puzzle1 :: IO ()
 puzzle1 = putStrLn (solve input)
 
 test4 = solve2 "ihgpwlah"
@@ -69,4 +69,5 @@ solve2 passcode =
     length $ history $ last $ filter finished $
         concat $ bfs (moves2 passcode) [start]
 
+puzzle2 :: IO ()
 puzzle2 = print (solve2 input)
