@@ -7,7 +7,7 @@ import Data.Maybe
 import Data.Hash.MD5(md5s, Str(..)) -- from MissingH package
 
 data Direction = U | D | L | R
-  deriving (Show, Bounded, Enum, Eq, Ord)
+  deriving (Show, Bounded, Enum)
 type Path = [Direction]
 
 showPath :: Path -> String
@@ -19,22 +19,26 @@ open passcode path = [d | (d, c) <- zip allValues hash, c >= 'b']
     hash = md5s (Str (passcode ++ showPath path))
 
 data Position = Pos Int Int
-  deriving (Show, Eq, Ord)
+  deriving (Show)
+
+x_max, y_max :: Int
+x_max = 3
+y_max = 3
 
 move :: Direction -> Position -> Maybe Position
 move U (Pos x y) = guard (y > 0) $> Pos x (y-1)
-move D (Pos x y) = guard (y < 3) $> Pos x (y+1)
+move D (Pos x y) = guard (y < y_max) $> Pos x (y+1)
 move L (Pos x y) = guard (x > 0) $> Pos (x-1) y
-move R (Pos x y) = guard (x < 3) $> Pos (x+1) y
+move R (Pos x y) = guard (x < x_max) $> Pos (x+1) y
 
 data State = State { position :: Position, history :: Path }
-  deriving (Show, Eq, Ord)
+  deriving (Show)
 
 start :: State
 start = State (Pos 0 0) []
 
 finished :: State -> Bool
-finished (State (Pos x y) _) = x == 3 && y == 3
+finished (State (Pos x y) _) = x == x_max && y == y_max
 
 moves :: String -> State -> [State]
 moves passcode (State pos path) =
@@ -46,7 +50,8 @@ solve passcode =
     showPath $ history $ head $ filter finished $
         concat $ simple_bfs (moves passcode) [start]
 
--- duplicates cannot occur in this application
+-- a simpler version of breadth-first search suffices,
+-- because duplicates cannot occur in this application
 simple_bfs :: (a -> [a]) -> [a] -> [[a]]
 simple_bfs f = takeWhile (not . null) . iterate (concatMap f)
 
@@ -66,14 +71,14 @@ moves2 passcode state
   | finished state = []
   | otherwise = moves passcode state
 
-test4 = solve2 "ihgpwlah"
-test5 = solve2 "kglvqrro"
-test6 = solve2 "ulqzkmiv"
-
 solve2 :: String -> Int
 solve2 passcode =
     length $ history $ last $ filter finished $
         concat $ simple_bfs (moves2 passcode) [start]
+
+test4 = solve2 "ihgpwlah"
+test5 = solve2 "kglvqrro"
+test6 = solve2 "ulqzkmiv"
 
 puzzle2 :: IO ()
 puzzle2 = print (solve2 input)
