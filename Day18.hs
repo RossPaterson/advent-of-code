@@ -1,4 +1,4 @@
-module Day18 where
+module Main where
 
 import Data.Char
 
@@ -31,15 +31,14 @@ test2 = test ".^^.^.^^^^" 10
 solve1 :: Input -> Int
 solve1 = numSafe . take 40 . iterate nextRow
 
-puzzle1 = do
-    s <- readFile "input18.txt"
-    print (solve1 (parse s))
-
 -- Part Two --
 
 solve2 :: Input -> Int
 solve2 = numSafe . take 400000 . iterate nextRow
 
-puzzle2 = do
+main :: IO ()
+main = do
     s <- readFile "input18.txt"
-    print (solve2 (parse s))
+    let input = parse s
+    print (solve1 input)
+    print (solve2 input)

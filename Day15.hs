@@ -1,4 +1,4 @@
-module Day15 where
+module Main where
 
 import Parser
 import Control.Applicative
@@ -58,10 +58,9 @@ addDisc npos pos0 discs = discs ++ [Disc (length discs + 1) npos 0 pos0]
 solve2 :: Input -> Integer
 solve2 = solve1 . addDisc 11 0
 
-puzzle1 = do
+main :: IO ()
+main = do
     s <- readFile "input15.txt"
-    print (solve1 (parse s))
-
-puzzle2 = do
-    s <- readFile "input15.txt"
-    print (solve2 (parse s))
+    let input = parse s
+    print (solve1 input)
+    print (solve2 input)

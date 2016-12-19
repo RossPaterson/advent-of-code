@@ -1,4 +1,4 @@
-module Day16 where
+module Main where
 
 import Utilities
 
@@ -40,8 +40,7 @@ solve size = bitsToString .
 input :: String
 input = "01111010110010011"
 
-puzzle1 :: IO ()
-puzzle1 = putStrLn (solve 272 input)
-
-puzzle2 :: IO ()
-puzzle2 = putStrLn (solve 35651584 input)
+main :: IO ()
+main = do
+    putStrLn (solve 272 input)
+    putStrLn (solve 35651584 input)

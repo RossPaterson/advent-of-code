@@ -1,4 +1,4 @@
-module Day11 where
+module Main where
 
 import Utilities
 import Data.List
@@ -130,8 +130,7 @@ initInput = [
     -- The fourth floor contains nothing relevant.
     []]
 
-puzzle1 :: IO ()
-puzzle1 = print (solve initInput)
+-- Part Two --
 
 initInput2 :: Input
 initInput2 = (extras++floor1):rest
@@ -143,5 +142,7 @@ initInput2 = (extras++floor1):rest
     -- A dilithium-compatible microchip
     extras = [Gen "elerium", Chip "elerium", Gen "dilithium", Chip "dilithium"]
 
-puzzle2 :: IO ()
-puzzle2 = print (solve initInput2)
+main :: IO ()
+main = do
+    print (solve initInput)
+    print (solve initInput2)

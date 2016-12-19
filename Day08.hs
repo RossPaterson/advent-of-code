@@ -1,4 +1,4 @@
-module Day08 where
+module Main where
 
 import Parser
 import Control.Applicative
@@ -70,10 +70,9 @@ test = "rect 3x2\nrotate column x=1 by 1\nrotate row y=0 by 4\nrotate column x=1
 solve2 :: Input -> String
 solve2 = showScreen . foldl apply blankScreen
 
-puzzle1 = do
+main :: IO ()
+main = do
     s <- readFile "input08.txt"
-    print (solve1 (parse s))
-
-puzzle2 = do
-    s <- readFile "input08.txt"
-    putStr (solve2 (parse s))
+    let input = parse s
+    print (solve1 input)
+    putStr (solve2 input)

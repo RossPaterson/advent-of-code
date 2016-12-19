@@ -1,4 +1,4 @@
-module Day01 where
+module Main where
 
 import Parser
 import Control.Applicative
@@ -88,10 +88,9 @@ test2 = solve1 (parse "R2, R2, R2")
 test3 = solve1 (parse "R5, L5, R5, R3")
 test4 = solve2 (parse "R8, R4, R4, R8")
 
-puzzle1 = do
+main :: IO ()
+main = do
     s <- readFile "input01.txt"
-    print (solve1 (parse s))
-
-puzzle2 = do
-    s <- readFile "input01.txt"
-    print (solve2 (parse s))
+    let input = parse s
+    print (solve1 input)
+    print (solve2 input)

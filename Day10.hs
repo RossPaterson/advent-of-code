@@ -1,4 +1,4 @@
-module Day10 where
+module Main where
 
 import Parser
 import Utilities
@@ -90,10 +90,9 @@ solve2 instrs = product [head (output!i) | i <- [0,1,2]]
   where
     output = out (finalState instrs)
 
-puzzle1 = do
+main :: IO ()
+main = do
     s <- readFile "input10.txt"
-    print (solve1 (parse s))
-
-puzzle2 = do
-    s <- readFile "input10.txt"
-    print (solve2 (parse s))
+    let input = parse s
+    print (solve1 input)
+    print (solve2 input)

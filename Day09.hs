@@ -1,4 +1,4 @@
-module Day09 where
+module Main where
 
 import Parser
 import Control.Applicative
@@ -6,6 +6,9 @@ import Data.Char
 
 data Element = Single Char | Repeat Int String
 type Input = [Element]
+
+parse :: String -> Input
+parse = parseString . filter (not . isSpace)
 
 parseString :: String -> Input
 parseString = runParser $ many (marker <|> single)
@@ -26,8 +29,8 @@ expand = concatMap expandElement
     expandElement (Single c) = [c]
     expandElement (Repeat n s) = concat (replicate n s)
 
-solve1 :: String -> Int
-solve1 = length . expand . parseString . filter (not . isSpace)
+solve1 :: Input -> Int
+solve1 = length . expand
 
 tests = ["ADVENT", "A(1x5)BC", "(3x3)XYZ", "A(2x2)BCD(2x2)EFG", "(6x1)(1x3)A", "X(8x2)(3x3)ABCY"]
 
@@ -39,15 +42,14 @@ expand2 = sum . map expandElement
     expandElement (Single c) = 1
     expandElement (Repeat n s) = n * expand2 (parseString s)
 
-solve2 :: String -> Int
-solve2 = expand2 . parseString . filter (not . isSpace)
+solve2 :: Input -> Int
+solve2 = expand2
 
 tests2 = ["(3x3)XYZ", "X(8x2)(3x3)ABCY", "(27x12)(20x12)(13x14)(7x10)(1x12)A", "(25x3)(3x3)ABC(2x3)XY(5x2)PQRSTX(18x9)(3x2)TWO(5x7)SEVEN"]
 
-puzzle1 = do
+main :: IO ()
+main = do
     s <- readFile "input09.txt"
-    print (solve1 s)
-
-puzzle2 = do
-    s <- readFile "input09.txt"
-    print (solve2 s)
+    let input = parse s
+    print (solve1 input)
+    print (solve2 input)

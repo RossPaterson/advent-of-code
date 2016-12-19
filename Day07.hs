@@ -1,4 +1,4 @@
-module Day07 where
+module Main where
 
 import Parser
 import Control.Applicative
@@ -59,10 +59,9 @@ solve2 = length . filter supportsSSL
 
 test2 = ["aba[bab]xyz", "xyx[xyx]xyx", "aaa[kek]eke", "zazbz[bzb]cdb"]
 
-puzzle1 = do
+main :: IO ()
+main = do
     s <- readFile "input07.txt"
-    print (solve1 (parse s))
-
-puzzle2 = do
-    s <- readFile "input07.txt"
-    print (solve2 (parse s))
+    let input = parse s
+    print (solve1 input)
+    print (solve2 input)

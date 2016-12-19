@@ -1,4 +1,4 @@
-module Day06 where
+module Main where
 
 import Utilities
 import Data.List
@@ -13,10 +13,9 @@ solve2 = map (last . mostCommon) . transpose
 
 test1 = "eedadn\ndrvtee\neandsr\nraavrd\natevrs\ntsrnev\nsdttsa\nrasrtv\nnssdts\nntnada\nsvetve\ntesnvt\nvntsnd\nvrdear\ndvrsen\nenarar\n"
 
-puzzle1 = do
+main :: IO ()
+main = do
     s <- readFile "input06.txt"
-    putStrLn (solve1 (lines s))
-
-puzzle2 = do
-    s <- readFile "input06.txt"
-    putStrLn (solve2 (lines s))
+    let input = lines s
+    putStrLn (solve1 input)
+    putStrLn (solve2 input)

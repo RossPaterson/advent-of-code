@@ -1,4 +1,4 @@
-module Day17 where
+module Main where
 
 import Utilities
 import Control.Monad
@@ -61,9 +61,6 @@ test3 = solve "ulqzkmiv"
 
 input = "qljzarfv"
 
-puzzle1 :: IO ()
-puzzle1 = putStrLn (solve input)
-
 -- Part Two
 
 moves2 :: String -> State -> [State]
@@ -80,5 +77,7 @@ test4 = solve2 "ihgpwlah"
 test5 = solve2 "kglvqrro"
 test6 = solve2 "ulqzkmiv"
 
-puzzle2 :: IO ()
-puzzle2 = print (solve2 input)
+main :: IO ()
+main = do
+    putStrLn (solve input)
+    print (solve2 input)

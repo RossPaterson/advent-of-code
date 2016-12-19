@@ -1,4 +1,4 @@
-module Day13 where
+module Main where
 
 import Utilities
 import Data.Bits
@@ -29,8 +29,13 @@ test = print (solve 10 (7, 4))
 input :: Int
 input = 1362
 
-puzzle1 :: IO ()
-puzzle1 = print (solve input (31, 39))
+-- Part Two
 
-puzzle2 :: IO ()
-puzzle2 = print $ sum $ map length $ take 51 $ bfs (neighbours input) [start]
+solve2 :: Int -> Int -> Int
+solve2 magic depth =
+    sum $ map length $ take (depth+1) $ bfs (neighbours magic) [start]
+
+main :: IO ()
+main = do
+    print (solve input (31, 39))
+    print (solve2 input 50)

@@ -1,4 +1,4 @@
-module Day04 where
+module Main where
 
 import Parser
 import Utilities
@@ -37,13 +37,12 @@ shiftLetter n c = chr ((ord c - ord 'a' + n) `mod` 26 + ord 'a')
 decrypt :: Room -> String
 decrypt (Room ns s c) = unwords (map (map (shiftLetter s)) ns)
 
-puzzle1 = do
-    s <- readFile "input04.txt"
-    print (solve1 (parse s))
-
-puzzle2 = do
-    s <- readFile "input04.txt"
-    print (solve2 (parse s))
-
 test1 = "aaaaa-bbb-z-y-x-123[abxyz]\na-b-c-d-e-f-g-h-987[abcde]\nnot-a-real-room-404[oarel]\ntotally-real-room-200[decoy]"
 test2 = Room ["qzmt", "zixmtkozy", "ivhz"] 343 ""
+
+main :: IO ()
+main = do
+    s <- readFile "input04.txt"
+    let input = parse s
+    print (solve1 input)
+    print (solve2 input)

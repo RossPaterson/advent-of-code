@@ -1,4 +1,4 @@
-module Day02 where
+module Main where
 
 import Data.Char
 
@@ -71,10 +71,9 @@ solve2 = map code2 . tail . scanl addLine2 start2
 
 example = "ULL\nRRDDD\nLURDL\nUUUUD\n"
 
-puzzle1 = do
+main :: IO ()
+main = do
     s <- readFile "input02.txt"
-    putStrLn (solve1 (parse s))
-
-puzzle2 = do
-    s <- readFile "input02.txt"
-    putStrLn (solve2 (parse s))
+    let input = parse s
+    putStrLn (solve1 input)
+    putStrLn (solve2 input)

@@ -1,4 +1,4 @@
-module Day19 where
+module Main where
 
 import Data.Sequence (Seq, ViewL(..), ViewR(..), (|>), (><))
 import qualified Data.Sequence as Seq
@@ -37,6 +37,7 @@ solve2 = play2 . initState
 input :: Int
 input = 3017957
 
-puzzle1 = print (solve1 input)
-
-puzzle2 = print (solve2 input)
+main :: IO ()
+main = do
+    print (solve1 input)
+    print (solve2 input)

@@ -1,4 +1,4 @@
-module Day03 where
+module Main where
 
 import Parser
 import Utilities
@@ -23,10 +23,6 @@ solve1 = length . filter isTriangle
 
 test1 = isTriangle [5, 10, 25]
 
-puzzle1 = do
-    s <- readFile "input03.txt"
-    print (solve1 (parse s))
-
 -- Part Two --
 
 verticalTriples :: Input -> Input
@@ -37,6 +33,9 @@ solve2 = solve1 . verticalTriples
 
 test2 = verticalTriples (parse "101 301 501\n102 302 502\n103 303 503\n201 401 601\n202 402 602\n203 403 603\n")
 
-puzzle2 = do
+main :: IO ()
+main = do
     s <- readFile "input03.txt"
-    print (solve2 (parse s))
+    let input = parse s
+    print (solve1 input)
+    print (solve2 input)

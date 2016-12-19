@@ -1,4 +1,4 @@
-module Day14 where
+module Main where
 
 import Utilities
 import Data.List
@@ -25,13 +25,14 @@ keys salt hash = [(n, s) |
 
 test1 = take 64 (keys "abc" hash1)
 
-puzzle1 :: IO ()
-puzzle1 = print (fst (keys salt hash1!!63))
+-- Part Two
 
 hash2  :: String -> String
 hash2 = times 2017 hash1
 
 test2 = take 64 (keys "abc" hash2)
 
-puzzle2 :: IO ()
-puzzle2 = print (fst (keys salt hash2!!63))
+main :: IO ()
+main = do
+    print (fst (keys salt hash1!!63))
+    print (fst (keys salt hash2!!63))

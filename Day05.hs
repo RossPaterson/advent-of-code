@@ -1,4 +1,4 @@
-module Day05 where
+module Main where
 
 import Data.Char
 import Data.Map hiding (map, foldl)
@@ -14,7 +14,10 @@ decode :: String -> String
 decode s = take 8 (map head (matches s))
 
 test = decode "abc"
-puzzle1 = decode "ojvtpuvg"
+
+input = "ojvtpuvg"
+
+-- Part Two
 
 decode2 :: String -> String
 decode2 s = elems $ head $ dropWhile ((< 8) . size) $ scanl add empty $ matches s
@@ -29,4 +32,8 @@ add m (pos:c:_)
     i = ord pos - ord '0'
 
 test2 = decode2 "abc"
-puzzle2 = decode2 "ojvtpuvg"
+
+main :: IO ()
+main = do
+    putStrLn (decode input)
+    putStrLn (decode2 input)
