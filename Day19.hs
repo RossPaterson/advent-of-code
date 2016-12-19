@@ -1,6 +1,6 @@
 module Day19 where
 
-import Data.Sequence (Seq, ViewL(..), (|>), (><))
+import Data.Sequence (Seq, ViewL(..), ViewR(..), (|>), (><))
 import qualified Data.Sequence as Seq
 
 -- original positions only -- number of presents is unused
@@ -24,12 +24,12 @@ solve1 = play . initState
 play2 :: State -> Int
 play2 elves = case Seq.viewl elves of
     EmptyL -> error "empty list"
-    e :< elves' -> case Seq.viewl right of
-        EmptyL -> e
-        _ :< right' -> play2 ((left >< right') |> e)
+    e :< elves' -> case Seq.viewr left of
+        EmptyR -> e
+        left' :> _ -> play2 ((left' >< right) |> e)
       where
         n = Seq.length elves'
-        (left, right) = Seq.splitAt ((n-1) `div` 2) elves'
+        (left, right) = Seq.splitAt ((n+1) `div` 2) elves'
 
 solve2 :: Int -> Int
 solve2 = play2 . initState
