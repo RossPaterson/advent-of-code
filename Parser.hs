@@ -58,10 +58,10 @@ anyChar :: Parser Char
 anyChar = satisfy (const True)
 
 -- non-negative integer
-nat :: Parser Int
-nat = read <$> some digit
+nat :: Integral a => Parser a
+nat = (fromInteger . read) <$> some digit
 
-int :: Parser Int
+int :: Integral a => Parser a
 int = negate <$ char '-' <*> nat <|> nat
 
 string :: String -> Parser String
