@@ -12,7 +12,7 @@ parse :: String -> Input
 parse = map getRange . lines
 
 getRange :: String -> Range
-getRange = runParser $ Range <$> nat <* char '-' <*> nat
+getRange = runParser $ Range <$> natural <* char '-' <*> natural
 
 -- given ranges in order, merge overlapping and contiguous ranges
 mergeRanges :: [Range] -> [Range]

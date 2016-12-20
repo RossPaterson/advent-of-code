@@ -4,6 +4,7 @@ module Parser where
 import Control.Applicative
 import Data.Char
 import Data.List
+import Data.Traversable
 
 newtype Parser a = Parser (ReadS a)
 
@@ -30,11 +31,7 @@ runParser (Parser p) s = case [x | (x, t) <- p s, null t] of
     [x] -> x
     _ -> error ("ambiguous parse: " ++ show s)
 
-count :: Int -> Parser a -> Parser [a]
-count n p = sequence (replicate n p)
-
-sepBy1 :: Parser a -> Parser sep -> Parser [a]
-sepBy1 p sep = (:) <$> p <*> many (sep *> p)
+-- specialized parsers
 
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy p = Parser satisfyP
@@ -58,11 +55,17 @@ anyChar :: Parser Char
 anyChar = satisfy (const True)
 
 -- non-negative integer
-nat :: Integral a => Parser a
-nat = (fromInteger . read) <$> some digit
+natural :: Parser Integer
+natural = read <$> some digit
 
-int :: Integral a => Parser a
-int = negate <$ char '-' <*> nat <|> nat
+integer :: Parser Integer
+integer = negate <$ char '-' <*> natural <|> natural
+
+nat :: Parser Int
+nat = fromInteger <$> natural
+
+int :: Parser Int
+int = fromInteger <$> integer
 
 string :: String -> Parser String
 string str = Parser matchStr
@@ -70,3 +73,11 @@ string str = Parser matchStr
     matchStr t
       | str `isPrefixOf` t = [(str, drop (length str) t)]
       | otherwise = []
+
+-- general combinators
+
+count :: Applicative p => Int -> p a -> p [a]
+count n p = sequenceA (replicate n p)
+
+sepBy1 :: Alternative p => p a -> p sep -> p [a]
+sepBy1 p sep = (:) <$> p <*> many (sep *> p)

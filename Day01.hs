@@ -35,8 +35,10 @@ data Move = Move Turn Int
 type Input = [Move]
 
 parse :: String -> Input
-parse = runParser $ move `sepBy1` (char ',' <* many space) <* many space
-  where move = Move <$> (char 'L' *> pure L <|> char 'R' *> pure R) <*> nat
+parse = runParser moves
+  where
+    moves = move `sepBy1` (char ',' <* many space) <* many space
+    move = Move <$> (char 'L' *> pure L <|> char 'R' *> pure R) <*> nat
 
 start :: State
 start = State { orientation = north, position = origin }

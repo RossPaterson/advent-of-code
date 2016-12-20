@@ -30,7 +30,7 @@ getInstruction = runParser $
     Decr <$ string "dec " <*> reg <|>
     JNZ <$ string "jnz " <*> value <* char ' ' <*> int
   where
-    value = (Value . fromIntegral) <$> int <|> Reg <$> reg
+    value = Value <$> integer <|> Reg <$> reg
     reg = A <$ char 'a' <|> B <$ char 'b' <|> C <$ char 'c' <|> D <$ char 'd'
 
 type Registers = Map Reg Integer
