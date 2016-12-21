@@ -19,12 +19,9 @@ data Output = Bot Bot | Output Bin
 type Input = [Instruction]
 
 parse :: String -> Input
-parse = map getInstruction . lines
-
-getInstruction :: String -> Instruction
-getInstruction = runParser $
-    initInstr <|> distInstr
+parse = map (runParser instruction) . lines
   where
+    instruction = initInstr <|> distInstr
     initInstr = Input <$ string "value " <*> nat <* string " goes to " <*> output
     distInstr = Distribute <$ string "bot " <*> nat <* string " gives low to " <*> output <* string " and high to " <*> output
     output =

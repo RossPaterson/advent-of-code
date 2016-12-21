@@ -14,11 +14,11 @@ data Disc = Disc {
 type Input = [Disc]
 
 parse :: String -> Input
-parse = map getDisc . lines
-
-getDisc :: String -> Disc
-getDisc = runParser $
-    Disc <$ string "Disc #" <*> nat <* string " has " <*> nat <* string " positions; at time=" <*> nat <* string ", it is at position " <*> nat <* string "."
+parse = map (runParser disc) . lines
+  where
+    disc = Disc <$ string "Disc #" <*> nat <* string " has " <*> nat
+        <* string " positions; at time=" <*> nat <*
+        string ", it is at position " <*> nat <* string "."
 
 -- position of disc when capsule released at time t arrives
 position :: Int -> Disc -> Int

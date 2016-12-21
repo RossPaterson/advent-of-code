@@ -9,10 +9,9 @@ data Range = Range { low :: Integer, high :: Integer }
 type Input = [Range]
 
 parse :: String -> Input
-parse = map getRange . lines
-
-getRange :: String -> Range
-getRange = runParser $ Range <$> natural <* char '-' <*> natural
+parse = map (runParser range) . lines
+  where
+    range = Range <$> natural <* char '-' <*> natural
 
 -- given ranges in order, merge overlapping and contiguous ranges
 mergeRanges :: [Range] -> [Range]

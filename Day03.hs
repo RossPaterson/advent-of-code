@@ -9,10 +9,9 @@ type Triple = [Int]
 type Input = [Triple]
 
 parse :: String -> Input
-parse = map getTriple . lines
-
-getTriple :: String -> Triple
-getTriple = runParser $ many space *> nat `sepBy1` some space
+parse = map (runParser triple) . lines
+  where
+    triple = many space *> nat `sepBy1` some space
 
 isTriangle :: [Int] -> Bool
 isTriangle [x, y, z] = x+y > z && y+z > x && z+x > y

@@ -11,8 +11,9 @@ parse :: String -> Input
 parse = parseString . filter (not . isSpace)
 
 parseString :: String -> Input
-parseString = runParser $ many (marker <|> single)
+parseString = runParser elements
   where
+    elements = many (marker <|> single)
     marker = do
         char '('
         len <- nat

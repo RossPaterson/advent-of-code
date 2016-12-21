@@ -21,15 +21,13 @@ type CodeAddr = Int
 type Input = Map CodeAddr Instruction
 
 parse :: String -> Input
-parse = Map.fromList . zip [0..] . map getInstruction . lines
-
-getInstruction :: String -> Instruction
-getInstruction = runParser $
-    Copy <$ string "cpy " <*> value <* char ' ' <*> reg <|>
-    Incr <$ string "inc " <*> reg <|>
-    Decr <$ string "dec " <*> reg <|>
-    JNZ <$ string "jnz " <*> value <* char ' ' <*> int
+parse = Map.fromList . zip [0..] . map (runParser instruction) . lines
   where
+    instruction =
+        Copy <$ string "cpy " <*> value <* char ' ' <*> reg <|>
+        Incr <$ string "inc " <*> reg <|>
+        Decr <$ string "dec " <*> reg <|>
+        JNZ <$ string "jnz " <*> value <* char ' ' <*> int
     value = Value <$> integer <|> Reg <$> reg
     reg = A <$ char 'a' <|> B <$ char 'b' <|> C <$ char 'c' <|> D <$ char 'd'
 

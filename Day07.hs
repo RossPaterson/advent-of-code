@@ -10,11 +10,9 @@ data Address = Address String [(String, String)]
 type Input = [Address]
 
 parse :: String -> Input
-parse = map getAddress . lines
-
-getAddress :: String -> Address
-getAddress = runParser $ Address <$> word <*> many ((,) <$> hyperword <*> word)
+parse = map (runParser address) . lines
   where
+    address = Address <$> word <*> many ((,) <$> hyperword <*> word)
     hyperword = char '[' *> word <* char ']'
     word = many (satisfy (\ c -> c /= '[' && c /= ']'))
 

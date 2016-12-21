@@ -21,13 +21,12 @@ data Operation
 type Input = [Operation]
 
 parse :: String -> Input
-parse = map getOperation . lines
-
-getOperation :: String -> Operation
-getOperation = runParser $
-    Rect <$ string "rect " <*> nat <* char 'x' <*> nat <|>
-    RotateRow <$ string "rotate row y=" <*> nat <* string " by " <*> nat <|>
-    RotateColumn <$ string "rotate column x=" <*> nat <* string " by " <*> nat
+parse = map (runParser operation) . lines
+  where
+    operation =
+        Rect <$ string "rect " <*> nat <* char 'x' <*> nat <|>
+        RotateRow <$ string "rotate row y=" <*> nat <* string " by " <*> nat <|>
+        RotateColumn <$ string "rotate column x=" <*> nat <* string " by " <*> nat
 
 screen :: Int -> Int -> Screen
 screen w h = Screen (replicate h (replicate w False))

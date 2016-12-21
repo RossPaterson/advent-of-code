@@ -10,12 +10,11 @@ data Room = Room { name :: [String], sector :: Int, checksum :: String }
 type Input = [Room]
 
 parse :: String -> Input
-parse = map getRoom . lines
-
-getRoom :: String -> Room
-getRoom = runParser $ Room <$>
-    (some letter `sepBy1` char '-')
-    <* char '-' <*> nat <* char '[' <*> some letter <* char ']'
+parse = map (runParser room) . lines
+  where
+    room = Room <$>
+        (some letter `sepBy1` char '-')
+        <* char '-' <*> nat <* char '[' <*> some letter <* char ']'
 
 solve1 :: Input -> Int
 solve1 = sum . map sector . filter real_room
