@@ -12,13 +12,11 @@ type Offset = Int
 data Value = Value Int | Reg Reg
   deriving Show
 data Instruction
-    = Copy Value Reg
-    | Incr Reg
-    | Decr Reg
+    = Copy Value Value
+    | Incr Value
+    | Decr Value
     | JNZ Value Value
     | Toggle Value
-    | BadIncr Int
-    | BadCopy Value Int
   deriving Show
 type CodeAddr = Int
 type Code = Map CodeAddr Instruction
@@ -28,24 +26,20 @@ parse :: String -> Input
 parse = Map.fromList . zip [0..] . map (runParser instruction) . lines
   where
     instruction =
-        Copy <$ string "cpy " <*> value <* char ' ' <*> reg <|>
-        Incr <$ string "inc " <*> reg <|>
-        Decr <$ string "dec " <*> reg <|>
+        Copy <$ string "cpy " <*> value <* char ' ' <*> value <|>
+        Incr <$ string "inc " <*> value <|>
+        Decr <$ string "dec " <*> value <|>
         JNZ <$ string "jnz " <*> value <* char ' ' <*> value <|>
         Toggle <$ string "tgl " <*> value
     value = Value <$> int <|> Reg <$> reg
     reg = A <$ char 'a' <|> B <$ char 'b' <|> C <$ char 'c' <|> D <$ char 'd'
 
 toggle :: Instruction -> Instruction
-toggle (Copy val r) = JNZ val (Reg r)
-toggle (Incr r) = Decr r
-toggle (Decr r) = Incr r
-toggle (JNZ val (Reg r)) = Copy val r
-toggle (JNZ val (Value i)) = BadCopy val i
-toggle (Toggle (Reg r)) = Incr r
-toggle (Toggle (Value i)) = BadIncr i
-toggle (BadIncr i) = BadIncr i
-toggle (BadCopy val i) = JNZ val (Value i)
+toggle (Copy src dest) = JNZ src dest
+toggle (Incr v) = Decr v
+toggle (Decr v) = Incr v
+toggle (JNZ val off) = Copy val off
+toggle (Toggle off) = Incr off
 
 type Registers = Map Reg Int
 data State = State CodeAddr Registers Code
@@ -65,11 +59,11 @@ fetch :: State -> Maybe Instruction
 fetch (State pc regs code) = Map.lookup pc code
 
 execute :: Instruction -> State -> State
-execute (Copy val r) (State pc regs code) =
+execute (Copy val (Reg r)) (State pc regs code) =
     State (pc+1) (Map.insert r (value val regs) regs) code
-execute (Incr r) (State pc regs code) =
+execute (Incr (Reg r)) (State pc regs code) =
     State (pc+1) (Map.adjust (+1) r regs) code
-execute (Decr r) (State pc regs code) =
+execute (Decr (Reg r)) (State pc regs code) =
     State (pc+1) (Map.adjust (subtract 1) r regs) code
 execute (JNZ val addr) (State pc regs code)
   | value val regs /= 0 = State (pc+offset) regs code
@@ -80,10 +74,7 @@ execute (Toggle addr) (State pc regs code) =
     State (pc+1) regs (Map.adjust toggle (pc+offset) code)
   where
     offset = value addr regs
-execute (BadIncr i) (State pc regs code) =
-    State (pc+1) regs code
-execute (BadCopy val i) (State pc regs code) =
-    State (pc+1) regs code
+execute _ (State pc regs code) = State (pc+1) regs code
 
 run :: State -> Registers
 run s0 = regs
