@@ -63,8 +63,7 @@ solve1 m = minimum (map cost (permutations other_ns))
 solve2 :: Input -> Int
 solve2 m = minimum (map cost (permutations other_ns))
   where
-    cost path = sum [g!e | e <- zip (startNode:path) path] +
-        g!(last path, startNode)
+    cost path = sum [g!e | e <- zip (startNode:path) (path ++ [startNode])]
     other_ns = filter (/= startNode) (nodes m)
     g = mkGraph m
 
