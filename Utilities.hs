@@ -53,7 +53,9 @@ bfs :: Ord a => (a -> [a]) -> [a] -> [[a]]
 bfs f = takeWhile (not . null) . map fst . iterate step . new_level Set.empty
   where
     step (xs, seen) = new_level seen (concatMap f xs)
-    new_level seen = foldr add ([], seen)
-    add x (xs, seen)
-      | Set.member x seen = (xs, seen)
-      | otherwise = (x:xs, Set.insert x seen)
+    new_level seen [] = ([], seen)
+    new_level seen (x:xs)
+      | Set.member x seen = new_level seen xs
+      | otherwise = (x:ys, seen')
+      where
+        (ys, seen') = new_level (Set.insert x seen) xs
