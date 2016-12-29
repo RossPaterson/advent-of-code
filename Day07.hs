@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveFunctor #-}
 module Main where
 
 import Parser
@@ -8,14 +9,8 @@ import Data.Word
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
 
-data Value a
-    = Literal Word16
-    | Wire a
-  deriving Show
-
-instance Functor Value where
-    fmap f (Literal i) = Literal i
-    fmap f (Wire x) = Wire (f x)
+data Value a = Literal Word16 | Wire a
+  deriving (Show, Functor)
 
 data Gate a
     = COPY (Value a)
@@ -24,15 +19,7 @@ data Gate a
     | LSHIFT (Value a) Int
     | RSHIFT (Value a) Int
     | NOT (Value a)
-  deriving Show
-
-instance Functor Gate where
-    fmap f (COPY i) = COPY (fmap f i)
-    fmap f (AND x y) = AND (fmap f x) (fmap f y)
-    fmap f (OR x y) = OR (fmap f x) (fmap f y)
-    fmap f (LSHIFT x k) = LSHIFT (fmap f x) k
-    fmap f (RSHIFT x k) = RSHIFT (fmap f x) k
-    fmap f (NOT x) = NOT (fmap f x)
+  deriving (Show, Functor)
 
 type Wire = String
 type Instruction = (Wire, Gate Wire)
@@ -52,10 +39,9 @@ parse = map (runParser instruction) . lines
     value = (Literal . fromIntegral) <$> nat <|> Wire <$> wire
     wire = some (satisfy isLower)
 
-evalCircuit :: Input -> Map Wire Word16
-evalCircuit instrs = values
-  where
-    values = Map.fromList [(w, eval (fmap (values!) g)) | (w, g) <- instrs]
+evalCircuit :: Input -> Map Wire Word16 -> Map Wire Word16
+evalCircuit instrs values =
+    Map.fromList [(w, eval (fmap (values!) g)) | (w, g) <- instrs]
 
 eval :: Gate Word16 -> Word16
 eval (COPY i) = evalValue i
@@ -69,8 +55,10 @@ evalValue :: Value Word16 -> Word16
 evalValue (Literal i) = i
 evalValue (Wire v) = v
 
-solve1 :: Input -> Int
-solve1 instrs = fromIntegral (evalCircuit instrs ! "a")
+solve1 :: Input -> Word16
+solve1 instrs = values!"a"
+  where -- memoize the value map
+    values = evalCircuit instrs values
 
 test =
     "123 -> x\n\
@@ -84,10 +72,10 @@ test =
 
 -- Part Two --
 
-solve2 :: Input -> Int
-solve2 instrs = solve1 [(w, if w == "b" then b else v) | (w, v) <- instrs]
+solve2 :: Input -> Word16
+solve2 instrs = values!"a"
   where
-    b = COPY (Literal (fromIntegral (solve1 instrs)))
+    values = Map.insert "b" (solve1 instrs) (evalCircuit instrs values)
 
 main :: IO ()
 main = do
