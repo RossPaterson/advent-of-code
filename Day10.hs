@@ -2,20 +2,24 @@ module Main where
 
 import Data.List
 
-look_and_say :: String -> String
-look_and_say s = concat [show (length g) ++ [head g] | g <- group s]
+-- look-and-say sequence (John Conway)
+look_and_say :: String -> [String]
+look_and_say = iterate count
+  where
+    count s = concat [show (length g) ++ [head g] | g <- group s]
 
-test = take 6 (iterate look_and_say "1")
+-- A005150 in OEIS
+test = take 6 (look_and_say "1")
 
 input = "1321131112"
 
 solve1 :: String -> Int
-solve1 s = length (iterate look_and_say s!!40)
+solve1 s = length (look_and_say s!!40)
 
 -- Part Two --
 
 solve2 :: String -> Int
-solve2 s = length (iterate look_and_say s!!50)
+solve2 s = length (look_and_say s!!50)
 
 main :: IO ()
 main = do
