@@ -41,9 +41,10 @@ choose n (x:xs) =
     [(x:ys, rest) | (ys, rest) <- choose (n-1) xs] ++
     [(ys, x:rest) | (ys, rest) <- choose n xs]
 
--- eliminate adjacent repetitions
-uniq :: Eq a => [a] -> [a]
-uniq = map head . group
+-- sort and eliminate repetitions
+-- O(n log(m)) where m is the number of unique elements
+fast_nub :: Ord a => [a] -> [a]
+fast_nub = Set.toList . Set.fromList
 
 -- breadth-first search
 -- bfs f xs!!k contains all the unique values reachable from xs via f
