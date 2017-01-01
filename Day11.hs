@@ -73,7 +73,7 @@ safeFloor (gens, chips) = null gens || null (chips \\ gens)
 
 moves :: State -> [State]
 moves (State elev gcs) =
-    uniq $ sort [State elev' (floorsToElements floors') |
+    [State elev' (floorsToElements floors') |
         (carry, rest) <- choose12 this, safeFloor rest,
         (elev', floors') <-
            [(elev+1, below ++ rest:above') | above' <- move_to carry above] ++
