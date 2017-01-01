@@ -29,17 +29,20 @@ happiness :: Input -> Person -> Person -> Int
 happiness m a b =
     fromMaybe 0 (Map.lookup (a, b) m) + fromMaybe 0 (Map.lookup (b, a) m)
 
-total_happiness :: Input -> [Person] -> Int
-total_happiness m [] = 0
-total_happiness m (p:ps) = sum (zipWith (happiness m) (p:ps) (ps++[p]))
+-- fix the first one, since rotations make no difference
+happiest :: Input -> [Person] -> Int
+happiest m [] = 0
+happiest m (p:rest) =
+    maximum [sum (zipWith (happiness m) (p:ps) (ps++[p])) |
+        ps <- permutations rest]
 
 solve1 :: Input -> Int
-solve1 m = maximum [total_happiness m ps | ps <- permutations (guests m)]
+solve1 m = happiest m (guests m)
 
 -- Part Two --
 
 solve2 :: Input -> Int
-solve2 m = maximum [total_happiness m ps | ps <- permutations ("":guests m)]
+solve2 m = happiest m ("":guests m)
 
 main :: IO ()
 main = do
