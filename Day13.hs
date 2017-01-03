@@ -1,13 +1,12 @@
 module Main where
 
+import Utilities
 import Parser
 import Control.Applicative
 import Data.List
 import Data.Maybe
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Set (Set)
-import qualified Data.Set as Set
 
 type Person = String
 type Input = Map (Person, Person) Int
@@ -23,7 +22,7 @@ parse = Map.fromList . map (runParser statement) . lines
     assoc p1 g p2 = ((p1, p2), g)
 
 guests :: Input -> [Person]
-guests = Set.toList . Set.fromList . map snd . Map.keys
+guests = fast_nub . map snd . Map.keys
 
 happiness :: Input -> Person -> Person -> Int
 happiness m a b =

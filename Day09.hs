@@ -1,11 +1,10 @@
 module Main where
 
+import Utilities
 import Parser
 import Control.Applicative
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Set (Set)
-import qualified Data.Set as Set
 import Data.Char
 import Data.List
 import Data.Maybe
@@ -25,8 +24,7 @@ getDist m src dest =
     fromMaybe maxBound (Map.lookup (src, dest) m <|> Map.lookup (dest, src) m)
 
 nodes :: Input -> [Node]
-nodes m = Set.toList $ Set.fromList $
-    concat [[src, dest] | (src, dest) <- Map.keys m]
+nodes m = fast_nub $ concat [[src, dest] | (src, dest) <- Map.keys m]
 
 solve1 :: Input -> Int
 solve1 m =

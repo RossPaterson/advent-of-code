@@ -1,11 +1,11 @@
 module Main where
 
+import Utilities
 import Parser
 import Control.Applicative
 import Data.Char
 import Data.List
 import Data.Maybe
-import qualified Data.Set as Set
 
 type Element = String
 type Molecule = [Element]
@@ -27,7 +27,7 @@ parse s = Input
     ls = lines s
 
 replacements :: Input -> [Molecule]
-replacements (Input rules es) = Set.toList $ Set.fromList $
+replacements (Input rules es) = fast_nub $
     [front ++ repl ++ back |
         (front, e:back) <- zip (inits es) (tails es),
         (r :=> repl) <- rules, r == e]
