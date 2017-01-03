@@ -1,8 +1,8 @@
 module Main where
 
+import Utilities
 import Parser
 import Control.Applicative
-import Data.List
 import Data.Ord
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -48,10 +48,9 @@ test =
 
 winners :: Time -> Input ->  Map Name Int
 winners t ps =
-    Map.fromList $ map (unit . fst) $ head $ groupBy sameDist $
-        sortOn (Down . snd) [(n, distance p t) | p@(Performance n _ _ _) <- ps]
+    Map.fromList $ map (unit . fst) $ leastBy (Down . snd) $
+        [(n, distance p t) | p@(Performance n _ _ _) <- ps]
   where
-    sameDist (_, d1) (_, d2) = d1 == d2
     unit x = (x, 1)
 
 points :: Time -> Input ->  Map Name Int
