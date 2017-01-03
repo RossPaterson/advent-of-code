@@ -78,6 +78,24 @@ test =
 solve2 :: Input -> Int
 solve2 code = run code (Map.insert A 1 zeroRegisters) ! B
 
+{-
+The input code is equivalent to:
+
+    if (a != 1)
+        a = 19683*a + 26623
+    else
+        a = 31911
+    while (a != 0)
+        b++
+        if (a%2 == 1)
+            a = 3*a + 1
+        else
+            a = a/2
+
+The latter part computes the number of steps in the 3x+1 or Collatz problem
+(OEIS A006577).
+-}
+
 main :: IO ()
 main = do
     s <- readFile "input23.txt"
