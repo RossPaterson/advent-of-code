@@ -11,7 +11,6 @@ data State = State {
     player_hit_points :: HitPoints,
     player_armor :: HitPoints,
     mana_points :: Mana,
-    spending :: Mana,
     active_spells :: [(Spell, Int)]
     }
   deriving Show
@@ -42,7 +41,6 @@ startState player_hp mana boss_hp boss_damage = State {
     player_hit_points = player_hp,
     player_armor = 0,
     mana_points = mana,
-    spending = 0,
     active_spells = []
     }
 
@@ -56,11 +54,11 @@ testState2 :: State
 testState2 = startState 10 250 14 8
 
 data Spell
-    = Poison
-    | Shield
-    | Recharge
-    | MagicMissile
+    = MagicMissile
     | Drain
+    | Shield
+    | Poison
+    | Recharge
   deriving (Show, Eq, Bounded, Enum)
 
 cost :: Spell -> Mana
@@ -106,44 +104,49 @@ afterSpell :: HitPoints -> Spell -> State -> State
 afterSpell level spell =
     applySpells . mod_player_hit_points (subtract level) .
     bossAttack . applySpells .
-    immediateEffect spell . spend (cost spell)
+    immediateEffect spell . mod_mana_points (subtract (cost spell))
 
-spend :: Mana -> State -> State
-spend n s = s {
-    mana_points = mana_points s - n,
-    spending = spending s + n }
-
-step :: HitPoints -> State -> [(Spell, State)]
-step level s = [(spell, afterSpell level spell s) |
+-- states immediately before casting a spell
+step :: HitPoints -> State -> [(Int, State)]
+step level s = [(cost spell, afterSpell level spell s) |
         spell <- allValues \\ map fst (active_spells s),
         cost spell <= mana_points s ]
 
--- states immediately before casting a spell
-data StateTree = Node State [(Spell, StateTree)]
+success :: State -> Bool
+success s = boss_hit_points s <= 0
 
-mkTree :: HitPoints -> State -> StateTree
-mkTree level = mkTree' . mod_player_hit_points (subtract level)
-  where
-    mkTree' s = Node s [(spell, mkTree' s') | (spell, s') <- step level s]
+failure :: State -> Bool
+failure s = player_hit_points s <= 0
+
+-- general search trees
+data SearchTree a = Node a [(Int, SearchTree a)]
+
+unfoldTree :: (a -> [(Int, a)]) -> a -> SearchTree a
+unfoldTree f x = Node x [(d, unfoldTree f child) | (d, child) <- f x]
 
 -- depth-first search, pruning branches that cost more than current best
-dfs :: StateTree -> Mana
-dfs = search maxBound
+dfs :: (a -> Bool) -> (a -> Bool) -> SearchTree a -> Int
+dfs succeeded failed = search 0 maxBound
   where
-    search :: Mana -> StateTree -> Mana
-    search best (Node s next)
-      | spending s >= best = best
-      | player_hit_points s <= 0 = best
-      | boss_hit_points s <= 0 = spending s
-      | otherwise = foldl search best (map snd next)
+    -- assume: sofar <= best
+    search sofar best (Node x children)
+      | sofar >= best || failed x = best::Int
+      | succeeded x = sofar
+      | otherwise =
+        foldr id best [flip (search (sofar+n)) child | (n, child) <- children]
+
+solve :: Int -> State -> Int
+solve level =
+    dfs success failure .  unfoldTree (step level) .
+    mod_player_hit_points (subtract level)
 
 solve1 :: Int
-solve1 = dfs (mkTree 0 initState)
+solve1 = solve 0 initState
 
 -- Part Two --
 
 solve2 :: Int
-solve2 = dfs (mkTree 1 initState)
+solve2 = solve 1 initState
 
 main :: IO ()
 main = do
