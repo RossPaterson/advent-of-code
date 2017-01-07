@@ -28,6 +28,12 @@ mod_player_armor f s = s { player_armor = f (player_armor s) }
 mod_mana_points :: (Mana -> Mana) -> State -> State
 mod_mana_points f s = s { mana_points = f (mana_points s) }
 
+success :: State -> Bool
+success s = boss_hit_points s <= 0
+
+failure :: State -> Bool
+failure s = player_hit_points s <= 0
+
 -- initial states
 
 startState :: HitPoints -> Mana -> HitPoints -> HitPoints -> State
@@ -43,25 +49,55 @@ startState player_hp mana boss_hp boss_damage = State {
 
 type Effect = State -> State
 
-noEffect :: Effect
-noEffect = id
-
 data Spell = Spell {
     name :: String,
     cost :: Mana,
-    immediateEffect :: Effect,
     lifetime :: Int,
-    recurrentEffect :: Effect }
+    effect :: Effect }
 
 allSpells :: [Spell]
 allSpells = [
-    Spell "Magic Missile" 53 (mod_boss_hit_points (subtract 4)) 0 noEffect,
-    Spell "Drain" 73
-        (mod_boss_hit_points (subtract 2) . mod_player_hit_points (+2))
-        0 noEffect,
-    Spell "Shield" 113 noEffect 6 (mod_player_armor (+7)),
-    Spell "Poison" 173 noEffect 6 (mod_boss_hit_points (subtract 3)),
-    Spell "Recharge" 229 noEffect 5 (mod_mana_points (+101)) ]
+    Spell "Magic Missile" 53 1 (mod_boss_hit_points (subtract 4)),
+    Spell "Drain" 73 1
+        (mod_boss_hit_points (subtract 2) . mod_player_hit_points (+2)),
+    Spell "Shield" 113 6 (mod_player_armor (+7)),
+    Spell "Poison" 173 6 (mod_boss_hit_points (subtract 3)),
+    Spell "Recharge" 229 5 (mod_mana_points (+101)) ]
+
+-- states immediately before casting a spell
+step :: HitPoints -> State -> [(Int, State)]
+step level s = [(cost spell, turns level s') | (spell, s') <- castSpell s ]
+
+castSpell :: State -> [(Spell, State)]
+castSpell s = [(spell, s') |
+        (spell, rest) <- pick (available_spells s),
+        cost spell <= mana_points s,
+        -- move recurrent spell to active list
+        let s' = s {
+                mana_points = mana_points s - cost spell,
+                active_spells = (spell, lifetime spell):active_spells s,
+                available_spells = rest } ]
+
+pick :: [a] -> [(a, [a])]
+pick xs = [(x, front++back) | (front, x:back) <- zip (inits xs) (tails xs)]
+
+turns :: HitPoints -> State -> State
+turns level =
+    applySpells . mod_player_hit_points (subtract level) .
+    bossAttack . applySpells
+
+-- apply recurrent spells
+applySpells :: State -> State
+applySpells s
+  | player_hit_points s > 0 = foldr id s' (map (effect . fst) spells)
+  | otherwise = s'
+  where
+    s' = s {
+        player_armor = 0,
+        active_spells = [(spell, n-1) | (spell, n) <- live_spells],
+        available_spells = map fst expired ++ available_spells s }
+    spells = active_spells s
+    (live_spells, expired) = partition ((> 1) . snd) spells
 
 bossAttack :: Effect
 bossAttack s
@@ -69,48 +105,6 @@ bossAttack s
   | otherwise = s
   where
     damage = max 1 (boss_damage s - player_armor s)
-
-applySpells :: State -> State
-applySpells s
-  | player_hit_points s > 0 =
-    (foldr id s' (map (recurrentEffect . fst) spells)) {
-        active_spells = [(spell, n-1) | (spell, n) <- live_spells],
-        available_spells = map fst expired ++ available_spells s}
-  | otherwise = s'
-  where
-    s' = s { player_armor = 0 }
-    spells = active_spells s
-    (live_spells, expired) = partition ((> 1) . snd) spells
-
-afterSpell :: HitPoints -> Spell -> [Spell] -> State -> State
-afterSpell level spell rest =
-    applySpells . mod_player_hit_points (subtract level) .
-    bossAttack . applySpells .
-    immediateEffect spell . mod_mana_points (subtract (cost spell)) .
-    startSpell spell rest
-
--- move recurrent spell to active list
-startSpell :: Spell -> [Spell] -> State -> State
-startSpell spell rest s
-  | lifetime spell > 0 = s {
-        active_spells = (spell, lifetime spell):active_spells s,
-        available_spells = rest }
-  | otherwise = s
-
--- states immediately before casting a spell
-step :: HitPoints -> State -> [(Int, State)]
-step level s = [(cost spell, afterSpell level spell rest s) |
-        (spell, rest) <- pick (available_spells s),
-        cost spell <= mana_points s ]
-
-pick :: [a] -> [(a, [a])]
-pick xs = [(x, front++back) | (front, x:back) <- zip (inits xs) (tails xs)]
-
-success :: State -> Bool
-success s = boss_hit_points s <= 0
-
-failure :: State -> Bool
-failure s = player_hit_points s <= 0
 
 -- general search trees
 data SearchTree a = Node a [(Int, SearchTree a)]
