@@ -118,7 +118,7 @@ testState2 = startState 10 250 14 8
 
 solve :: Int -> State -> Int
 solve level =
-    lfs success . unfoldTree (step level) .
+    dfs success . unfoldTree (step level) .
     mod_player_hit_points (subtract level)
 
 solve1 :: Int
