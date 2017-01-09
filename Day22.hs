@@ -1,5 +1,6 @@
 module Main where
 
+import SearchTree
 import Data.List
 
 type Mana = Int
@@ -30,9 +31,6 @@ mod_mana_points f s = s { mana_points = f (mana_points s) }
 
 success :: State -> Bool
 success s = boss_hit_points s <= 0
-
-failure :: State -> Bool
-failure s = player_hit_points s <= 0
 
 -- initial states
 
@@ -66,17 +64,20 @@ allSpells = [
 
 -- states immediately before casting a spell
 step :: HitPoints -> State -> [(Int, State)]
-step level s = [(cost spell, turns level s') | (spell, s') <- castSpell s ]
+step level s =
+    [(cost spell, turns level s') |
+        boss_hit_points s > 0 && player_hit_points s > 0,
+        (spell, s') <- castSpell s ]
 
 castSpell :: State -> [(Spell, State)]
 castSpell s = [(spell, s') |
-        (spell, rest) <- pick (available_spells s),
-        cost spell <= mana_points s,
-        -- move recurrent spell to active list
-        let s' = s {
-                mana_points = mana_points s - cost spell,
-                active_spells = (spell, lifetime spell):active_spells s,
-                available_spells = rest } ]
+    (spell, rest) <- pick (available_spells s),
+    cost spell <= mana_points s,
+    -- move recurrent spell to active list
+    let s' = s {
+            mana_points = mana_points s - cost spell,
+            active_spells = (spell, lifetime spell):active_spells s,
+            available_spells = rest } ]
 
 pick :: [a] -> [(a, [a])]
 pick xs = [(x, front++back) | (front, x:back) <- zip (inits xs) (tails xs)]
@@ -106,23 +107,6 @@ bossAttack s
   where
     damage = max 1 (boss_damage s - player_armor s)
 
--- general search trees
-data SearchTree a = Node a [(Int, SearchTree a)]
-
-unfoldTree :: (a -> [(Int, a)]) -> a -> SearchTree a
-unfoldTree f x = Node x [(d, unfoldTree f child) | (d, child) <- f x]
-
--- depth-first search, pruning branches that cost more than current best
-dfs :: (a -> Bool) -> (a -> Bool) -> SearchTree a -> Int
-dfs succeeded failed = search 0 maxBound
-  where
-    -- assume: sofar <= best
-    search sofar best (Node x children)
-      | sofar >= best || failed x = best::Int
-      | succeeded x = sofar
-      | otherwise =
-        foldr id best [flip (search (sofar+n)) child | (n, child) <- children]
-
 initState :: State
 initState = startState 50 500 55 8
 
@@ -134,7 +118,7 @@ testState2 = startState 10 250 14 8
 
 solve :: Int -> State -> Int
 solve level =
-    dfs success failure .  unfoldTree (step level) .
+    lfs success . unfoldTree (step level) .
     mod_player_hit_points (subtract level)
 
 solve1 :: Int
