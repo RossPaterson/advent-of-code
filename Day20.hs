@@ -11,7 +11,7 @@ type Input = [Range]
 parse :: String -> Input
 parse = map (runParser range) . lines
   where
-    range = Range <$> natural <* char '-' <*> natural
+    range = Range <$> nat <* char '-' <*> nat
 
 -- given ranges in order, merge overlapping and contiguous ranges
 mergeRanges :: [Range] -> [Range]

@@ -28,7 +28,7 @@ parse = Map.fromList . zip [0..] . map (runParser instruction) . lines
         Incr <$ string "inc " <*> reg <|>
         Decr <$ string "dec " <*> reg <|>
         JNZ <$ string "jnz " <*> value <* char ' ' <*> int
-    value = Value <$> integer <|> Reg <$> reg
+    value = Value <$> int <|> Reg <$> reg
     reg = A <$ char 'a' <|> B <$ char 'b' <|> C <$ char 'c' <|> D <$ char 'd'
 
 type Registers = Map Reg Integer

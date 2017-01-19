@@ -55,17 +55,11 @@ anyChar :: Parser Char
 anyChar = satisfy (const True)
 
 -- non-negative integer
-natural :: Parser Integer
-natural = read <$> some digit
+nat :: Num a => Parser a
+nat = (fromInteger . read) <$> some digit
 
-integer :: Parser Integer
-integer = negate <$ char '-' <*> natural <|> natural
-
-nat :: Parser Int
-nat = fromInteger <$> natural
-
-int :: Parser Int
-int = fromInteger <$> integer
+int :: Num a => Parser a
+int = negate <$ char '-' <*> nat <|> nat
 
 string :: String -> Parser String
 string str = Parser matchStr
