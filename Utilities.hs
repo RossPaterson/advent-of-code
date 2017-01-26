@@ -42,6 +42,13 @@ choose n (x:xs) =
     [(x:ys, rest) | (ys, rest) <- choose (n-1) xs] ++
     [(ys, x:rest) | (ys, rest) <- choose n xs]
 
+-- possible choices of between m and n items (m <= n)
+chooseBetween :: Int -> Int -> [a] -> [[a]]
+chooseBetween m n [] = [[] | m == 0]
+chooseBetween m n (x:xs) =
+    [x:ys | n > 0,
+        ys <- chooseBetween (max 0 (m-1)) (n-1) xs] ++ chooseBetween m n xs
+
 -- select all the elements of xs that have the least value of f
 -- (f is evaluated once for each element of the list.)
 leastBy :: (Ord v) => (a -> v) -> [a] -> [a]
