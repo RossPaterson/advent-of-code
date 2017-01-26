@@ -4,23 +4,26 @@ import Utilities
 import Data.List
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Data.Set (Set)
+import qualified Data.Set as Set
 
-data Object = Gen String | Chip String
+data Object a = Gen a | Chip a
   deriving (Show, Eq, Ord)
-type Input = [[Object]]
+type Input = [[Object String]]
 
-generators :: [Object] -> [String]
+generators :: [Object a] -> [a]
 generators os = [e | Gen e <- os]
 
-microchips :: [Object] -> [String]
+microchips :: [Object a] -> [a]
 microchips os = [e | Chip e <- os]
 
 type FloorNo = Int -- 0..3
-data State = State { elevator :: FloorNo, ordered_gcs :: [(FloorNo, FloorNo)] }
-  deriving (Show, Eq, Ord)
 
 topFloor :: FloorNo
 topFloor = 3
+
+data State = State { elevator :: FloorNo, ordered_gcs :: [(FloorNo, FloorNo)] }
+  deriving (Show, Eq, Ord)
 
 showState :: State -> String
 showState (State elev gcs) = unlines [
@@ -32,6 +35,17 @@ showFloor :: FloorNo -> [(FloorNo, FloorNo)] -> String
 showFloor f gcs = unwords [
     (if f == g then "G" else ".") ++ (if f == c then "C" else ".") |
     (g, c) <- gcs]
+
+safeState :: State -> Bool
+safeState s = Set.null (chipFloors s `Set.intersection` genFloors s)
+
+-- floors with unguarded chips
+chipFloors :: State -> Set FloorNo
+chipFloors (State _ gcs) = Set.fromList [cf | (gf, cf) <- gcs, gf /= cf]
+
+-- floors with generators
+genFloors :: State -> Set FloorNo
+genFloors (State _ gcs) = Set.fromList (map fst gcs)
 
 -- finished if all objects on top floor
 -- (uses the fact that pairs are ordered)
@@ -50,55 +64,31 @@ toFloors gss css = sort (Map.elems (Map.intersectionWith (,) gens chips))
     chips = Map.fromList [(c, f) | (f, cs) <- zip [0..] css, c <- cs]
 
 type Element = Int -- index of gcs list of a state
-type Floor = ([Element], [Element]) -- (gens, chips)
-
-sizeFloor :: Floor -> Int
-sizeFloor (gens, chips) = length gens + length chips
-
--- list of objects on each floor
-elementsToFloors :: [(FloorNo, FloorNo)] -> [Floor]
-elementsToFloors gcs =
-    [([e | (e, (g, _)) <- egcs, g == f], [e | (e, (_, c)) <- egcs, c == f]) |
-        f <- [0..topFloor]]
-  where
-    egcs = zip [0..] gcs
-
-floorsToElements :: [Floor] -> [(FloorNo, FloorNo)]
-floorsToElements floors = toFloors (map fst floors) (map snd floors)
-
-safeFloor :: Floor -> Bool
-safeFloor (gens, chips) = null gens || null (chips \\ gens)
 
 -- possible moves from state
 
 moves :: State -> [State]
-moves (State elev gcs) =
-    [State elev' (floorsToElements floors') |
-        (carry, rest) <- choose12 this, safeFloor rest,
-        (elev', floors') <-
-           [(elev+1, below ++ rest:above') | above' <- move_to carry above] ++
-           [(elev-1, below' ++ rest:above) |
-               below' <- map reverse (move_to carry (reverse below))]]
-  where
-    (below, this:above) = splitAt elev (elementsToFloors gcs)
+moves s = filter safeState
+    [moveTo f os s | os <- chooseBetween 1 2 (movable s), f <- adjacentFloors s]
 
-move_to :: Floor -> [Floor] -> [[Floor]]
-move_to (gs1, cs1) ((gs2, cs2):rest)
-  | safeFloor next = [next:rest]
+movable :: State -> [Object Element]
+movable (State elev gcs) =
+    [Gen p | (p, (g, _)) <- pgcs, g == elev] ++
+    [Chip p | (p, (_, c)) <- pgcs, c == elev]
   where
-    next = (gs1 ++ gs2, cs1 ++ cs2)
-move_to _ _ = []
+    pgcs = zip [(0::Element)..] gcs
 
--- choose 1 or 2 objects from a floor
-choose12 :: Floor -> [(Floor, Floor)]
-choose12 (gs, cs) =
-    [((gs_sel, cs_sel), (gs_rest, cs_rest)) |
-        (gs_sel, gs_rest) <- choose 1 gs,
-        (cs_sel, cs_rest) <- choose 1 cs] ++
-    [((gs_sel, []), (gs_rest, cs)) |
-        n <- [1, 2], (gs_sel, gs_rest) <- choose n gs] ++
-    [(([], cs_sel), (gs, cs_rest)) |
-        n <- [1, 2], (cs_sel, cs_rest) <- choose n cs]
+adjacentFloors :: State -> [FloorNo]
+adjacentFloors (State elev _) =
+    [elev-1 | elev > 0] ++ [elev+1 | elev < topFloor]
+
+moveTo :: FloorNo -> [Object Element] -> State -> State
+moveTo f os (State _ gcs) =
+    State f (sort (map move (zip [(0::Element)..] gcs)))
+  where
+    move (p, (g, c)) =
+        (if Gen p `elem` os then f else g,
+         if Chip p `elem` os then f else c)
 
 solve :: Input -> Int
 solve rs = length $ takeWhile (not . any finished) $ bfs moves $ [mkState rs]
