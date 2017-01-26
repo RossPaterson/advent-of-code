@@ -1,5 +1,7 @@
 module Main where
 
+import Utilities
+
 data Item = Item {
     name :: String,
     cost :: Int,
@@ -50,15 +52,9 @@ initState is = Player initHP (total damage is) (total armor is)
 
 purchases :: [[Item]]
 purchases = [ws ++ as ++ rs |
-    ws <- choose 1 1 weapon_items,
-    as <- choose 0 1 armor_items,
-    rs <- choose 0 2 ring_items]
-
--- choices of between m and n items (m <= n)
-choose :: Int -> Int -> [a] -> [[a]]
-choose m n [] = [[] | m == 0]
-choose m n (x:xs) =
-    [x:ys | n > 0, ys <- choose (max 0 (m-1)) (n-1) xs] ++ choose m n xs
+    ws <- chooseBetween 1 1 weapon_items,
+    as <- chooseBetween 0 1 armor_items,
+    rs <- chooseBetween 0 2 ring_items]
 
 -- first player is about to attack
 type State = (PlayerState, PlayerState)
