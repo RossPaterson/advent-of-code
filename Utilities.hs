@@ -76,3 +76,11 @@ bfs f = takeWhile (not . null) . map fst . iterate step . new_level Set.empty
       | otherwise = (x:ys, seen')
       where
         (ys, seen') = new_level (Set.insert x seen) xs
+
+-- Run a function on a number of test inputs with expected outputs
+-- and report any mismatches.
+failures :: (Show a, Show b, Eq b) =>
+    String -> (a -> b) -> [(a, b)] -> [String]
+failures fname f xys =
+    [fname ++ showsPrec 11 x "" ++ " = " ++ show (f x) ++ " (expected " ++
+        show y ++ ")" | (x, y) <- xys, f x /= y]
