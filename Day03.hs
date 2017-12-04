@@ -41,6 +41,17 @@ tests1 = [(1, 0), (12, 3), (23, 2), (1024, 31)]
 coords :: [Coord]
 coords = map coord [1..]
 
+-- alternative iterative definition
+coords' :: [Coord]
+coords' = iterate next (0,0)
+  where
+    next :: Coord -> Coord
+    next (x, y)
+      | x > abs y = (x, y-1)
+      | y < - abs x || y < 0 && y == - x = (x-1, y)
+      | x < - abs y || x < 0 && x == y = (x, y+1)
+      | y >= abs x = (x+1, y)
+
 -- OEIS A141481
 values :: [Int]
 values = 1:snd (mapAccumL addNeighbours (Map.singleton (coord 1) 1) (tail coords))
