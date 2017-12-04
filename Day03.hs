@@ -29,6 +29,7 @@ coord n = times side rotate (ring, ring - pos - 1)
     -- each of the 4 sides of the ring r has 2*r elements
     (side, pos) = divMod posOnRing (2*ring)
 
+-- OEIS A214526
 solve1 :: Input -> Int
 solve1 n = manhattan (coord n)
 
