@@ -22,8 +22,11 @@ coord :: Int -> Coord
 coord 1 = (0,0)
 coord n = times side rotate (ring, ring - pos - 1)
   where
+    -- spiral inside ring r contains (2*r - 1)^2 elements
     ring = floor ((sqrt (fromIntegral (n-1)) + 1)/2)
     posOnRing = n-1 - (2*ring - 1)^2
+
+    -- each of the 4 sides of the ring r has 2*r elements
     (side, pos) = divMod posOnRing (2*ring)
 
 solve1 :: Input -> Int
@@ -42,11 +45,16 @@ values :: [Int]
 values = 1:snd (mapAccumL addNeighbours (Map.singleton (coord 1) 1) (tail coords))
 
 addNeighbours :: Map Coord Int -> Coord -> (Map Coord Int, Int)
-addNeighbours m (x, y) = (Map.insert (x, y) v m, v)
+addNeighbours m p = (Map.insert p v m, v)
   where
-    v = sum [Map.findWithDefault 0 n m | n <- neighbours]
-    neighbours =
-        [(x+dx, y+dy) | dx <- [-1..1], dy <- [-1..1], dx /= 0 || dy /= 0]
+    v = sum [Map.findWithDefault 0 (add p n) m | n <- neighbourhood]
+
+add :: Coord -> Coord -> Coord
+add (x1, y1) (x2, y2) = (x1+x2, y1+y2)
+
+-- points adjacent to (0,0)
+neighbourhood :: [Coord]
+neighbourhood = [(dx, dy) | dx <- [-1..1], dy <- [-1..1], dx /= 0 || dy /= 0]
 
 test2 :: Bool
 test2 = [1, 1, 2, 4, 5, 10, 11, 23, 25, 26, 54, 57, 59, 122, 133, 142, 147, 304, 330, 351, 362, 747, 806] `isPrefixOf` values
