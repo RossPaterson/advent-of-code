@@ -30,6 +30,11 @@ mostCommon xs = map snd (sort [(-n, w) | (w, n) <- frequency xs])
 whileJust :: (a -> Maybe a) -> a -> a
 whileJust f x = maybe x (whileJust f) (f x)
 
+-- repeatedly apply the function until it doesn't produce a new value,
+-- collecting all the values
+iterateWhileJust :: (a -> Maybe a) -> a -> [a]
+iterateWhileJust f x = x:maybe [] (iterateWhileJust f) (f x)
+
 -- apply a function n times
 times :: Int -> (a -> a) -> a -> a
 times n f x = foldr id x (replicate n f)
@@ -82,5 +87,5 @@ bfs f = takeWhile (not . null) . map fst . iterate step . new_level Set.empty
 failures :: (Show a, Show b, Eq b) =>
     String -> (a -> b) -> [(a, b)] -> [String]
 failures fname f xys =
-    [fname ++ showsPrec 11 x "" ++ " = " ++ show (f x) ++ " (expected " ++
-        show y ++ ")" | (x, y) <- xys, f x /= y]
+    [fname ++ " " ++ showsPrec 11 x "" ++ " = " ++ show (f x) ++
+        " (expected " ++ show y ++ ")" | (x, y) <- xys, f x /= y]
