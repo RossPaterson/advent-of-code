@@ -10,27 +10,32 @@ data Direction = N | NE | SE | S | SW | NW
 type Input = [Direction]
 
 parse :: String -> Input
-parse cs = map read $
-    words [if c == ',' then ' ' else toUpper c | c <- cs, c /= '\n']
+parse cs = read ("[" ++ map toUpper cs ++ "]")
 
--- coordinate in an infinite hexagonal tiling: x+y is even
+-- skew coordinate in an infinite hexagonal tiling
 data Coord = Coord Int Int
     deriving (Eq, Show)
 
 start :: Coord
 start = Coord 0 0
 
--- metric (step start d) = 2
+-- one step in the skey coordinate system:
+--
+--   NW | N |
+--   SW |   | NE
+--      | S | SE
+--
 step :: Coord -> Direction -> Coord
-step (Coord x y) N  = Coord x (y+2)
-step (Coord x y) NE = Coord (x+1) (y+1)
+step (Coord x y) N  = Coord x (y+1)
+step (Coord x y) NE = Coord (x+1) y
 step (Coord x y) SE = Coord (x+1) (y-1)
-step (Coord x y) S  = Coord x (y-2)
-step (Coord x y) SW = Coord (x-1) (y-1)
+step (Coord x y) S  = Coord x (y-1)
+step (Coord x y) SW = Coord (x-1) y
 step (Coord x y) NW = Coord (x-1) (y+1)
 
+-- number o steps from the start
 metric :: Coord -> Int
-metric (Coord x y) = (abs x + abs y) `div` 2
+metric (Coord x y) =  maximum [abs x, abs y, abs (x+y)]
 
 solve1 :: Input -> Int
 solve1 = metric . foldl step start
