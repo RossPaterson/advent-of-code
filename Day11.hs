@@ -13,32 +13,36 @@ parse :: String -> Input
 parse cs = read ("[" ++ map toUpper cs ++ "]")
 
 -- skew coordinate in an infinite hexagonal tiling
+-- (= axial coordinate at https://www.redblobgames.com/grids/hexagons/)
 data Coord = Coord Int Int
-    deriving (Eq, Show)
+    deriving (Show)
 
-start :: Coord
-start = Coord 0 0
+origin :: Coord
+origin = Coord 0 0
 
--- one step in the skey coordinate system:
+add :: Coord -> Coord -> Coord
+add (Coord x1 y1) (Coord x2 y2) = Coord (x1+x2) (y1+y2)
+
+-- one step in the skew coordinate system:
 --
 --   NW | N |
---   SW |   | NE
+--   SW | * | NE
 --      | S | SE
 --
-step :: Coord -> Direction -> Coord
-step (Coord x y) N  = Coord x (y+1)
-step (Coord x y) NE = Coord (x+1) y
-step (Coord x y) SE = Coord (x+1) (y-1)
-step (Coord x y) S  = Coord x (y-1)
-step (Coord x y) SW = Coord (x-1) y
-step (Coord x y) NW = Coord (x-1) (y+1)
+direction :: Direction -> Coord
+direction N  = Coord 0 1
+direction NE = Coord 1 0
+direction SE = Coord 1 (-1)
+direction S  = Coord 0 (-1)
+direction SW = Coord (-1) 0
+direction NW = Coord (-1) 1
 
--- number o steps from the start
+-- number of steps from the origin
 metric :: Coord -> Int
 metric (Coord x y) =  maximum [abs x, abs y, abs (x+y)]
 
 solve1 :: Input -> Int
-solve1 = metric . foldl step start
+solve1 = metric . foldl add origin . map direction
 
 tests1 :: [(String, Int)]
 tests1 = [
@@ -50,7 +54,7 @@ tests1 = [
 -- Part Two
 
 solve2 :: Input -> Int
-solve2 = maximum . map metric . scanl step start
+solve2 = maximum . map metric . scanl add origin . map direction
 
 main :: IO ()
 main = do
