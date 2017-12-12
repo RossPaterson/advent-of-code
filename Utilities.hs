@@ -37,7 +37,11 @@ iterateWhileJust f x = x:maybe [] (iterateWhileJust f) (f x)
 
 -- apply a function n times
 times :: Int -> (a -> a) -> a -> a
-times n f x = foldr id x (replicate n f)
+times n f = compose (replicate n f)
+
+-- composition of a list of functions
+compose :: [a -> a] -> a -> a
+compose fs x = foldr id x fs
 
 -- possible choices of n elements from a list
 choose :: Int -> [a] -> [([a], [a])]
