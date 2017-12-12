@@ -2,6 +2,7 @@ module Main where
 
 import Parser
 import Utilities
+import Data.Maybe
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
 import Data.Set (Set)
@@ -18,19 +19,16 @@ parse = map (runParser node) . lines
 -- out-edges from each node
 type Graph = Map Node [Node]
 
-emptyGraph :: Graph
-emptyGraph = Map.empty
-
 -- add an edge from x to y
 addEdge :: Node -> Node -> Graph -> Graph
-addEdge x y g = case Map.lookup x g of
-    Nothing -> Map.insert x [y] g
-    Just ys -> Map.insert x (y:ys) g
+addEdge x y g = Map.insert x (y:ys) g
+  where
+    ys = fromMaybe [] (Map.lookup x g)
 
--- create a bidirectional graph
+-- create a bidirectional graph by adding the reverse edges
 bigraph :: Input -> Graph
 bigraph xys =
-    compose [addEdge x y . addEdge y x | (x, ys) <- xys, y <- ys] emptyGraph
+    compose [addEdge y x | (x, ys) <- xys, y <- ys] (Map.fromList xys)
 
 -- nodes connected to n
 closure :: Node -> Graph -> [Node]
