@@ -2,40 +2,28 @@ module Main where
 
 import Parser
 import Utilities
-import Data.Maybe
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
 
 type Node = Int
-type Input = [(Node, [Node])]
-
-parse :: String -> Input
-parse = map (runParser node) . lines
-  where
-    node = (,) <$> nat <* string " <-> " <*> sepBy1 nat (string ", ")
-
 -- out-edges from each node
 type Graph = Map Node [Node]
+type Input = Graph
 
--- add an edge from x to y
-addEdge :: Node -> Node -> Graph -> Graph
-addEdge x y g = Map.insert x (y:ys) g
+parse :: String -> Input
+parse = Map.fromList . map (runParser node) . lines
   where
-    ys = fromMaybe [] (Map.lookup x g)
+    node :: Parser (Int, [Int])
+    node = (,) <$> nat <* string " <-> " <*> sepBy1 nat (string ", ")
 
--- create a bidirectional graph by adding the reverse edges
-bigraph :: Input -> Graph
-bigraph xys =
-    compose [addEdge y x | (x, ys) <- xys, y <- ys] (Map.fromList xys)
-
--- nodes connected to n
+-- nodes reachable from n
 closure :: Node -> Graph -> [Node]
 closure n g = concat (bfs (g!) [n])
 
 solve1 :: Input -> Int
-solve1 = length . closure 0 . bigraph
+solve1 = length . closure 0
 
 testInput =
     "0 <-> 2\n\
@@ -57,12 +45,12 @@ components g = comps (Map.keysSet g)
   where
     comps left = case Set.minView left of
         Nothing -> []
-        Just (n, _) -> reached:comps (Set.difference left reached)
+        Just (n, _) -> component:comps (Set.difference left component)
           where
-            reached = Set.fromList (closure n g)
+            component = Set.fromList (closure n g)
 
 solve2 :: Input -> Int
-solve2 = length . components . bigraph
+solve2 = length . components
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 2)]
