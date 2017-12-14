@@ -1,5 +1,6 @@
 module Main where
 
+import Components
 import Parser
 import Utilities
 import Data.Map (Map, (!))
@@ -18,12 +19,8 @@ parse = Map.fromList . map (runParser node) . lines
     node :: Parser (Int, [Int])
     node = (,) <$> nat <* string " <-> " <*> sepBy1 nat (string ", ")
 
--- nodes reachable from n
-closure :: Node -> Graph -> [Node]
-closure n g = concat (bfs (g!) [n])
-
 solve1 :: Input -> Int
-solve1 = length . closure 0
+solve1 g = length (component (g!) 0)
 
 testInput =
     "0 <-> 2\n\
@@ -39,18 +36,8 @@ tests1 = [(testInput, 6)]
 
 -- Part Two
 
--- connected components of the graph
-components :: Graph -> [Set Node]
-components g = comps (Map.keysSet g)
-  where
-    comps left = case Set.minView left of
-        Nothing -> []
-        Just (n, _) -> component:comps (Set.difference left component)
-          where
-            component = Set.fromList (closure n g)
-
 solve2 :: Input -> Int
-solve2 = length . components
+solve2 g = length (components (g!) (Map.keysSet g))
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 2)]

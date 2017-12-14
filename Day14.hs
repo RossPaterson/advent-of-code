@@ -1,5 +1,6 @@
 module Main where
 
+import Components
 import Knothash
 import Utilities
 import Data.Bits
@@ -46,13 +47,8 @@ neighbours g (pos@(x,y))
     [pos' | pos' <- [(x-1,y), (x,y-1), (x+1,y), (x,y+1)], Set.member pos' g]
   | otherwise = []
 
-region :: Grid -> Position -> Set Position
-region g pos = Set.fromList (concat (bfs (neighbours g) [pos]))
-
 regions :: Grid -> [Set Position]
-regions g = case Set.minView g of
-    Nothing -> []
-    Just (pos, _) -> let r = region g pos in r:regions (Set.difference g r)
+regions g = components (neighbours g) g
 
 solve2 :: Input -> Int
 solve2 = length . regions
