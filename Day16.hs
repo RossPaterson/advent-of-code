@@ -1,6 +1,7 @@
 module Main where
 
 import Parser
+import Permutation
 import Utilities
 import Control.Applicative
 import Data.Array
@@ -39,43 +40,20 @@ mtimes k p
 
 -- Dances perform permutations of [0..n-1]
 
-data Permutation = Identity | Permutation (Array Int Int)
-    deriving Show
-
-instance Monoid Permutation where
-    mempty = Identity
-    mappend = composePerm
-
-composePerm :: Permutation -> Permutation -> Permutation
-composePerm Identity p2 = p2
-composePerm p1 Identity = p1
-composePerm (Permutation p1) (Permutation p2) =
-    Permutation (listArray (bounds p2) [p1!(p2!i) | i <- indices p2])
-
-showPerm :: Permutation -> String
-showPerm Identity = "<identity>"
-showPerm (Permutation p) = map programLetter (elems p)
+showPerm :: Int -> Permutation -> String
+showPerm n p = map (programLetter . apply p) [0..n-1]
 
 -- Basic permutations
 
 spin :: Int -> Int -> Permutation
-spin n i = Permutation (listArray (0, n-1) ([n-i..n-1] ++ [0..n-i-1]))
-
-swap :: Int -> Int -> Int -> Permutation
-swap n i j
-  | i == j = Identity
-  | otherwise = Permutation $
-        listArray (0, n-1) ([0..p1-1] ++ p2:[p1+1..p2-1] ++ p1:[p2+1..n-1])
-  where
-    p1 = min i j
-    p2 = max i j
+spin n i = swapRanges 0 (n-i) n
 
 {-
 If a dance performs a permutation p, then adding one more move changes
 the permutation as follows:
 
 Spin i       : p <> spin i
-Exchange i j : p <> swap n i j
+Exchange i j : p <> swap i j
 Partner i j  : swap n i j <> p
 
 Therefore we build a pair of permutations to be wrapped around the starting
@@ -88,39 +66,42 @@ type Wrap a = (Dual a, a)
 wrap :: Monoid a => Wrap a -> a
 wrap (Dual pf, pb) = pf <> pb
 
-movePermutations :: Int -> Move -> Wrap Permutation
-movePermutations n (Spin i) = (mempty, spin n i)
-movePermutations n (Exchange i j) = (mempty, swap n i j)
-movePermutations n (Partner i j) = (Dual (swap n i j), mempty)
+movePermutation :: Int -> Move -> Wrap Permutation
+movePermutation n (Spin i) = (mempty, spin n i)
+movePermutation n (Exchange i j) = (mempty, swap i j)
+movePermutation n (Partner i j) = (Dual (swap i j), mempty)
 
-showDance :: Wrap Permutation -> String
-showDance = showPerm . wrap
+showDance :: Int -> Wrap Permutation -> String
+showDance n = showPerm n . wrap
 
 dance :: Int -> [Move] -> Wrap Permutation
-dance n = mconcat . map (movePermutations n)
+dance n = mconcat . map (movePermutation n)
 
 solve1 :: Input -> String
-solve1 = showDance . dance 16
+solve1 = showDance 16 . dance 16
 
 testInput :: String
 testInput = "s1,x3/4,pe/b"
 
-tests1 :: [((Int, [Move]), String)]
-tests1 = [((5, parse testInput), "baedc")]
+tests1 :: [((Int, Int, [Move]), String)]
+tests1 = [((5, 1, parse testInput), "baedc")]
+
+runTest :: (Int, Int, [Move]) -> String
+runTest (size, rep, ms) = showDance size (mtimes rep (dance size ms))
 
 -- Part Two
 
 solve2 :: Input -> String
-solve2 = showDance . mtimes 1000000000 . dance 16
+solve2 = showDance 16 . mtimes 1000000000 . dance 16
 
-tests2 :: [((Int, [Move]), String)]
-tests2 = [((5, parse testInput), "ceadb")]
+tests2 :: [((Int, Int, [Move]), String)]
+tests2 = [((5, 2, parse testInput), "ceadb")]
 
 main :: IO ()
 main = do
     s <- readFile "input16.txt"
     let input = parse s
-    putStr (unlines (failures "solve1" (showDance . uncurry dance) tests1))
+    putStr (unlines (failures "solve1" runTest tests1))
     print (solve1 input)
-    putStr (unlines (failures "solve2" (showDance . mtimes 2 . uncurry dance) tests2))
+    putStr (unlines (failures "solve2" runTest tests2))
     print (solve2 input)
