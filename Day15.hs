@@ -1,7 +1,5 @@
 module Main where
 
-import Data.List
-
 next :: Int -> Int -> Int
 next f v = f*v `mod` 2147483647
 
