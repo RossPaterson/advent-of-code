@@ -4,6 +4,7 @@ module Permutation (
     invert,
     cyclic,
     cycles,
+    order,
     swap,
     swapRanges,
   ) where
@@ -22,7 +23,22 @@ import qualified Data.Set as Set
 -- | A permutation of the integers that is the identity on all but a finite
 -- subset.
 data Permutation = Identity | Permutation (Array Int Int)
-    deriving Show
+
+instance Eq Permutation where
+    p1 == p2 = cycles p1 == cycles p2
+
+instance Ord Permutation where
+    compare p1 p2 = compare (cycles p1) (cycles p2)
+
+instance Show Permutation where
+    showsPrec d p = case cycles p of
+        [] -> showString "mempty"
+        [c] -> showParen (d > 10) $ showCycle c
+        c:cs -> showParen (d > 6) $
+            showCycle c .
+            foldr (.) id [showString " <> " . showCycle c' | c' <- cs]
+     where
+       showCycle c = showString "cyclic " . showsPrec 11 c
 
 instance Monoid Permutation where
     mempty = Identity
@@ -81,6 +97,10 @@ cycles (Permutation arr) = getCycles (Set.fromList (indices arr))
     getCycle i seen
       | Set.member i seen = []
       | otherwise = i:getCycle (arr!i) (Set.insert i seen)
+
+-- | The smallest k > 0 such that p^k = id
+order :: Permutation -> Int
+order p = foldr lcm 1 (map length (cycles p))
 
 trivial :: [a] -> Bool
 trivial [] = True
