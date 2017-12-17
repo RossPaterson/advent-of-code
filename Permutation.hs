@@ -59,7 +59,7 @@ invert p = Permutation (Map.fromList [(apply p x, x) | x <- Set.toList (nonIdent
 
 -- | A cyclic permutation mapping each element of the list to the next,
 -- and wrapping around at the end.
-cyclic :: Ord a => [a] -> Permutation a
+cyclic :: (Ord a) => [a] -> Permutation a
 cyclic vs = Permutation (Map.fromList (zip unique_vs (rotate unique_vs)))
   where
     unique_vs = catMaybes (snd (mapAccumL unique Set.empty vs))
@@ -70,7 +70,7 @@ cyclic vs = Permutation (Map.fromList (zip unique_vs (rotate unique_vs)))
     rotate (x:xs) = xs ++ [x]
 
 -- | Non-unit cycles of the permutation
-cycles :: Ord a => Permutation a -> [[a]]
+cycles :: (Ord a) => Permutation a -> [[a]]
 cycles p = getCycles (nonIdentity p)
   where
     getCycles left = case Set.minView left of
@@ -85,14 +85,14 @@ cycles p = getCycles (nonIdentity p)
       | otherwise = i:getCycle (apply p i) (Set.insert i seen)
 
 -- | The smallest k > 0 such that p^k = id
-order :: Ord a => Permutation a -> Int
+order :: (Ord a) => Permutation a -> Int
 order p = foldr lcm 1 (map length (cycles p))
 
 -- Basic permutations
 
-swap :: Ord a => a -> a -> Permutation a
+swap :: (Ord a) => a -> a -> Permutation a
 swap i j = cyclic [i, j]
 
 -- | swap [i..j) with [j..k)
-swapRanges :: Integral a => a -> a -> a -> Permutation a
-swapRanges i j k = permutation (zip [i..k-1] ([j..k-1] ++ [i..j-1]))
+swapRanges :: (Enum a, Ord a) => a -> a -> a -> Permutation a
+swapRanges i j k = permutation (zip [i..pred k] ([j..pred k] ++ [i..pred j]))
