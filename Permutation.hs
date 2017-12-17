@@ -10,7 +10,6 @@ module Permutation (
   ) where
 
 import Control.Applicative
-import Data.Array
 import Data.Char
 import Data.List
 import Data.Maybe
@@ -20,17 +19,18 @@ import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
 
--- | A permutation of the integers that is the identity on all but a finite
--- subset.
-data Permutation = Identity | Permutation (Array Int Int)
+-- | A permutation that is the identity on all but a finite subset.
+newtype Permutation a = Permutation (Map a a)
+    deriving (Eq, Ord)
 
-instance Eq Permutation where
-    p1 == p2 = cycles p1 == cycles p2
+-- Only non-identity entries are stored
+permutation :: (Ord a) => [(a, a)] -> Permutation a
+permutation = Permutation . Map.fromList . filter (uncurry (/=))
 
-instance Ord Permutation where
-    compare p1 p2 = compare (cycles p1) (cycles p2)
+nonIdentity :: (Ord a) => Permutation a -> Set a
+nonIdentity (Permutation m) = Map.keysSet m
 
-instance Show Permutation where
+instance (Ord a, Show a) => Show (Permutation a) where
     showsPrec d p = case cycles p of
         [] -> showString "mempty"
         [c] -> showParen (d > 10) $ showCycle c
@@ -40,37 +40,27 @@ instance Show Permutation where
      where
        showCycle c = showString "cyclic " . showsPrec 11 c
 
-instance Monoid Permutation where
-    mempty = Identity
+instance (Ord a) => Monoid (Permutation a) where
+    mempty = Permutation Map.empty
     mappend = composePerm
 
-apply :: Permutation -> Int -> Int
-apply (Permutation arr) i | inRange (bounds arr) i = arr!i
-apply _ i = i
+apply :: (Ord a) => Permutation a -> a -> a
+apply (Permutation m) x = Map.findWithDefault x x m
 
-composePerm :: Permutation -> Permutation -> Permutation
-composePerm Identity p2 = p2
-composePerm p1 Identity = p1
-composePerm p1@(Permutation arr1) p2@(Permutation arr2) =
-    Permutation (listArray bds [apply p1 (apply p2 i) | i <- range bds])
+composePerm :: (Ord a) => Permutation a -> Permutation a -> Permutation a
+composePerm p1 p2 =
+    permutation [(x, apply p1 (apply p2 x)) | x <- keys]
   where
-    (lo1, hi1) = bounds arr1
-    (lo2, hi2) = bounds arr2
-    bds = (min lo1 lo2, max hi1 hi2)
+    keys = Set.toList (Set.union (nonIdentity p1) (nonIdentity p2))
 
 -- | The inverse of a permutation
-invert :: Permutation -> Permutation
-invert Identity = Identity
-invert p@(Permutation arr) =
-    Permutation (array (bounds arr) [(j, i) | (i, j) <- assocs arr])
+invert :: (Ord a) => Permutation a -> Permutation a
+invert p = Permutation (Map.fromList [(apply p x, x) | x <- Set.toList (nonIdentity p)])
 
 -- | A cyclic permutation mapping each element of the list to the next,
 -- and wrapping around at the end.
-cyclic :: [Int] -> Permutation
-cyclic vs
-  | trivial unique_vs = Identity
-  | otherwise =
-        Permutation (listArray bds [Map.findWithDefault i i m | i <- range bds])
+cyclic :: Ord a => [a] -> Permutation a
+cyclic vs = Permutation (Map.fromList (zip unique_vs (rotate unique_vs)))
   where
     unique_vs = catMaybes (snd (mapAccumL unique Set.empty vs))
     unique seen v
@@ -78,40 +68,31 @@ cyclic vs
       | otherwise = (Set.insert v seen, Just v)
     rotate [] = []
     rotate (x:xs) = xs ++ [x]
-    bds = (minimum unique_vs, maximum unique_vs)
-    m = Map.fromList (zip unique_vs (rotate unique_vs))
 
 -- | Non-unit cycles of the permutation
-cycles :: Permutation -> [[Int]]
-cycles Identity = []
-cycles (Permutation arr) = getCycles (Set.fromList (indices arr))
+cycles :: Ord a => Permutation a -> [[a]]
+cycles p = getCycles (nonIdentity p)
   where
     getCycles left = case Set.minView left of
         Nothing -> []
-        Just (i, _)
-          | trivial i_cycle -> others
-          | otherwise -> i_cycle:others
+        Just (i, _) -> i_cycle:others
           where
+            -- the cycle muct have at least two elements
             i_cycle = getCycle i Set.empty
             others = getCycles (Set.difference left (Set.fromList i_cycle))
     getCycle i seen
       | Set.member i seen = []
-      | otherwise = i:getCycle (arr!i) (Set.insert i seen)
+      | otherwise = i:getCycle (apply p i) (Set.insert i seen)
 
 -- | The smallest k > 0 such that p^k = id
-order :: Permutation -> Int
+order :: Ord a => Permutation a -> Int
 order p = foldr lcm 1 (map length (cycles p))
-
-trivial :: [a] -> Bool
-trivial [] = True
-trivial [_] = True
-trivial _ = False
 
 -- Basic permutations
 
-swap :: Int -> Int -> Permutation
+swap :: Ord a => a -> a -> Permutation a
 swap i j = cyclic [i, j]
 
 -- | swap [i..j) with [j..k)
-swapRanges :: Int -> Int -> Int -> Permutation
-swapRanges i j k = Permutation (listArray (i, k-1) ([j..k-1] ++ [i..j-1]))
+swapRanges :: Integral a => a -> a -> a -> Permutation a
+swapRanges i j k = permutation (zip [i..k-1] ([j..k-1] ++ [i..j-1]))
