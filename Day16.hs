@@ -40,12 +40,12 @@ mtimes k p
 
 -- Dances perform permutations of [0..n-1]
 
-showPerm :: Int -> Permutation -> String
+showPerm :: Int -> Permutation Int -> String
 showPerm n p = map (programLetter . apply p) [0..n-1]
 
 -- Basic permutations
 
-spin :: Int -> Int -> Permutation
+spin :: Int -> Int -> Permutation Int
 spin n i = swapRanges 0 (n-i) n
 
 {-
@@ -66,16 +66,18 @@ type Wrap a = (Dual a, a)
 wrap :: Monoid a => Wrap a -> a
 wrap (Dual pf, pb) = pf <> pb
 
-movePermutation :: Int -> Move -> Wrap Permutation
-movePermutation n (Spin i) = (mempty, spin n i)
-movePermutation n (Exchange i j) = (mempty, swap i j)
-movePermutation n (Partner i j) = (Dual (swap i j), mempty)
+type Dance = Wrap (Permutation Int)
 
-showDance :: Int -> Wrap Permutation -> String
+danceMove :: Int -> Move -> Dance
+danceMove n (Spin i) = (mempty, spin n i)
+danceMove n (Exchange i j) = (mempty, swap i j)
+danceMove n (Partner i j) = (Dual (swap i j), mempty)
+
+showDance :: Int -> Dance -> String
 showDance n = showPerm n . wrap
 
-dance :: Int -> [Move] -> Wrap Permutation
-dance n = mconcat . map (movePermutation n)
+dance :: Int -> [Move] -> Dance
+dance n = mconcat . map (danceMove n)
 
 solve1 :: Input -> String
 solve1 = showDance 16 . dance 16
