@@ -55,12 +55,13 @@ composePerm p1 p2 =
 
 -- | The inverse of a permutation
 invert :: (Ord a) => Permutation a -> Permutation a
-invert p = Permutation (Map.fromList [(apply p x, x) | x <- Set.toList (nonIdentity p)])
+invert p = Permutation $
+    Map.fromList [(apply p x, x) | x <- Set.toList (nonIdentity p)]
 
 -- | A cyclic permutation mapping each element of the list to the next,
 -- and wrapping around at the end.
 cyclic :: (Ord a) => [a] -> Permutation a
-cyclic vs = Permutation (Map.fromList (zip unique_vs (rotate unique_vs)))
+cyclic vs = permutation (zip unique_vs (rotate unique_vs))
   where
     unique_vs = catMaybes (snd (mapAccumL unique Set.empty vs))
     unique seen v
@@ -69,22 +70,19 @@ cyclic vs = Permutation (Map.fromList (zip unique_vs (rotate unique_vs)))
     rotate [] = []
     rotate (x:xs) = xs ++ [x]
 
--- | Non-unit cycles of the permutation
+-- | Non-unit cycles of the permutation, in increasing order of least element
 cycles :: (Ord a) => Permutation a -> [[a]]
-cycles p = getCycles (nonIdentity p)
+cycles p = unfoldr extractCycle (nonIdentity p)
   where
-    getCycles left = case Set.minView left of
-        Nothing -> []
-        Just (i, _) -> i_cycle:others
+    extractCycle left = case Set.minView left of
+        Nothing -> Nothing
+        Just (i, _) ->
+            Just (i_cycle, Set.difference left (Set.fromList i_cycle))
           where
-            -- the cycle muct have at least two elements
-            i_cycle = getCycle i Set.empty
-            others = getCycles (Set.difference left (Set.fromList i_cycle))
-    getCycle i seen
-      | Set.member i seen = []
-      | otherwise = i:getCycle (apply p i) (Set.insert i seen)
+            -- the cycle must have at least two elements
+            i_cycle = i:takeWhile (/= i) (iterate (apply p) (apply p i))
 
--- | The smallest k > 0 such that p^k = id
+-- | The smallest positive k such that p^k = id
 order :: (Ord a) => Permutation a -> Int
 order p = foldr lcm 1 (map length (cycles p))
 
