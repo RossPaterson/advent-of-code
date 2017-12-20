@@ -5,27 +5,20 @@ import Utilities
 import Control.Monad
 import Data.Char
 import Data.List
-import Data.Maybe
 import Data.Map (Map)
 import qualified Data.Map as Map
-
-type Item = Char
-type Wire = Maybe Item
 
 data Position = Position Int Int -- row first, so start is first key
     deriving (Eq, Ord, Show)
 
-type Diagram = Map Position Wire
+type Diagram = Map Position Char
 type Input = Diagram
 
 parse :: String -> Input
-parse s = compose [Map.insert (Position row col) (cell c) |
+parse s = compose [Map.insert (Position row col) c |
     (row, line) <- zip [0..] (lines s),
     (col, c) <- zip [0..] line,
     c /= ' '] Map.empty
-  where
-    cell c | isAlpha c = Just c
-    cell _ = Nothing
 
 data Direction = Up | Down | Left | Right
     deriving Show
@@ -66,8 +59,8 @@ step diagram (pos, dir) =
 path :: Map Position a -> [a]
 path diagram = unfoldr (step diagram) (start diagram)
 
-solve1 :: Input -> [Item]
-solve1 = catMaybes . path
+solve1 :: Input -> String
+solve1 = filter isAlpha . path
 
 testInput :: String
 testInput = "\
@@ -80,7 +73,7 @@ testInput = "\
     \\n"
 
 
-tests1 :: [(String, [Item])]
+tests1 :: [(String, String)]
 tests1 = [(testInput, "ABCDEF")]
 
 -- Part Two
