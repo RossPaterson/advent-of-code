@@ -61,10 +61,14 @@ chooseBetween m n (x:xs) =
 -- select all the elements of xs that have the least value of f
 -- (f is evaluated once for each element of the list.)
 leastBy :: (Ord v) => (a -> v) -> [a] -> [a]
-leastBy f = map fst . head . groupBy same . sortBy (comparing snd) . map add_f
+leastBy f =
+    map fst . head . groupBy (same snd) . sortBy (comparing snd) . map add_f
   where
     add_f x = (x, f x)
-    same (_, fx) (_, fy) = fx == fy
+
+-- Equal results under f (useful for groupBy)
+same :: (Eq b) => (a -> b) -> a -> a -> Bool
+same f x y = f x == f y
 
 -- sort and eliminate repetitions
 -- O(n log(m)) where m is the number of unique elements
