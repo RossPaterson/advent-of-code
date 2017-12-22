@@ -43,7 +43,7 @@ mtimes k p
 showPerm :: Int -> Permutation Int -> String
 showPerm n p = map (programLetter . apply p) [0..n-1]
 
--- Basic permutations
+-- Basic permutation
 
 spin :: Int -> Int -> Permutation Int
 spin n i = swapRanges 0 (n-i) n
@@ -54,7 +54,7 @@ the permutation as follows:
 
 Spin i       : p <> spin i
 Exchange i j : p <> swap i j
-Partner i j  : swap n i j <> p
+Partner i j  : swap i j <> p
 
 Therefore we build a pair of permutations to be wrapped around the starting
 permutation, with the front one composed in the reverse order.
