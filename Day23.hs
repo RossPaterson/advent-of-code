@@ -82,8 +82,17 @@ solve1 program = length $ filter (isMul . (program!)) $ init $
 composite :: Int -> Bool
 composite n = or [n `mod` f == 0 | f <- takeWhile ((<= n) . (^2)) [2..]]
 
+getValue :: Instruction -> Int
+getValue (Set r (Value x)) = x
+getValue (Sub r (Value x)) = x
+getValue (Mul r (Value x)) = x
+
 solve2 :: Input -> Int
-solve2 _ = length $ filter composite [107900 + i*17 | i <- [0..1000]]
+solve2 program = length $ filter composite [start, start+incr .. finish]
+  where
+    start = getValue (program!0) * getValue (program!4) - getValue (program!5)
+    finish = start - getValue (program!7)
+    incr = - getValue (program!30)
 
 main :: IO ()
 main = do
