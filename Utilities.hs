@@ -43,6 +43,10 @@ times n f = compose (replicate n f)
 compose :: [a -> a] -> a -> a
 compose fs x = foldr id x fs
 
+-- ways of picking one element from a list
+pick :: [a] -> [(a, [a])]
+pick xs = [(x, front ++ back) | (front, x:back) <- zip (inits xs) (tails xs)]
+
 -- possible choices of n elements from a list
 choose :: Int -> [a] -> [([a], [a])]
 choose 0 xs = [([], xs)]
