@@ -23,11 +23,13 @@ bridgesFrom :: Int -> [Component] -> [[Component]]
 bridgesFrom n comps =
     []:[(x, y):path |
         (e, rest) <- pick comps,
-        (x, y) <- [e, swap e],
+        (x, y) <- arrangements e,
         x == n,
         path <- bridgesFrom y rest]
   where
-    swap (x, y) = (y, x)
+    arrangements (x, y)
+      | x == y = [(x, y)]
+      | otherwise = [(x, y), (y, x)]
 
 solve1 :: Input -> Int
 solve1 = maximum . map strength . bridges
