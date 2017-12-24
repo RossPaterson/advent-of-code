@@ -7,7 +7,7 @@ run: $(PROGS)
 	for prog in $(PROGS); do echo $$prog:; ./$$prog; echo; done
 
 clean:
-	$(RM) $(PROGS) *.o *.hi
+	$(RM) $(PROGS) *.o *.hi Utilities/*.o Utilities/*.hi
 
 Day%: Day%.hs $(LIBDIR)/*.hs
 	/usr/bin/ghc --make -O -i$(LIBDIR) Day$*.hs
