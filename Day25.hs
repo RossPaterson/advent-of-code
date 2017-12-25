@@ -48,56 +48,57 @@ paragraphs ls = para:case rest of
   where
     (para, rest) = span (not . null) ls
 
--- list padded with False
-type Tape = [Value]
+-- infinite tape padded with False
+data Tape =
+    Tape { leftValues :: ![Value], cursor :: !Value, rightValues :: ![Value] }
+    deriving Show
 
-getValue :: Tape -> (Value, Tape)
+emptyTape :: Tape
+emptyTape = Tape { leftValues = [], cursor = False, rightValues = [] }
+
+-- move the cursor left or right
+move :: Direction -> Tape -> Tape
+move Left s =
+    Tape { leftValues = l, cursor = sym, rightValues = cursor s:rightValues s }
+  where
+    (sym, l) = getValue (leftValues s)
+move Right s =
+    Tape { leftValues = cursor s:leftValues s, cursor = sym, rightValues = r }
+  where
+    (sym, r) = getValue (rightValues s)
+
+getValue :: [Bool] -> (Bool, [Bool])
 getValue [] = (False, [])
 getValue (b:bs) = (b, bs)
 
+-- number of ones on the tape
+checksum :: Tape -> Int
+checksum s = ones (leftValues s) + ones (cursor s : rightValues s)
+  where
+    ones = length . filter id
+
 -- state of the Turing machine
-data TMState = TMState {
-    current :: !State,
-    leftTape :: !Tape,
-    symbol :: !Value,
-    rightTape :: !Tape }
+data TMState = TMState { current :: !State, tape :: !Tape }
     deriving Show
 
 initState :: State -> TMState
-initState s =
-    TMState { current = s, leftTape = [], symbol = False, rightTape = [] }
+initState s = TMState { current = s, tape = emptyTape }
 
 -- one step of the Turing machine
 step :: Machine -> TMState -> TMState
-step mc s = apply (selectPair (symbol s) (mc!current s)) s
+step mc s = apply (selectPair (cursor (tape s)) (mc!current s)) s
 
 selectPair :: Bool -> (a, a) -> a
 selectPair False (f, t) = f
 selectPair True (f, t) = t
 
 apply :: Transition -> TMState -> TMState
-apply (Transition value dir newState) s =
-    move dir $ s { current = newState, symbol = value }
-
--- move the read/write head left or right
-move :: Direction -> TMState -> TMState
-move Left s =
-    s { leftTape = l, symbol = sym, rightTape = symbol s:rightTape s }
-  where
-    (sym, l) = getValue (leftTape s)
-move Right s =
-    s { leftTape = symbol s:leftTape s, symbol = sym, rightTape = r }
-  where
-    (sym, r) = getValue (rightTape s)
-
--- number of ones on the tape
-checksum :: TMState -> Int
-checksum s = ones (leftTape s) + ones (symbol s : rightTape s)
-  where
-    ones = length . filter id
+apply (Transition value dir newState) s = TMState {
+    current = newState,
+    tape = move dir $ (tape s) { cursor = value } }
 
 solve1 :: Input -> Int
-solve1 input = checksum $
+solve1 input = checksum $ tape $
     times (stopAfter input) (step (tm input)) (initState (startState input))
 
 testInput :: String
