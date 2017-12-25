@@ -48,19 +48,20 @@ paragraphs ls = para:case rest of
   where
     (para, rest) = span (not . null) ls
 
-data TMState = TMState {
-    current :: !State,
-    leftTape :: !Tape,
-    symbol :: !Value,
-    rightTape :: !Tape }
-    deriving Show
-
 -- list padded with False
 type Tape = [Value]
 
 getValue :: Tape -> (Value, Tape)
 getValue [] = (False, [])
 getValue (b:bs) = (b, bs)
+
+-- state of the Turing machine
+data TMState = TMState {
+    current :: !State,
+    leftTape :: !Tape,
+    symbol :: !Value,
+    rightTape :: !Tape }
+    deriving Show
 
 initState :: State -> TMState
 initState s =
@@ -75,24 +76,25 @@ selectPair False (f, t) = f
 selectPair True (f, t) = t
 
 apply :: Transition -> TMState -> TMState
-apply (Transition value Left newState) s = TMState {
-    current = newState,
-    leftTape = l,
-    symbol = sym,
-    rightTape = value:rightTape s }
+apply (Transition value dir newState) s =
+    move dir $ s { current = newState, symbol = value }
+
+-- move the read/write head left or right
+move :: Direction -> TMState -> TMState
+move Left s =
+    s { leftTape = l, symbol = sym, rightTape = symbol s:rightTape s }
   where
     (sym, l) = getValue (leftTape s)
-apply (Transition value Right newState) s = TMState {
-    current = newState,
-    leftTape = value:leftTape s,
-    symbol = sym,
-    rightTape = r }
+move Right s =
+    s { leftTape = symbol s:leftTape s, symbol = sym, rightTape = r }
   where
     (sym, r) = getValue (rightTape s)
 
 -- number of ones on the tape
 checksum :: TMState -> Int
-checksum s = length $ filter id (leftTape s ++ symbol s : rightTape s)
+checksum s = ones (leftTape s) + ones (symbol s : rightTape s)
+  where
+    ones = length . filter id
 
 solve1 :: Input -> Int
 solve1 input = checksum $
