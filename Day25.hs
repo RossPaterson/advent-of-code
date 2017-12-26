@@ -58,18 +58,24 @@ emptyTape = Tape { leftValues = [], cursor = False, rightValues = [] }
 
 -- move the cursor left or right
 move :: Direction -> Tape -> Tape
-move Left s =
-    Tape { leftValues = l, cursor = sym, rightValues = cursor s:rightValues s }
+move Left s = Tape {
+    leftValues = l, cursor = sym,
+    rightValues = pushValue (cursor s) (rightValues s) }
   where
-    (sym, l) = getValue (leftValues s)
-move Right s =
-    Tape { leftValues = cursor s:leftValues s, cursor = sym, rightValues = r }
+    (sym, l) = popValue (leftValues s)
+move Right s = Tape {
+    leftValues = pushValue (cursor s) (leftValues s),
+    cursor = sym, rightValues = r }
   where
-    (sym, r) = getValue (rightValues s)
+    (sym, r) = popValue (rightValues s)
 
-getValue :: [Bool] -> (Bool, [Bool])
-getValue [] = (False, [])
-getValue (b:bs) = (b, bs)
+popValue :: [Bool] -> (Bool, [Bool])
+popValue [] = (False, [])
+popValue (b:bs) = (b, bs)
+
+pushValue :: Bool -> [Bool] -> [Bool]
+pushValue False [] = [] -- trim
+pushValue b bs = b:bs
 
 -- number of ones on the tape
 checksum :: Tape -> Int
