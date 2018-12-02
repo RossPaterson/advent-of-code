@@ -24,14 +24,13 @@ tests1 = [
 solve2 :: Input -> Int
 solve2 = head . repeats . scanl (+) 0 . cycle
 
--- repeating elements of the list, in order of second occurrence
+-- repeated elements of the list
 repeats :: Ord a => [a] -> [a]
-repeats = reps Set.empty
-  where
-    reps seen [] = []
-    reps seen (x:xs)
-      | Set.member x seen = x : reps seen xs
-      | otherwise = reps (Set.insert x seen) xs
+repeats xs = [x | (x, prev_xs) <- zip xs (init_sets xs), Set.member x prev_xs]
+
+-- same as map Set.fromList (inits xs)
+init_sets :: Ord a => [a] -> [Set a]
+init_sets xs = scanl (flip Set.insert) Set.empty xs
 
 tests2 :: [(Input, Int)]
 tests2 = [
