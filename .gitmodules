@@ -1,3 +1,0 @@
-[submodule "aoc-utilities"]
-	path = aoc-utilities
-	url = git@github.com:RossPaterson/aoc-utilities.git
