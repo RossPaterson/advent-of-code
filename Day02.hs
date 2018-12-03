@@ -26,7 +26,8 @@ tests1 = [(["abcdef", "bababc", "abbcde", "abcccd", "aabcdd", "abcdee", "ababab"
 solve2 :: Input -> String
 solve2 = head . nearRepetitions
 
--- lists that are repeated except for the value at one position
+-- shared parts of lists that are repeated except for the value at one position
+-- The cost for n lists of length k is O(nk log n).
 nearRepetitions :: Ord a => [[a]] -> [[a]]
 nearRepetitions xss =
     [rest | ((p, rest), n) <- frequency (sort (concatMap removals xss)), n > 1]
@@ -37,6 +38,16 @@ nearRepetitions xss =
 removals :: [a] -> [(Int, [a])]
 removals xs =
     [(length front, front++back) | (front, x:back) <- zip (inits xs) (tails xs)]
+
+-- Another way of finding the shared part of a list that is repeated
+-- except for the value at one position.
+-- This implementation compares each list with every other list
+-- The cost is O(n^2 k), but it is faster for the supplied input.
+solve2_quadratic :: Ord a => [[a]] -> [a]
+solve2_quadratic xss =
+    head [[x1 | (x1, x2) <- zip xs1 xs2, x1 == x2] |
+        xs1 <- xss, xs2 <- xss,
+        length (filter id (zipWith (/=) xs1 xs2)) == 1]
 
 tests2 :: [(Input, String)]
 tests2 = [(["abcde", "fghij", "klmno", "pqrst", "fguij", "axcye", "wvxyz"], "fgij")]
