@@ -10,7 +10,7 @@ import Data.Ord
 
 -- Input processing
 
-type Input = [Record]
+type Input = [Shift]
 
 -- a line in the log
 type Record = (Timestamp, Event)
@@ -25,7 +25,7 @@ data Event = Start Int | Sleeps | Wakes
   deriving Show
 
 parse :: String -> Input
-parse = map (runParser record) . sort . lines
+parse = getShifts . map (runParser record) . sort . lines
   where
     record = (,) <$> timestamp <* char ' ' <*> event
     timestamp =
@@ -61,7 +61,7 @@ getShifts ((_, Start n):rs) =
 -- Part One
 
 solve1 :: Input -> Int
-solve1 = uncurry (*) . strategy1 . getShifts
+solve1 = uncurry (*) . strategy1
 
 -- The guard who slept most, and the minute they sleep most often
 strategy1 :: [Shift] -> (Int, Int)
@@ -118,7 +118,7 @@ tests1 = [(testInput, 240)]
 -- Part Two
 
 solve2 :: Input -> Int
-solve2 = uncurry (*) . strategy2 . getShifts
+solve2 = uncurry (*) . strategy2
 
 -- The guard and minute most often asleep
 strategy2 :: [Shift] -> (Int, Int)
