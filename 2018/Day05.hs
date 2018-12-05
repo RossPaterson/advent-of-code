@@ -5,10 +5,14 @@ import Data.Char
 
 -- Input processing
 
-type Input = [Unit Char]
+type Input = FreeGroup Char
 
-data Unit a = Unit { polarity :: Bool, uType :: a }
-  deriving Show
+type FreeGroup a = [Unit a]
+data Unit a = Unit { polarity :: Bool, absValue :: a }
+  deriving (Show, Eq)
+
+inverse :: Unit a -> Unit a
+inverse (Unit p t) = Unit (not p) t
 
 parse :: String -> Input
 parse = map unit . filter (/= '\n')
@@ -18,21 +22,17 @@ parse = map unit . filter (/= '\n')
 -- Part One
 
 solve1 :: Input -> Int
-solve1 = length . reduce
+solve1 = length . normalize
 
--- repeatedly remove adjacent cancelling units
-reduce :: Eq a => [Unit a] -> [Unit a]
-reduce = reverse . react []
+-- normalize by repeatedly removing adjacent cancelling units
+normalize :: Eq a => FreeGroup a -> FreeGroup a
+normalize = reverse . reduce []
   where
-    react xs [] = xs
-    react [] (y:ys) = react [y] ys
-    react (x:xs) (y:ys)
-      | cancel x y = react xs ys
-      | otherwise = react (y:x:xs) ys
-
--- two units cancel if they have the same type and opposite polarities
-cancel :: Eq a => Unit a -> Unit a -> Bool
-cancel (Unit p1 t1) (Unit p2 t2) = p1 == not p2 && t1 == t2
+    reduce xs [] = xs
+    reduce [] (y:ys) = reduce [y] ys
+    reduce (x:xs) (y:ys)
+      | x == inverse y = reduce xs ys
+      | otherwise = reduce (y:x:xs) ys
 
 tests1 :: [(String, Int)]
 tests1 = [("aA", 0), ("abBA", 0), ("abAB", 4), ("aabAAB", 6), ("dabAcCaCBAcCcaDA", 10)]
@@ -43,10 +43,10 @@ solve2 :: Input -> Int
 solve2 = shortest
 
 -- shortest length obtained by removing all of one type of unit and reducing
-shortest :: Ord a => [Unit a] -> Int
+shortest :: Ord a => FreeGroup a -> Int
 shortest us =
-    minimum [length (reduce (filter ((/= t) . uType) us)) |
-        t <- fast_nub (map uType us)]
+    minimum [length (normalize (filter ((/= t) . absValue) us)) |
+        t <- fast_nub (map absValue us)]
 
 tests2 :: [(String, Int)]
 tests2 = [("dabAcCaCBAcCcaDA", 4)]
