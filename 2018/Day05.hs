@@ -26,13 +26,13 @@ solve1 = length . normalize
 
 -- normalize by repeatedly removing adjacent cancelling units
 normalize :: Eq a => FreeGroup a -> FreeGroup a
-normalize = reverse . reduce []
+normalize = reverse . foldl reduce []
   where
-    reduce xs [] = xs
-    reduce [] (y:ys) = reduce [y] ys
-    reduce (x:xs) (y:ys)
-      | x == inverse y = reduce xs ys
-      | otherwise = reduce (y:x:xs) ys
+    -- accumulation parameter is reverse of reduced prefix
+    reduce [] y = [y]
+    reduce (x:xs) y
+      | x == inverse y = xs
+      | otherwise = y:x:xs
 
 tests1 :: [(String, Int)]
 tests1 = [("aA", 0), ("abBA", 0), ("abAB", 4), ("aabAAB", 6), ("dabAcCaCBAcCcaDA", 10)]
