@@ -45,8 +45,10 @@ solve2 = shortest
 -- shortest length obtained by removing all of one type of unit and reducing
 shortest :: Ord a => FreeGroup a -> Int
 shortest us =
-    minimum [length (normalize (filter ((/= t) . absValue) us)) |
+    minimum [length (normalize (filter ((/= t) . absValue) us')) |
         t <- fast_nub (map absValue us)]
+  where
+    us' = normalize us -- speeds things up
 
 tests2 :: [(String, Int)]
 tests2 = [("dabAcCaCBAcCcaDA", 4)]
