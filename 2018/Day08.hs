@@ -15,9 +15,10 @@ parse = fst . takeTree . map read . words
 -- Scan one tree from the list
 -- First two numbers are number of subtress and number of data values
 takeTree :: [Int] -> (Tree, [Int])
-takeTree (nc:nd:xs) = (Tree children (take nd rest), drop nd rest)
+takeTree (nc:nd:xs) = (Tree children vs, rest)
   where
-    (children, rest) = takeTrees nc xs
+    (children, xs') = takeTrees nc xs
+    (vs, rest) = splitAt nd xs'
 
 -- Scan n trees from the list
 takeTrees :: Int -> [Int] -> ([Tree], [Int])
