@@ -68,7 +68,7 @@ tests1 = [(testInput, "CABDFE")]
 -- Part Two
 
 solve2 :: Input -> Int
-solve2 = numSteps 60 5
+solve2 = numSteps letterCost 5
 
 -- state of the execution
 data State a = State {
@@ -84,22 +84,22 @@ type Job a = (a, Int) -- task with completion time
 start :: [Task a] -> State a
 start ts = State 0 [] ts
 
-numSteps :: Int -> Int -> [Task Char] -> Int
-numSteps basetime nworkers =
+numSteps :: Ord a => (a -> Int) -> Int -> [Task a] -> Int
+numSteps cost nworkers =
     clock .
     until (null . running)
-        (startJobs basetime nworkers . completeJobs . advance) .
-    startJobs basetime nworkers .
+        (startJobs cost nworkers . completeJobs . advance) .
+    startJobs cost nworkers .
     start
 
 -- start idle workers on available tasks
-startJobs :: Int -> Int -> State Char -> State Char
-startJobs basetime nworkers s = s {
-    running = [job t n | n <- ready] ++ running s,
+startJobs :: Ord a => (a -> Int) -> Int -> State a -> State a
+startJobs cost nworkers s = s {
+    running = [(n, t + cost n) | n <- ready] ++ running s,
     queue = [(n, ds) | (n, ds) <- queue s, not (elem n ready)]
     }
   where
-    t = clock s + basetime
+    t = clock s
     idle = nworkers - length (running s)
     ready = take idle (runnable (queue s))
 
@@ -118,11 +118,11 @@ completeJobs s = s {
     (completed, ongoing) = partition ((== t) . snd) (running s)
     completed_set = Set.fromList (map fst completed)
 
-job :: Int -> Char -> Job Char
-job basetime c = (c, basetime + cost c)
+letterCost :: Char -> Int
+letterCost c = ord c - ord 'A' + 61
 
-cost :: Char -> Int
-cost c = ord c - ord 'A' + 1
+testCost :: Char -> Int
+testCost = subtract 60 . letterCost
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 15)]
@@ -133,5 +133,5 @@ main = do
     let input = parse s
     putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     putStrLn (solve1 input)
-    putStr (unlines (failures "solve2" (numSteps 0 2 . parse) tests2))
+    putStr (unlines (failures "solve2" (numSteps testCost 2 . parse) tests2))
     print (solve2 input)
