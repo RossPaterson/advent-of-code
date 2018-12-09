@@ -104,9 +104,11 @@ child would only compute it once, and unused children would not be computed.
 
 ## Day 9: Marble Mania
 
-This was straightforward, though fiddly in the details.  The naive
-approach to was to use a deque, and that turned out to be enough.
-The rest was following detailed instructions accurately.
+This was straightforward, though fiddly in the details.  Because all
+the changes occur near the current position in the circle, the naive
+approach to was to break the circle as a deque with the current element
+at one end, and that turned out to be enough.  The rest was following
+detailed instructions accurately.
 
 The second part was the same with a larger input.  The naive
 implementation ran out of stack in the interpreter, but compiling it
