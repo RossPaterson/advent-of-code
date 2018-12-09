@@ -86,11 +86,11 @@ three separate state transformations:
 * advancing the clock
 * wrapping up any completed jobs
 
-Each of these was manageable by itself.  Also, with this breakdown, it
-was clear that the termination test should be before advancing the clock,
-and this breakdown made it easy to unroll the loop.  For the advancing
-step, it would suffice to move the clock one tick at a time, but it's
-just as easy to advance to the time when the next job will complete.
+Each of these was manageable by itself.  Also, it was clear that
+the termination test should be before advancing the clock, and this
+breakdown made it easy to unroll the loop.  For the advancing step,
+it would suffice to move the clock one tick at a time, but it's just as
+easy to advance to the time when the next job will complete.
 
 ## Day 8: Memory Maneuver
 
@@ -105,11 +105,13 @@ child would only compute it once, and unused children would not be computed.
 ## Day 9: Marble Mania
 
 This was straightforward, though fiddly in the details.  Because all
-the changes occur near the current position in the circle, the naive
+the changes occur near the current position in the circle, a simple
 approach to was to break the circle as a deque with the current element
 at one end, and that turned out to be enough.  The rest was following
 detailed instructions accurately.
 
-The second part was the same with a larger input.  The naive
-implementation ran out of stack in the interpreter, but compiling it
-avoided that and was fast enough for this input.
+The second part was the same with a larger input.  (I was expecting this,
+as it is a recurring Advent of Code motif, but it caught out people who
+used less flexible sequence types.)  The deque implementation ran out
+of stack in the interpreter, but compiling it avoided that and was fast
+enough for this input.
