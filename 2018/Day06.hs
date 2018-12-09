@@ -69,10 +69,9 @@ closestAll ps cs = [c | p <- ps, c <- maybeToList (closest p cs)]
 -- the unique closest coordinate to p
 closest :: Coordinate -> [Coordinate] -> Maybe Coordinate
 closest p cs =
-    unique $ map fst $ head $ groupBy sameDist $ sortBy (comparing snd) $
+    unique $ map fst $ head $ groupBy (same snd) $ sortBy (comparing snd) $
     [(c, distance p c) | c <- cs]
   where
-    sameDist (_, d1) (_, d2) = d1 == d2
     unique [x] = Just x
     unique _ = Nothing
 
