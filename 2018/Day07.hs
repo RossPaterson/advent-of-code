@@ -11,24 +11,23 @@ import qualified Data.Set as Set
 
 -- Input processing
 
-type Input = [Task Char]
+type Input = Prerequisites Char
 
 data Dependency a = Before a a
 
 parse :: String -> Input
-parse = tasks . map (runParser dependency) . lines
+parse = prerequisites . map (runParser dependency) . lines
   where
     dependency = Before <$ string "Step " <*> letter <*
         string " must be finished before step " <*> letter <*
         string " can begin."
     letter = satisfy isUpper
 
--- step with the tasks that must be done previously
-type Task a = (a, Set a)
+-- set of prerequisites for each task
+type Prerequisites a = Map a (Set a)
 
-tasks :: Ord a => [Dependency a] -> [Task a]
-tasks ds = Map.assocs $
-    Map.unionsWith Set.union
+prerequisites :: Ord a => [Dependency a] -> Prerequisites a
+prerequisites ds = Map.unionsWith Set.union
     ([Map.singleton after (Set.singleton before) | Before before after <- ds]
     ++
     [Map.singleton before Set.empty | Before before after <- ds])
@@ -36,21 +35,17 @@ tasks ds = Map.assocs $
 -- Part One
 
 solve1 :: Input -> String
-solve1 = schedule
+solve1 ds = schedule ds (Map.keysSet ds)
 
 -- schedule tasks respecting dependencies, breaking ties using list order
-schedule :: Ord a => [Task a] -> [a]
-schedule ts = case runnable ts of
+schedule :: Ord a => Prerequisites a -> Set a -> [a]
+schedule ds ts = case runnable ds ts of
     [] -> []
-    (n:_) -> n : schedule (remove n ts)
+    (t:_) -> t : schedule ds (Set.delete t ts)
 
 -- tasks that are available for running
-runnable :: Ord a => [Task a] -> [a]
-runnable ts = [n | (n, ds) <- ts, Set.null ds]
-
--- remove task and dependencies
-remove :: Ord a => a -> [Task a] -> [Task a]
-remove n ts = [(x, Set.delete n ds) | (x, ds) <- ts, x /= n]
+runnable :: Ord a => Prerequisites a -> Set a -> [a]
+runnable ds ts = [t | t <- Set.toList ts, Set.disjoint (ds!t) ts]
 
 testInput :: String
 testInput = "\
@@ -73,35 +68,42 @@ solve2 = numSteps letterCost 5
 -- state of the execution
 data State a = State {
     clock :: Int, -- current time
+    queue :: Set a, -- tasks that have not yet started
     running :: [Job a], -- running tasks
-    queue :: [Task a] -- tasks that have not yet run
+    completed :: Set a -- tasks that have finished
     }
   deriving Show
 
 type Job a = (a, Int) -- task with completion time
 
--- initial state for a list of tasks
-start :: [Task a] -> State a
-start ts = State 0 [] ts
-
-numSteps :: Ord a => (a -> Int) -> Int -> [Task a] -> Int
-numSteps cost nworkers =
-    clock .
+numSteps :: Ord a => (a -> Int) -> Int -> Prerequisites a -> Int
+numSteps cost nworkers ds =
+    clock $
     until (null . running)
-        (startJobs cost nworkers . completeJobs . advance) .
-    startJobs cost nworkers .
-    start
+        (startJobs cost nworkers ds . completeJobs . advance) $
+    startJobs cost nworkers ds $
+    start ds
+
+-- initial state for a list of tasks
+start :: Ord a => Prerequisites a -> State a
+start ds = State {
+    clock = 0,
+    queue = Map.keysSet ds,
+    running = [],
+    completed = Set.empty
+    }
 
 -- start idle workers on available tasks
-startJobs :: Ord a => (a -> Int) -> Int -> State a -> State a
-startJobs cost nworkers s = s {
+startJobs :: Ord a => (a -> Int) -> Int -> Prerequisites a -> State a -> State a
+startJobs cost nworkers ds s = s {
     running = [(n, t + cost n) | n <- ready] ++ running s,
-    queue = [(n, ds) | (n, ds) <- queue s, not (elem n ready)]
+    queue = Set.difference (queue s) (Set.fromList ready)
     }
   where
     t = clock s
     idle = nworkers - length (running s)
-    ready = take idle (runnable (queue s))
+    ready = take idle
+        [t | t <- Set.toList (queue s), Set.isSubsetOf (ds!t) (completed s)]
 
 -- advance clock to next completion
 advance :: State a -> State a
@@ -111,12 +113,11 @@ advance s = s { clock = minimum (map snd (running s)) }
 completeJobs :: Ord a => State a -> State a
 completeJobs s = s {
     running = ongoing,
-    queue = [(n, Set.difference ds completed_set) | (n, ds) <- queue s]
+    completed = Set.union (completed s) (Set.fromList (map fst completing))
     }
   where
     t = clock s
-    (completed, ongoing) = partition ((== t) . snd) (running s)
-    completed_set = Set.fromList (map fst completed)
+    (completing, ongoing) = partition ((== t) . snd) (running s)
 
 letterCost :: Char -> Int
 letterCost c = ord c - ord 'A' + 61
