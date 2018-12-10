@@ -8,10 +8,10 @@ import qualified Data.Set as Set
 
 -- Input processing
 
-type Input = State
+type Input = System
 
 -- simple particle system
-type State = [Particle]
+type System = [Particle]
 data Particle = Particle { pos :: Vector, vel :: Vector }
   deriving Show
 type Vector = (Int, Int)
@@ -35,17 +35,17 @@ solve = concat . map (uncurry display) . candidates
 -- States that might be compact enough to contain a message.
 -- We expect the points to converge into a compact group and then expand
 -- again as each of them keeps moving linearly.
-candidates :: State -> [(Int, State)]
+candidates :: System -> [(Int, [Vector])]
 candidates s =
     takeWhile grouped $
-    dropWhile (not . grouped) $
-    zip [0..] $ iterate (map move) s
+    dropWhile (not . grouped)
+    [(n, map (positionAt n) s) | n <- [0..]]
   where
-    grouped = compact . map pos . snd
+    grouped = compact . snd
 
--- move a particle for one tick
-move :: Particle -> Particle
-move (Particle (px, py) (vx, vy)) = Particle (px+vx, py+vy) (vx, vy)
+-- position of particle at time t
+positionAt :: Int -> Particle -> Vector
+positionAt t (Particle (px, py) (vx, vy)) = (px+vx*t, py+vy*t)
 
 -- is the bounding rectangle small enough to be a message?
 compact :: [Vector] -> Bool
@@ -54,8 +54,8 @@ compact ps = width rect < 80 && height rect <= 12
     rect = boundingRect ps
 
 -- show a numbered state
-display :: Int -> State -> String
-display n s = show n ++ ":\n" ++ displayPoints (map pos s) ++ "\n"
+display :: Int -> [Vector] -> String
+display n ps = show n ++ ":\n" ++ displayPoints ps ++ "\n"
 
 -- display the filled part of a state as a bitmap
 displayPoints :: [Vector] -> String
