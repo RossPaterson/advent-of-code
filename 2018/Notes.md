@@ -58,7 +58,8 @@ intersecting with the boundary of a large enough rectangle, but I used a
 rectangle 9 times the size of the smallest bounding rectangle, to be safe.
 That worked, but was clearly overkill.  (Later, I learned from
 [Jo Wood's notes](https://github.com/jwoLondon/adventOfCode/blob/master/literateElm/d06_2018.md)
-that the smallest bounding rectangle was enough.)
+that the smallest bounding rectangle was enough.)  For the finite regions,
+I used the `frequency` utility function again.
 
 The second part, total distances for each point, was easier.  I made the
 search area a bit bigger than the smallest bounding rectangle, which
@@ -115,3 +116,10 @@ as it is a recurring Advent of Code motif, but it caught out people who
 used less flexible sequence types.)  The deque implementation ran out
 of stack in the interpreter, but compiling it avoided that and was fast
 enough for this input.
+
+## Day 10: The Stars Align
+
+This was fun.  Simulating the motion of the points was easy enough,
+but the spare specification of the end condition made it interesting.
+We had to work out which part of the space to draw, and when it might
+contain a message.
