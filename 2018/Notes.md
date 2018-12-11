@@ -123,3 +123,25 @@ This was fun.  Simulating the motion of the points was easy enough,
 but the spare specification of the end condition made it interesting.
 We had to work out which part of the space to draw, and when it might
 contain a message.
+
+## Day 11: Chronal Charge
+
+The first part was simple list comprehensions, but using this naive approach
+on the generalization in the second part would be O(*n*<sup>5</sup>),
+which I assumed would be too slow.  At first it was quite daunting, but
+then it became clear that a dynamic programming approach could compute
+all the sums in O(*n*<sup>3</sup>) time.  It also turned out to be a
+neat application of bulk operations on grids of numbers.  Again I had
+to compile the solution because it ran out of stack in the interpreter.
+
+Going through the subreddit later, I learned that one can easily compute
+all the sums in O(*n*<sup>3</sup>) time using a
+[summed-area table group](https://en.wikipedia.org/wiki/Summed-area_table),
+so people familiar with that structure would find part 2 quite easy.
+And some people had just used the naive O(*n*<sup>5</sup>) algorithm
+and got answers in time.
+
+This problem is a 2-dimensional
+[maximum subarray problem](https://en.wikipedia.org/wiki/Maximum_subarray_problem),
+and perhaps there are algorithms that do not require computing all the sums
+(like Kadane's for the 1-dimensional case).
