@@ -2,6 +2,7 @@ module Utilities where
 
 import Data.List
 import Data.Ord
+import Data.Semigroup
 import Data.Set (Set)
 import qualified Data.Set as Set
 
@@ -42,6 +43,12 @@ times n f = compose (replicate n f)
 -- composition of a list of functions
 compose :: [a -> a] -> a -> a
 compose fs x = foldr id x fs
+
+-- mtimes k p = mconcat (replicate k) p, but with O(log k) operations
+mtimes :: Monoid a => Int -> a -> a
+mtimes k p
+  | k == 0 = mempty
+  | otherwise = stimes k p
 
 -- ways of picking one element from a list
 pick :: [a] -> [(a, [a])]

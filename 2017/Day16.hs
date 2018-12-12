@@ -28,16 +28,6 @@ programLetter n = chr (n + ord 'a')
 letterToProgram :: Char -> Int
 letterToProgram c = ord c - ord 'a'
 
--- mtimes k p = mconcat (replicate k) p, but with O(log k) operations
-mtimes :: Monoid a => Int -> a -> a
-mtimes k p
-  | k == 0 = mempty
-  | k == 1 = p
-  | even k = pk2 <> pk2
-  | otherwise = pk2 <> pk2 <> p
-  where
-    pk2 = mtimes (k `div` 2) p
-
 -- Dances perform permutations of [0..n-1]
 
 showPerm :: Int -> Permutation Int -> String
