@@ -40,9 +40,11 @@ instance (Ord a, Show a) => Show (Permutation a) where
      where
        showCycle c = showString "cyclic " . showsPrec 11 c
 
+instance (Ord a) => Semigroup (Permutation a) where
+    (<>) = composePerm
+
 instance (Ord a) => Monoid (Permutation a) where
     mempty = Permutation Map.empty
-    mappend = composePerm
 
 apply :: (Ord a) => Permutation a -> a -> a
 apply (Permutation m) x = Map.findWithDefault x x m
