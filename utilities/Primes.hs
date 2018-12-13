@@ -14,12 +14,9 @@ primeFactors = factorize primes 0
 
 -- is n prime?
 isPrime :: Int -> Bool
-isPrime n = test primes
+isPrime n = noFactors primes
   where
-    test (p:ps)
-      | p*p > n = True
-      | n `mod` p == 0 = False
-      | otherwise = test ps
+    noFactors (p:ps) = p*p > n || n `mod` p /= 0 && noFactors ps
 
 -- infinite list of prime numbers
 primes :: [Int]
