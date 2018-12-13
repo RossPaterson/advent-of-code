@@ -9,6 +9,18 @@ import qualified Data.Set as Set
 allValues :: (Bounded a, Enum a) => [a]
 allValues = [minBound..maxBound]
 
+-- like succ, but wraps at maxBound
+succWrap :: (Eq a, Bounded a, Enum a) => a -> a
+succWrap v
+  | v == maxBound = minBound
+  | otherwise = succ v
+
+-- like pred, but wraps at minBound
+predWrap :: (Eq a, Bounded a, Enum a) => a -> a
+predWrap v
+  | v == minBound = maxBound
+  | otherwise = pred v
+
 -- groups n xs partitions xs into groups of size n, with the possible
 -- exception of the last one, which is non-empty.
 groups :: Int -> [a] -> [[a]]
@@ -35,6 +47,15 @@ whileJust f x = maybe x (whileJust f) (f x)
 -- collecting all the values
 iterateWhileJust :: (a -> Maybe a) -> a -> [a]
 iterateWhileJust f x = x:maybe [] (iterateWhileJust f) (f x)
+
+-- repeatedly apply the function until it produces a Left value
+whileRight :: (a -> Either b a) -> a -> b
+whileRight f x = either id (whileRight f) (f x)
+
+-- repeatedly apply the function until it produces a Left value,
+-- collecting all the Right values
+iterateWhileRight :: (a -> Either b a) -> a -> [a]
+iterateWhileRight f x = x : either (const []) (iterateWhileRight f) (f x)
 
 -- apply a function n times
 times :: Int -> (a -> a) -> a -> a
