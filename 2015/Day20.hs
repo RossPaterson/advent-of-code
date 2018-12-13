@@ -1,16 +1,6 @@
 module Main where
 
--- n = product [p^k | (p, k) <- primeFactors n]
--- p's primes in ascending order
-primeFactors :: Int -> [(Int, Int)]
-primeFactors = factorize 2 0
-  where
-    factorize _ 0 1 = []
-    factorize p k n
-      | n `mod` p == 0 = factorize p (k+1) (n `div` p)
-      | k > 0 = (p, k):factorize (p+1) 0 n
-      | p*p > n = [(n, 1)]
-      | otherwise = factorize (p+1) 0 n
+import Primes
 
 sumOfFactors :: Int -> Int
 sumOfFactors n = product [(p^(k+1) - 1) `div` (p-1) | (p, k) <- primeFactors n]
