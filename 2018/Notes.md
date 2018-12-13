@@ -138,8 +138,15 @@ Going through the subreddit later, I learned that one can easily compute
 all the sums in O(*n*<sup>3</sup>) time using a
 [summed-area table group](https://en.wikipedia.org/wiki/Summed-area_table),
 so people familiar with that structure would find part 2 quite easy.
-And some people had just used the naive O(*n*<sup>5</sup>) algorithm
-and got answers in time.
+
+Some people had just used the naive O(*n*<sup>5</sup>) algorithm and got
+answers in time.  This worked for this formulation because values range
+uniformly between -5 and 4, and thus have an average of -0.5, so the
+sums of large squares tend to be negative and one need only consider
+the smaller ones.  (This is the discrete version of an
+[Irwin–Hall distribution](https://en.wikipedia.org/wiki/Irwin%E2%80%93Hall_distribution),
+so the sum of a square of size *k*<sup>2</sup> has expected value
+-*k*<sup>2</sup>/2 with standard deviation approximately 5*k*/√3.)
 
 This problem is a 2-dimensional
 [maximum subarray problem](https://en.wikipedia.org/wiki/Maximum_subarray_problem),
