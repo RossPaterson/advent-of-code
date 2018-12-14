@@ -108,8 +108,9 @@ child would only compute it once, and unused children would not be computed.
 This was straightforward, though fiddly in the details.  Because all
 the changes occur near the current position in the circle, a simple
 approach to was to break the circle as a deque with the current element
-at one end, and that turned out to be enough.  The rest was following
-detailed instructions accurately.
+at one end, and that turned out to be enough.  (I used the Haskell
+[Seq](http://hackage.haskell.org/package/containers/docs/Data-Sequence.html)
+container.)  The rest was following detailed instructions accurately.
 
 The second part was the same with a larger input.  (I was expecting this,
 as it is a recurring Advent of Code motif, but it caught out people who
@@ -176,3 +177,14 @@ added complication: one has to determine the order of the carts at the
 start of each step, but by the time we reach a cart, it might already
 have been destroyed in a crash.  As seen before in AoC, this does not
 arise in the example given, but does happen with the supplied input.
+
+## Day 14: Chocolate Charts
+
+My original solutions to both parts involved iteratively updating the
+state, with fairly messy termination conditions.  I used the Haskell
+[Seq](http://hackage.haskell.org/package/containers/docs/Data-Sequence.html)
+container again, so that none of the operations were too costly, but an
+imperative extensible array would also have worked.
+
+A much neater solution is to generate the infinite list of scores,
+from which both parts can be easily computed.
