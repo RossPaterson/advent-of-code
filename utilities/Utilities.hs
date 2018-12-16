@@ -21,10 +21,10 @@ predWrap v
   | v == minBound = maxBound
   | otherwise = pred v
 
--- groups n xs partitions xs into groups of size n, with the possible
+-- takes n xs partitions xs into groups of size n, with the possible
 -- exception of the last one, which is non-empty.
-groups :: Int -> [a] -> [[a]]
-groups n = takeWhile (not . null) . map (take n) . iterate (drop n)
+takes :: Int -> [a] -> [[a]]
+takes n = takeWhile (not . null) . map (take n) . iterate (drop n)
 
 -- combine adjacent pairs, halving the size of the list
 pairWith :: (a -> a -> a) -> [a] -> [a]

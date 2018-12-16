@@ -49,4 +49,4 @@ knothash :: String -> [Int]
 knothash s = dense (hashRounds 64 256 lengths)
   where
     lengths = map ord (filter (/= '\n') s) ++ [17, 31, 73, 47, 23]
-    dense = map (foldr1 xor) . groups 16
+    dense = map (foldr1 xor) . takes 16
