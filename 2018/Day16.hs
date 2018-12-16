@@ -137,19 +137,35 @@ analyse samples =
 -- for each of which we have a set of opcodes.
 -- Any value with a unique opcode can be assigned, and both value and
 -- opcode removed from the remaining possibilities.
--- The dual strategy could also be used, but is not needed for this input.
+-- The same can be done for any opcode with a unique value.
+-- Both strategies are implemented here, but the first suffices for this input.
 reduce ::
    (Map Int OpCode, Map Int (Set OpCode)) ->
    (Map Int OpCode, Map Int (Set OpCode))
 reduce (done, ambiguous) = (done', ambiguous')
   where
     unique =
-        [(i, head (Set.toList s)) |
-            (i, s) <- Map.toList ambiguous, Set.size s == 1]
+        fast_nub (singletons ambiguous ++
+            map swap (singletons (invert ambiguous)))
     done' = Map.union done (Map.fromList unique)
     ambiguous' =
         compose [fmap (Set.delete opcode) | (i, opcode) <- unique] $
         foldr Map.delete ambiguous [i | (i, opcode) <- unique]
+
+-- mappings to a unique value
+singletons :: (Ord a, Ord b) => Map a (Set b) -> [(a, b)]
+singletons m =
+    [(i, head (Set.toList s)) | (i, s) <- Map.toList m, Set.size s == 1]
+
+-- invert a relation
+invert :: (Ord a, Ord b) => Map a (Set b) -> Map b (Set a)
+invert m =
+    Map.unionsWith Set.union
+        [Map.singleton y (Set.singleton x) |
+            (x, s) <- Map.toList m, y <- Set.toList s]
+
+swap :: (a, b) -> (b, a)
+swap (x, y) = (y, x)
 
 main :: IO ()
 main = do
