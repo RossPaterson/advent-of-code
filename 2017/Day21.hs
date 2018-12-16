@@ -76,7 +76,7 @@ splitGrid (Grid n bss)
   | otherwise = subGrids 3 bss
 
 subGrids :: Int -> [[Bool]] -> [[Grid]]
-subGrids n = map (map (Grid n) . transpose) . groups n . map (groups n)
+subGrids n = map (map (Grid n) . transpose) . takes n . map (takes n)
 
 reassemble :: [[Grid]] -> Grid
 reassemble gss = foldr1 above (map (foldr1 beside) gss)

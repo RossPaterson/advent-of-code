@@ -25,7 +25,7 @@ test1 = isTriangle [5, 10, 25]
 -- Part Two --
 
 verticalTriples :: Input -> Input
-verticalTriples = concat . map (groups 3) . transpose
+verticalTriples = concat . map (takes 3) . transpose
 
 solve2 :: Input -> Int
 solve2 = solve1 . verticalTriples
