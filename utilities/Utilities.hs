@@ -57,6 +57,10 @@ whileRight f x = either id (whileRight f) (f x)
 iterateWhileRight :: (a -> Either b a) -> a -> [a]
 iterateWhileRight f x = x : either (const []) (iterateWhileRight f) (f x)
 
+-- return the first xn such that p x_{n-1} xn
+convergeBy :: (a -> a -> Bool) -> [a] -> a
+convergeBy p xs = head [x2 | (x1, x2) <- zip xs (tail xs), p x1 x2]
+
 -- apply a function n times
 times :: Int -> (a -> a) -> a -> a
 times n f = compose (replicate n f)
