@@ -215,3 +215,14 @@ though the input processing is quite messy.
 The first part is straightforward, and suggests a strategy that works for
 the more open second part, at least for this input.  Other inputs might
 also have required the dual strategy.
+
+## Day 17: Reservoir Research
+
+This is a very novel problem.  The statement is noncommittal about the
+order in which water flows sideways, which guides one towards computing
+the full horizontal extent of the flow at once.  I then went for a
+simplistic implementation, spreading water at each step until the set
+of wet tiles converged.  This was fairly easy to get right, and worked
+on the test input.  It seemed to be running forever on the actual input,
+but stopped after 5 minutes with the correct answer.  The second part
+is an easy variation.
