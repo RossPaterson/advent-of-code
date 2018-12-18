@@ -17,7 +17,8 @@ data Dir = Horiz | Vert
 parse :: String -> Input
 parse = Set.fromList . concatMap (runParser vein) . lines
   where
-    vein = mkVein <$> dir <* string "=" <*> nat <* string ", " <* dir <* string "=" <*> nat <* string ".." <*> nat
+    vein = mkVein <$> dir <* string "=" <*> nat <* string ", " <*
+        dir <* string "=" <*> nat <* string ".." <*> nat
     dir = Horiz <$ char 'y' <|> Vert <$ char 'x'
 
 type Position = (Int, Int)
@@ -34,12 +35,12 @@ spring = (500, 0)
 solve1 :: Input -> Int
 solve1 = fst . solve
 
-solve :: Input -> (Int, Int)
-solve clay = (nw+nr, nw)
+solve :: Set Position -> (Int, Int)
+solve clay = (ns+nr, ns)
   where
     ymin = minimum (map snd (Set.toList clay))
     Water standing running = maxGrowth spring clay
-    nw = Set.size standing
+    ns = Set.size standing
     nr = Set.size (Set.filter inRange running)
     inRange (x, y) = y >= ymin
 
@@ -94,6 +95,11 @@ grow ymax clay (Water standing running) =
     layers = map (mkLayer blocked) (Set.toList running')
     inRange (x, y) = y <= ymax
 
+-- the positions immediately below those in s
+below :: Set Position -> Set Position
+below s = Set.fromList [(x, y+1) | (x, y) <- Set.toList s]
+
+-- extend (x,y) into a horizontal layer of water
 mkLayer :: Set Position -> Position -> Layer
 mkLayer blocked (x, y) =
     Layer y (mkEnd (iterate (subtract 1) x)) (mkEnd (iterate (+1) x))
@@ -103,14 +109,12 @@ mkLayer blocked (x, y) =
       | Set.member (x2, y) blocked = End Closed x1
       | otherwise = mkEnd (x2:xs)
 
-closed :: Layer -> Bool
-closed (Layer _ (End Closed _) (End Closed _)) = True
-closed _ = False
-
+-- the positions of a layer
 layerPositions :: Layer -> Set Position
 layerPositions (Layer y (End _ x1) (End _ x2)) =
     Set.fromList [(x, y) | x <- [x1..x2]]
 
+-- add a layer of standing or running water
 addLayer :: Water -> Layer -> Water
 addLayer (Water standing running) l
   | closed l = Water (Set.union standing ps) (Set.difference running ps)
@@ -118,8 +122,10 @@ addLayer (Water standing running) l
   where
     ps = layerPositions l
 
-below :: Set Position -> Set Position
-below s = Set.fromList [(x, y+1) | (x, y) <- Set.toList s]
+-- a layer will hold standing water if both ends are closed
+closed :: Layer -> Bool
+closed (Layer _ (End Closed _) (End Closed _)) = True
+closed _ = False
 
 tests1 :: [(String, Int)]
 tests1 = [(testInput, 57)]
