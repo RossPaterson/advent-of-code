@@ -224,5 +224,21 @@ the full horizontal extent of the flow at once.  I then went for a
 simplistic implementation, spreading water at each step until the set
 of wet tiles converged.  This was fairly easy to get right, and worked
 on the test input.  It seemed to be running forever on the actual input,
-but stopped after 5 minutes with the correct answer.  The second part
-is an easy variation.
+but stopped after 5 minutes with the correct answer.  It could be made
+much faster by focussing on the bits that are growing, but getting that
+right in a hurry is difficult.
+
+The second part is an easy variation.
+
+## Day 18: Settlers of The North Pole
+
+Another
+[cellular automaton](https://en.wikipedia.org/wiki/Cellular_automaton),
+this time 2-dimensional.  The first part is straightforward, to check
+that the rules are correctly implemented.
+
+The second part is scaled up so much that the same approach will obviously
+take far too long.  It might be feasible if the states repeat early and
+often enough, and plugging in the RepeatingList abstraction I wrote
+after thinking about the Day 12 puzzle did the trick.  (On my input,
+the states repeat every 28 steps after an initial 480.)
