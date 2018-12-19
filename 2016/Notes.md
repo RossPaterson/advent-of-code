@@ -2,6 +2,8 @@
   
 ![Completion times 2016](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2016.png)
 
+(image by Jo Wood)
+
 ## Day 1: No Time for a Taxicab
 
 The first part is just following Cartesian directions.
@@ -60,13 +62,17 @@ An asynchonous network, incompletely specified.
 
 ## Day 11: Radioisotope Thermoelectric Generators
 
-This one came as a shock.
+After a run of medium-sized problems, this one came as a shock.
 It is a 3-stage variant of the
 [Jealous Husbands Problem](https://en.wikipedia.org/wiki/Missionaries_and_cannibals_problem).
 The first part is to get the implementation correct,
-but simple methods are infeasible for the second part.
+but simple methods take far too long for the second part.
+I did manage to get an answer by using the
+[A* algorithm](https://en.wikipedia.org/wiki/A*_search_algorithm)
+and a hand-optimized representation, but none of that was necessary,
+or as fast as exploiting the structure of the problem.
 
-Lesson: merge equivalent states to cut the search space.
+**Lesson:** merge equivalent states to cut the search space.
 
 ## Day 12: Leonardo's Monorail
 
@@ -104,7 +110,7 @@ Two variations on the
 
 There are fast shortcuts, but brute force with the Haskell
 [Seq](http://hackage.haskell.org/package/containers/docs/Data-Sequence.html)
-container worked.
+container worked when array-based implementations were prohibitively slow.
 
 ## Day 20: Firewall Rules
 
@@ -113,7 +119,7 @@ Merging intervals.
 ## Day 21: Scrambled Letters and Hash
 
 The second part is the inverse of the first.
-The inverse is not unique on example, but is on puzzle input.
+The inverse is not unique on the example, but is on puzzle input.
 
 ## Day 22: Grid Computing
 
