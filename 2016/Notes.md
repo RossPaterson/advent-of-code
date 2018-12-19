@@ -62,7 +62,7 @@ An asynchonous network, incompletely specified.
 
 This one came as a shock.
 It is a 3-stage variant of the
-(Jealous Husbands Problem)[https://en.wikipedia.org/wiki/Missionaries_and_cannibals_problem].
+[Jealous Husbands Problem](https://en.wikipedia.org/wiki/Missionaries_and_cannibals_problem).
 The first part is to get the implementation correct,
 but simple methods are infeasible for the second part.
 
@@ -83,7 +83,7 @@ Lots of MD5 calls, but otherwise simple.
 ## Day 15: Timing is Everything
 
 Easily recognizable as the
-(Chinese Remainder Problem)[https://en.wikipedia.org/wiki/Chinese_remainder_theorem].
+[Chinese Remainder Problem](https://en.wikipedia.org/wiki/Chinese_remainder_theorem).
 
 ## Day 16: Dragon Checksum
 
