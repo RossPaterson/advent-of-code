@@ -1,5 +1,7 @@
 # Notes on each day's solutions
 
+![Completion times 2018](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2018.png)
+
 ## Day 1: Chronal Calibration
 
 An easy one to start with.  The first part was just a sum, while in
