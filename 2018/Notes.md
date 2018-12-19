@@ -2,6 +2,8 @@
 
 ![Completion times 2018](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2018.png)
 
+(image by Jo Wood)
+
 ## Day 1: Chronal Calibration
 
 An easy one to start with.  The first part was just a sum, while in
@@ -139,8 +141,9 @@ to compile the solution because it ran out of stack in the interpreter.
 
 Going through the subreddit later, I learned that one can easily compute
 all the sums in O(*n*<sup>3</sup>) time using a
-[summed-area table group](https://en.wikipedia.org/wiki/Summed-area_table),
-so people familiar with that structure would find part 2 quite easy.
+[summed-area table](https://en.wikipedia.org/wiki/Summed-area_table),
+so people familiar with that structure would have found the second part
+quite easy.
 
 Some people had just used the naive O(*n*<sup>5</sup>) algorithm and got
 answers in time.  This worked for this formulation because values range
@@ -241,7 +244,7 @@ that the rules are correctly implemented.
 
 The second part is scaled up so much that the same approach will obviously
 take far too long.  It might be feasible if the states repeat early and
-often enough, and plugging in the RepeatingList abstraction I wrote
+often enough, and plugging in the repeating list abstraction I wrote
 after thinking about the Day 12 puzzle did the trick.  (On my input,
 the states repeat every 28 steps after an initial 480.)
 
@@ -249,6 +252,6 @@ the states repeat every 28 steps after an initial 480.)
 
 A regular appearance on AoC: the first part is implementing a simple
 machine and running the input code on it, while the second part requires
-disassembling the code to create a more efficient equivalent.  The
-machine here uses eight of the instructions from Day 16, though with
-a twist: one of the registers holds the instruction pointer.
+disassembling the code to create a more efficient equivalent.  The machine
+here uses eight of the instructions from Day 16, though with a twist:
+one of the registers holds the instruction pointer.
