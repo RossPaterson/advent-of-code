@@ -2,9 +2,6 @@ module Main where
 
 import Primes
 
-sumOfFactors :: Int -> Int
-sumOfFactors n = product [(p^(k+1) - 1) `div` (p-1) | (p, k) <- primeFactors n]
-
 input :: Int
 input = 29000000
 
