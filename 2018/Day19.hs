@@ -4,6 +4,7 @@ import Parser
 import Primes
 import Utilities
 import Control.Applicative
+import Data.Maybe
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
 
@@ -37,11 +38,11 @@ parse s =
 -- Part One
 
 solve1 :: Input -> Int
-solve1 c = run c (initState 6) ! 0
+solve1 c = run c ! 0
 
 -- run code from initial state to completion
-run :: Code -> State -> State
-run c = until (finished c) (step c)
+run :: Code -> State
+run c = until (finished c) (step c) initState
 
 type State = Map Int Int
 
@@ -70,9 +71,12 @@ incr c s = Map.adjust (+1) (ip c) s
 finished :: Code -> State -> Bool
 finished c s = not (Map.member (s!ip c) (instructions c))
 
+numRegisters :: Int
+numRegisters = 6
+
 -- initially, all registers hold 0
-initState :: Int -> State
-initState nreg = Map.fromList [(r, 0) | r <- [0..nreg-1]]
+initState :: State
+initState = Map.fromList [(r, 0) | r <- [0..numRegisters-1]]
 
 tests1 :: [(String, Int)]
 tests1 = [(testInput, 7)]
@@ -116,15 +120,15 @@ the main computation.
 -}
 
 solve2 :: Input -> Int
-solve2 = sumOfFactors . inputNumber 1
+solve2 = sumOfFactors . target 1
 
--- The input number when R0 initially contains v, which will be
--- the contents of R5 when control first reaches instruction 1.
-inputNumber :: Int -> Code -> Int
-inputNumber v c = (head $ dropWhile initializing $ iterate (step c) s0) ! 5
-  where
-    s0 = Map.insert 0 v (initState 6)
-    initializing s = s!ip c /= 1
+-- The bound used in the first GTRR if R0 initially contains v.
+target :: Int -> Code -> Int
+target v c =
+    head [s!b |
+        s <- iterate (step c) (Map.insert 0 v initState),
+        Instruction GTRR a b c <-
+            maybeToList (Map.lookup (s!ip c) (instructions c))]
 
 main :: IO ()
 main = do
