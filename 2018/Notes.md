@@ -201,7 +201,7 @@ My solution worked with all the examples, but its answer on the full
 input was rejected.  Since there's nothing to indicate what went wrong,
 there was no choice but to re-examine all the logic.  Still stuck,
 I found the issue in a Reddit posting
-["Details easy to be wrong on"](https://www.reddit.com/r/adventofcode/comments/a6f100/day_15_details_easy_to_be_wrong_on/)
+["Details easy to be wrong on"](https://www.reddit.com/r/adventofcode/comments/a6f100/day_15_details_easy_to_be_wrong_on/).
 As is often the case in AoC, it didn't arise with the supplied examples.
 It was easily fixed, at the cost of even messier code.
 
@@ -242,3 +242,11 @@ take far too long.  It might be feasible if the states repeat early and
 often enough, and plugging in the RepeatingList abstraction I wrote
 after thinking about the Day 12 puzzle did the trick.  (On my input,
 the states repeat every 28 steps after an initial 480.)
+
+## Day 19: Go With The Flow
+
+A regular appearance on AoC: the first part is implementing a simple
+machine and running the input code on it, while the second part requires
+disassembling the code to create a more efficient equivalent.  The
+machine here uses eight of the instructions from Day 16, though with
+a twist: one of the registers holds the instruction pointer.
