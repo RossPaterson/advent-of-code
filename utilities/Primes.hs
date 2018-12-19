@@ -21,3 +21,7 @@ isPrime n = noFactors primes
 -- infinite list of prime numbers
 primes :: [Int]
 primes = 2:filter isPrime [3,5..]
+
+-- the sum of all the factors of n
+sumOfFactors :: Int -> Int
+sumOfFactors n = product [(p^(k+1) - 1) `div` (p-1) | (p, k) <- primeFactors n]
