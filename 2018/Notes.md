@@ -255,3 +255,21 @@ machine and running the input code on it, while the second part requires
 disassembling the code to create a more efficient equivalent.  The machine
 here uses eight of the instructions from Day 16, though with a twist:
 one of the registers holds the instruction pointer.
+
+## Day 20: A Regular Map
+
+This problem requires three steps, which are clearly laid out in the
+description:
+
+1. parsing the "regular expressions" (actually just concatenation and
+   alternatives),
+2. converting the expression into a maze, and
+3. finding shortest paths in the maze.
+
+The challenge is in the second step, mainly in choosing a representation
+for the maze and deciding how to generate it.  A neat feature (also seen
+previously on Days 10 and 12) is that the bounds of the area of interest
+are not clear in advance, making it difficult to use fixed array structures.
+
+The third step is easy given a breadth-first searcher, and the second
+part is also easily derived from the breadth-first search.
