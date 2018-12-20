@@ -68,6 +68,10 @@ string str = Parser matchStr
       | str `isPrefixOf` t = [(str, drop (length str) t)]
       | otherwise = []
 
+-- values of an enumerated type by name
+enumValue :: (Show a, Enum a, Bounded a) => Parser a
+enumValue = foldr1 (<|>) [c <$ string (show c) | c <- [minBound..maxBound]]
+
 -- general combinators
 
 count :: Applicative p => Int -> p a -> p [a]
