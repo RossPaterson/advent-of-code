@@ -1,39 +1,18 @@
 module Main where
 
-import Parser
+import AssemblyCode
 import Primes
 import Utilities
-import Control.Applicative
 import Data.Maybe
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
 
 -- Input processing
 
-type Input = Code
-
-data Code = Code { ip :: Int, instructions :: Map Int Instruction }
-  deriving Show
-data Instruction = Instruction OpCode Int Int Int
-  deriving Show
-data OpCode = ADDI | ADDR | EQRR | GTRR | MULI | MULR | SETI | SETR
-  deriving Show
+type Input = Program
 
 parse :: String -> Input
-parse s =
-    Code (runParser ip (head ls))
-        (Map.fromList (zip [0..] (map (runParser instruction) (tail ls))))
-  where
-    ip = string "#ip " *> nat
-    instruction =
-        Instruction <$> opcode <* char ' ' <*> nat
-            <* char ' ' <*> nat <* char ' ' <*> nat
-    opcode =
-        ADDI <$ string "addi" <|> ADDR <$ string "addr" <|>
-        EQRR <$ string "eqrr" <|> GTRR <$ string "gtrr" <|>
-        MULI <$ string "muli" <|> MULR <$ string "mulr" <|>
-        SETI <$ string "seti" <|> SETR <$ string "setr"
-    ls = lines s
+parse = parseProgram
 
 -- Part One
 
@@ -41,42 +20,11 @@ solve1 :: Input -> Int
 solve1 c = run c ! 0
 
 -- run code from initial state to completion
-run :: Code -> State
-run c = until (finished c) (step c) initState
-
-type State = Map Int Int
-
--- a single fetch-execute step
-step :: Code -> State -> State
-step c s = incr c (execute (instructions c!pc) s)
-  where
-    pc = s!ip c
-
--- execute one instruction
-execute :: Instruction -> State -> State
-execute (Instruction ADDR a b c) s = Map.insert c (s!a + s!b) s
-execute (Instruction ADDI a b c) s = Map.insert c (s!a + b) s
-execute (Instruction EQRR a b c) s = Map.insert c (fromEnum (s!a == s!b)) s
-execute (Instruction GTRR a b c) s = Map.insert c (fromEnum (s!a > s!b)) s
-execute (Instruction MULI a b c) s = Map.insert c (s!a * b) s
-execute (Instruction MULR a b c) s = Map.insert c (s!a * s!b) s
-execute (Instruction SETI a b c) s = Map.insert c a s
-execute (Instruction SETR a b c) s = Map.insert c (s!a) s
-
--- increment the instruction pointer
-incr :: Code -> State -> State
-incr c s = Map.adjust (+1) (ip c) s
-
--- stop if the instruction pointer is outside the range of the code
-finished :: Code -> State -> Bool
-finished c s = not (Map.member (s!ip c) (instructions c))
+run :: Program -> State
+run c = until (finished c) (step c) (initState numRegisters)
 
 numRegisters :: Int
 numRegisters = 6
-
--- initially, all registers hold 0
-initState :: State
-initState = Map.fromList [(r, 0) | r <- [0..numRegisters-1]]
 
 tests1 :: [(String, Int)]
 tests1 = [(testInput, 7)]
@@ -123,10 +71,10 @@ solve2 :: Input -> Int
 solve2 = sumOfFactors . target 1
 
 -- The bound used in the first GTRR if R0 initially contains v.
-target :: Int -> Code -> Int
+target :: Int -> Program -> Int
 target v c =
     head [s!b |
-        s <- iterate (step c) (Map.insert 0 v initState),
+        s <- iterate (step c) (Map.insert 0 v (initState numRegisters)),
         Instruction GTRR a b c <-
             maybeToList (Map.lookup (s!ip c) (instructions c))]
 
