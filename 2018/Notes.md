@@ -252,7 +252,7 @@ the states repeat every 28 steps after an initial 480.)
 
 A regular appearance on AoC: the first part is implementing a simple
 machine and running the input code on it, while the second part requires
-disassembling the code to create a more efficient equivalent.  The machine
+decompiling the code to create a more efficient equivalent.  The machine
 here uses eight of the instructions from Day 16, though with a twist:
 one of the registers holds the instruction pointer.
 
@@ -273,3 +273,19 @@ are not clear in advance, making it difficult to use fixed array structures.
 
 The third step is easy given a breadth-first searcher, and the second
 part is also easily derived from the breadth-first search.
+
+## Day 21: Chronal Conversion
+
+Another problem using the same assembly code as Days 16 and 19.  It turns
+out not to be necessary to decompile the whole thing, just the outer loop,
+and then simulate execution monitoring the termination test of that loop.
+
+It took a little while to realize that the second part is a return to the
+theme of detecting a cycle in the iterations of a function, as seen on
+Days 12 and 18.  Simulating execution to do that took 4 minutes; one would
+have to decompile and optimize the assembly program to make it faster.
+
+The problem description is padded with an irrelevant discussion of the
+initial part of the program, which has no effect.  It also seems that
+the "lowest" qualification in both parts is redundant, but included to
+obscure the uniqueness of the solution.
