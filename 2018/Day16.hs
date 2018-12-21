@@ -1,10 +1,8 @@
 module Main where
 
+import AssemblyCode
 import Parser
 import Utilities
-import Control.Applicative
-import Data.Bits
-import Data.Functor
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
 import Data.Set (Set)
@@ -12,46 +10,25 @@ import qualified Data.Set as Set
 
 -- Input processing
 
-type Input = ([Sample], [Instruction Int])
+type Input = ([Sample], [RawInstruction])
 
-type Sample = (State, Instruction Int, State)
-
-type State = Map Register Int
-
-data Instruction a = Instruction a Register Register Register
-  deriving Show
-
-instance Functor Instruction where
-    fmap f (Instruction i a b c) = Instruction (f i) a b c
-
-data OpCode =
-    ADDR | ADDI | MULR | MULI | BANR | BANI | BORR | BORI |
-    SETR | SETI | GTIR | GTRI | GTRR | EQIR | EQRI | EQRR
-  deriving (Show, Eq, Ord, Bounded, Enum)
-data Register = R0 | R1 | R2 | R3
-  deriving (Show, Eq, Ord, Bounded, Enum)
+type Sample = (State, RawInstruction, State)
+type RawInstruction = GenInstruction Int
 
 parse :: String -> Input
-parse s = (map parseSample samples, map (runParser instruction) code)
+parse s = (map parseSample samples, map (runParser (instruction int)) code)
   where
     (samples, code) = splitSamples (lines s)
-    instruction = Instruction <$>
-        nat <* char ' ' <*> reg <* char ' ' <*> reg <* char ' ' <*> reg
-    reg = toEnum <$> nat
 
 parseSample :: String -> Sample
 parseSample = runParser sample
   where
     sample = (,,) <$
         string "Before: " <*> state <* char '\n' <*>
-        instruction <* char '\n' <*
+        instruction int <* char '\n' <*
         string "After:  " <*> state <* string "\n\n"
-    state = mkState <$ string "[" <*> nat <* string ", " <*> nat <*
-        string ", " <*> nat <* string ", " <*> nat <* char ']'
-    instruction = Instruction <$>
-        nat <* char ' ' <*> reg <* char ' ' <*> reg <* char ' ' <*> reg
-    reg = toEnum <$> nat
-    mkState v0 v1 v2 v3 = Map.fromList [(R0, v0), (R1, v1), (R2, v2), (R3, v3)]
+    state = mkState <$ string "[" <*> sepBy1 nat (string ", ") <* char ']'
+    mkState vs = Map.fromList (zip [0..] vs)
 
 splitSamples :: [String] -> ([String], [String])
 splitSamples ls = (map unlines (init (takes 4 sample_lines)), code_lines)
@@ -72,33 +49,6 @@ possibles (before, instr, after) = [opcode |
     opcode <- allValues,
     execute before (opcode <$ instr) == after]
 
--- execute a single instruction
-execute :: State -> Instruction OpCode -> State
-execute s (Instruction ADDR a b c) = Map.insert c (s!a + s!b) s
-execute s (Instruction ADDI a b c) = Map.insert c (s!a + fromEnum b) s
-execute s (Instruction MULR a b c) = Map.insert c (s!a * s!b) s
-execute s (Instruction MULI a b c) = Map.insert c (s!a * fromEnum b) s
-execute s (Instruction BANR a b c) = Map.insert c (s!a .&. s!b) s
-execute s (Instruction BANI a b c) = Map.insert c (s!a .&. fromEnum b) s
-execute s (Instruction BORR a b c) = Map.insert c (s!a .|. s!b) s
-execute s (Instruction BORI a b c) = Map.insert c (s!a .|. fromEnum b) s
-execute s (Instruction SETR a b c) = Map.insert c (s!a) s
-execute s (Instruction SETI a b c) = Map.insert c (fromEnum a) s
-execute s (Instruction GTIR a b c) =
-    Map.insert c (fromEnum (fromEnum a > s!b)) s
-execute s (Instruction GTRI a b c) =
-    Map.insert c (fromEnum (s!a > fromEnum b)) s
-execute s (Instruction GTRR a b c) =
-    Map.insert c (fromEnum (s!a > s!b)) s
-execute s (Instruction EQIR a b c) =
-    Map.insert c (fromEnum (fromEnum a ==
-    s!b)) s
-execute s (Instruction EQRI a b c) =
-    Map.insert c (fromEnum (s!a ==
-    fromEnum b)) s
-execute s (Instruction EQRR a b c) =
-    Map.insert c (fromEnum (s!a == s!b)) s
-
 tests1 :: [(String, [OpCode])]
 tests1 = [(testInput, [ADDI,MULR,SETI])]
 
@@ -113,13 +63,9 @@ testInput = "\
 -- identify the opcodes, and run the translated code
 solve2 :: Input -> Int
 solve2 (samples, code) =
-    foldl execute initState (map (fmap (table!)) code) ! R0
+    foldl execute (initState 4) (map (fmap (table!)) code) ! 0
   where
     table = resolve samples
-
--- Initially each register holds 0
-initState :: State
-initState = Map.fromList [(r, 0) | r <- allValues]
 
 -- The opcodes for each value consistent with the samples
 resolve :: [Sample] -> Map Int OpCode
