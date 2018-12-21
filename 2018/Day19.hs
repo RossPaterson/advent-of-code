@@ -17,11 +17,7 @@ parse = parseProgram
 -- Part One
 
 solve1 :: Input -> Int
-solve1 c = run c ! 0
-
--- run code from initial state to completion
-run :: Program -> State
-run c = until (finished c) (step c) (initState numRegisters)
+solve1 p = finalState p numRegisters ! 0
 
 numRegisters :: Int
 numRegisters = 6
@@ -72,11 +68,11 @@ solve2 = sumOfFactors . target 1
 
 -- The bound used in the first GTRR if R0 initially contains v.
 target :: Int -> Program -> Int
-target v c =
+target v p =
     head [s!b |
-        s <- iterate (step c) (Map.insert 0 v (initState numRegisters)),
+        s <- iterate (step p) (Map.insert 0 v (initState numRegisters)),
         Instruction GTRR a b c <-
-            maybeToList (Map.lookup (s!ip c) (instructions c))]
+            maybeToList (Map.lookup (s!ip p) (instructions p))]
 
 main :: IO ()
 main = do

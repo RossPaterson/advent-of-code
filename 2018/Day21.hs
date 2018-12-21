@@ -32,13 +32,12 @@ solve1 = head . values
 -- values compared for equality with register 0
 -- (assumes that there is a single such comparison in the program)
 values :: Program -> [Int]
-values c =
-    map (!r) $ filter breakpoint $ iterate (step c) $ initState numRegisters
+values p = map (!r) $ filter breakpoint $ allStates p numRegisters
   where
-    breakpoint s = s!ip c == loc
+    breakpoint s = s!ip p == loc
     (loc, r) =
         head [(l, rv) |
-            (l, Instruction EQRR rv 0 _) <- Map.toList (instructions c)]
+            (l, Instruction EQRR rv 0 _) <- Map.toList (instructions p)]
 
 numRegisters :: Int
 numRegisters = 6

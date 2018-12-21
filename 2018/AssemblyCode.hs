@@ -73,6 +73,21 @@ parseProgram s =
     ip = string "#ip " *> nat
     ls = lines s
 
+-- run code from initial state to completion
+finalState :: Program -> Int -> State
+finalState c numRegisters =
+    until (finished c) (step c) (initState numRegisters)
+
+-- intermediate states when running code from initial state to completion
+allStates :: Program -> Int -> [State]
+allStates c numRegisters =
+    takeWhile (not . finished c) $ iterate (step c) (initState numRegisters)
+
+-- frequency of execution of each instruction in a sample run
+heatMap :: Program -> Int -> Int -> [(Int, Int)]
+heatMap c numRegisters maxSteps =
+    frequency $ map (!ip c) $ take maxSteps $ allStates c numRegisters
+
 -- a single fetch-execute step
 step :: Program -> State -> State
 step c s = incr c (execute s (instructions c!pc))
