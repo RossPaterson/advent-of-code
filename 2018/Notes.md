@@ -289,3 +289,19 @@ The problem description is padded with an irrelevant discussion of the
 initial part of the program, which has no effect.  It also seems that
 the "lowest" qualification in both parts is redundant, but included to
 obscure the uniqueness of the solution.
+
+## Day 22: Mode Maze
+
+The first part is building the maze and testing that it is correct (though
+neither the example nor the question test the area beyond the target).
+Since we don't know how much of it we will use, the proper approach would
+be a memoized function over the infinite quarter-plane, but I just used
+a large enough finite area.  I took a ridiculous amount of time getting
+the details of the cell calculations right.
+
+The second part was a path search, for which I used the breadth-first
+searcher I had to hand.  This approach makes a lot of extra states
+while one is in the process of switching equipment, but it was enough.
+A proper approach would have turned the maze into a weighted graph with
+admissible position-equipment pairs as nodes, and then used a general
+path-finding algorithm.

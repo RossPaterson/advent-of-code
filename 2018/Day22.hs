@@ -1,0 +1,134 @@
+module Main where
+
+import Parser
+import Utilities
+import Data.Array
+
+-- Input processing
+
+type Input = (Int, Position)
+
+parse :: String -> Input
+parse s = (runParser depth ld, runParser target lt)
+  where
+    depth = string "depth: " *> nat
+    target = (,) <$ string "target: " <*> nat <* char ',' <*> nat
+    [ld, lt] = lines s
+
+type Position = (Int, Int)
+
+type Cave = Array Position Region
+data Region = Rocky | Wet | Narrow
+  deriving (Show, Enum)
+
+-- build a cave according to the rules in the puzzle
+makeCave :: Int -> Int -> Int -> Position -> Cave
+makeCave depth w h (xt, yt) = fmap regionType $ erosionLevel
+  where
+    erosionLevel =
+        array ((0,0), (w-1,h-1))
+            [((x, y), erosion (x, y)) | x <- [0..w-1], y <- [0..h-1]]
+    erosion p = (geologicIndex p + depth) `mod` modulus
+    geologicIndex (x, y)
+      | x == xt && y == yt = 0
+      | y == 0 = x * xincr
+      | x == 0 = y * yincr
+      | otherwise = erosionLevel!(x-1, y) * erosionLevel!(x, y-1)
+
+xincr, yincr :: Int
+xincr = 16807
+yincr = 48271
+
+modulus :: Int
+modulus = 20183
+
+regionType :: Int -> Region
+regionType e = toEnum (e `mod` 3)
+
+-- string representation of a cave
+showCave :: Position -> Cave -> String
+showCave (xt, yt) cave =
+    unlines [[showPoint (x, y) | x <- [0..xb]] | y <- [0..yb]]
+  where
+    showPoint (x, y)
+      | x == 0 && y == 0 = 'M'
+      | x == xt && y == yt = 'T'
+      | otherwise = showRegion (cave!(x, y))
+    (xb, yb) = snd (bounds cave)
+
+showRegion :: Region -> Char
+showRegion Rocky = '.'
+showRegion Wet = '='
+showRegion Narrow = '|'
+
+-- Part One
+
+solve1 :: Input -> Int
+solve1 (depth, (xt, yt)) =
+    sum [fromEnum r | r <- elems (makeCave depth (xt+1) (yt+1) (xt, yt))]
+
+tests1 :: [(Input, Int)]
+tests1 = [((510, (10,10)), 114)]
+
+-- Part Two
+
+-- minimum number of minutes from the start to the finish
+solve2 :: Input -> Int
+solve2 (depth, target) = length $
+    takeWhile (not . (finalState target `elem`)) $
+        bfs (moves cave) [startState]
+  where
+    -- fairly arbitrary enlargement of the search area beyond the target
+    cave = makeCave depth (xt+100) (yt+100) target
+    (xt, yt) = target
+
+data State = State {
+    pos :: Position, -- current position in the cave
+    equipment :: Equipment, -- equipment we have or are switching to
+    waitTime :: Int } -- time until our equipment is read for use
+  deriving (Show, Eq, Ord)
+data Equipment = Torch | ClimbingGear | Neither
+  deriving (Show, Eq, Ord, Bounded, Enum)
+
+-- start at the origin with the torch
+startState :: State
+startState = State (0, 0) Torch 0
+
+-- finish at the target with the torch ready for use
+finalState :: Position -> State
+finalState target = State target Torch 0
+
+-- things we can do in a minute from a given state
+moves :: Cave -> State -> [State]
+moves cave (State p e t)
+  | t == 0 =
+    -- move to neighbouring region with current equipment
+    [State p' e 0 | p' <- neighbours cave p, works e (cave!p')] ++
+    -- start switching to different equipment, which will take 7 minutes
+    [State p e' 6 | e' <- allValues, e' /= e, works e' (cave!p)]
+    -- continue switching to different equipment
+  | otherwise = [State p e (t-1)]
+
+-- neighbouring positions in the cave
+neighbours :: Cave -> Position -> [Position]
+neighbours cave (x, y) =
+    filter (inRange (bounds cave)) [(x-1, y), (x, y-1), (x+1, y), (x, y+1)]
+
+-- Does this equipment with this region type?
+works :: Equipment -> Region -> Bool
+works Neither Rocky = False
+works Torch Wet = False
+works ClimbingGear Narrow = False
+works _ _ = True
+
+tests2 :: [(Input, Int)]
+tests2 = [((510, (10,10)), 45)]
+
+main :: IO ()
+main = do
+    s <- readFile "input22.txt"
+    let input = parse s
+    putStr (unlines (failures "solve1" solve1 tests1))
+    print (solve1 input)
+    putStr (unlines (failures "solve2" solve2 tests2))
+    print (solve2 input)
