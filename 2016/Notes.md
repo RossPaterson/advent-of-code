@@ -30,7 +30,7 @@ Finding most common letters, second part shift cipher.
 
 The first part was a simple list search to invert an MD5 hash.
 
-The second part builds inverted array.
+The second part builds an inverted array.
 
 ## Day 6: Signals and Noise
 
@@ -51,7 +51,7 @@ The second part involves displaying a bitmap for manual reading.
 
 ## Day 9: Explosives in Cyberspace
 
-string expansion
+String expansion.
 
 The second part is incompletely specified; needs recursion.
 It is crucial that markers must be nested.
@@ -137,4 +137,4 @@ A maze search (Day 13) plus the
 
 ## Day 25: Clock Signal
 
-Disassembly (similar language to Day 12 and Day 23).
+Decompiling of a similar assembly language to Days 12 and 23.
