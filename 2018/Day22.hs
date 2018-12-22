@@ -17,13 +17,19 @@ parse s = (runParser depth ld, runParser target lt)
 
 type Position = (Int, Int)
 
+-- Part One
+
+solve1 :: Input -> Int
+solve1 (depth, (xt, yt)) =
+    sum [fromEnum r | r <- elems (makeCave depth (xt+1) (yt+1) (xt, yt))]
+
 type Cave = Array Position Region
 data Region = Rocky | Wet | Narrow
   deriving (Show, Enum)
 
 -- build a cave according to the rules in the puzzle
 makeCave :: Int -> Int -> Int -> Position -> Cave
-makeCave depth w h (xt, yt) = fmap regionType $ erosionLevel
+makeCave depth w h (xt, yt) = fmap regionType erosionLevel
   where
     erosionLevel =
         array ((0,0), (w-1,h-1))
@@ -61,12 +67,6 @@ showRegion Rocky = '.'
 showRegion Wet = '='
 showRegion Narrow = '|'
 
--- Part One
-
-solve1 :: Input -> Int
-solve1 (depth, (xt, yt)) =
-    sum [fromEnum r | r <- elems (makeCave depth (xt+1) (yt+1) (xt, yt))]
-
 tests1 :: [(Input, Int)]
 tests1 = [((510, (10,10)), 114)]
 
@@ -85,7 +85,7 @@ solve2 (depth, target) = length $
 data State = State {
     pos :: Position, -- current position in the cave
     equipment :: Equipment, -- equipment we have or are switching to
-    waitTime :: Int } -- time until our equipment is read for use
+    waitTime :: Int } -- time until our equipment is ready for use
   deriving (Show, Eq, Ord)
 data Equipment = Torch | ClimbingGear | Neither
   deriving (Show, Eq, Ord, Bounded, Enum)
@@ -114,7 +114,7 @@ neighbours :: Cave -> Position -> [Position]
 neighbours cave (x, y) =
     filter (inRange (bounds cave)) [(x-1, y), (x, y-1), (x+1, y), (x, y+1)]
 
--- Does this equipment with this region type?
+-- Does this equipment work in this region type?
 works :: Equipment -> Region -> Bool
 works Neither Rocky = False
 works Torch Wet = False
