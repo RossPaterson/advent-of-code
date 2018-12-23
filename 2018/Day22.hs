@@ -21,7 +21,7 @@ type Position = (Int, Int)
 
 solve1 :: Input -> Int
 solve1 (depth, (xt, yt)) =
-    sum [fromEnum r | r <- elems (makeCave depth (xt+1) (yt+1) (xt, yt))]
+    sum [fromEnum r | r <- elems (makeCave (xt+1) (yt+1) depth (xt, yt))]
 
 type Cave = Array Position Region
 data Region = Rocky | Wet | Narrow
@@ -29,7 +29,7 @@ data Region = Rocky | Wet | Narrow
 
 -- build a cave according to the rules in the puzzle
 makeCave :: Int -> Int -> Int -> Position -> Cave
-makeCave depth w h (xt, yt) = fmap regionType erosionLevel
+makeCave w h depth (xt, yt) = fmap regionType erosionLevel
   where
     erosionLevel =
         array ((0,0), (w-1,h-1))
@@ -73,14 +73,30 @@ tests1 = [((510, (10,10)), 114)]
 -- Part Two
 
 -- minimum number of minutes from the start to the finish
+-- We don't know how big the search area should be, so run the search
+-- twice: once to get an upper bound, and again to get the optimum.
 solve2 :: Input -> Int
-solve2 (depth, target) = length $
-    takeWhile (not . (finalState target `elem`)) $
+solve2 (depth, target) = constrainedFastest margin depth target
+  where
+    (xt, yt) = target
+    -- There is always a Manhattan path to the target, even if we need
+    -- to change equipment on each move and again to use the torch when
+    -- we reach the target, but there may also be faster paths that
+    -- stay within that rectangle.
+    -- That gives us an upper bound on the length of an optimal path.
+    bound = constrainedFastest 0 depth target
+    -- furthest out a faster route could go and come back to the target
+    margin = (bound - (xt+yt)) `div` 2
+
+-- minimum number of minutes from the start to the finish on routes that
+-- do not go more than margin past either of the target's coordinates
+constrainedFastest :: Int -> Int -> Position -> Int
+constrainedFastest margin depth target = length $
+    takeWhile (finalState target `notElem`) $
         bfs (moves cave) [startState]
   where
-    -- fairly arbitrary enlargement of the search area beyond the target
-    cave = makeCave depth (xt+100) (yt+100) target
     (xt, yt) = target
+    cave = makeCave (xt+margin+1) (yt+margin+1) depth target
 
 data State = State {
     pos :: Position, -- current position in the cave
