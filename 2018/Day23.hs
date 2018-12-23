@@ -68,7 +68,7 @@ solve2 ns = searchCubes (add (boundingCube (map pos ns)) PQ.empty)
         Nothing -> error "empty queue"
         Just (k@(Key _ (Down dist) s), c, pq')
           | s == 1 -> dist
-          | otherwise -> run (foldr add pq' (splitCube c))
+          | otherwise -> searchCubes (foldr add pq' (splitCube c))
 
     -- add a cube to the priority queue in appropriate order
     add c pq = PQ.insert (makeKey ns c) c pq
