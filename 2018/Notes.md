@@ -305,3 +305,18 @@ while one is in the process of switching equipment, but it was enough.
 A proper approach would have turned the maze into a weighted graph with
 admissible position-equipment pairs as nodes, and then used a general
 path-finding algorithm.
+
+## Day 23: Experimental Emergency Teleportation
+
+After several elaborate descriptions, this one was beautifully clear,
+with an easy first part setting the stage for a very challenging search
+problem in the second part.
+
+I took ages on this one, and eventually gave up and looked on Reddit
+for hints.  One idea there was to take the 8 bounding planes of each
+nanobot range and consider intersections of 3 planes.  I got that working,
+but it is an O(*n*<sup>4</sup>) algorithm, and I estimate that it would
+have taken 3 weeks of CPU time on this input.
+
+A much better idea from that thread was a directed divide-and-conquer
+approach, which turned out much simpler and faster.
