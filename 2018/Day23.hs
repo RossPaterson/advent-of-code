@@ -54,12 +54,12 @@ testInput1 = "\
 
 -- shortest distance from the origin of points that are within range of
 -- the most nanobots.
--- Uses a directed search of cubes of candidate points, starting with
--- a cube containing all the nanobots, and at each stage examining the
--- code that intersects with the most nanobot ranges and dividing it
--- into eight subcubes for further consideration.
+-- Uses a directed search of cubes of candidate points, starting with a
+-- cube containing all the nanobot ranges, and at each stage examining
+-- the code that intersects with the most nanobot ranges and dividing
+-- it into eight subcubes for further consideration.
 solve2 :: [Nanobot] -> Int
-solve2 ns = searchCubes (add (boundingCube (map pos ns)) PQ.empty)
+solve2 ns = searchCubes (add (boundingCube ns) PQ.empty)
   where
     -- The ordering on keys ensures that if the least is a cube of size 1,
     -- it is a point inside the most nanobot ranges that has the least
@@ -77,16 +77,16 @@ solve2 ns = searchCubes (add (boundingCube (map pos ns)) PQ.empty)
 data Cube = Cube Position Int
   deriving Show
 
--- cube containing all the points
-boundingCube :: [Position] -> Cube
+-- cube containing all the ranges of the nanobots
+boundingCube :: [Nanobot] -> Cube
 boundingCube ps = Cube (xmin, ymin, zmin) size
   where
-    xmin = minimum [x | (x, y, z) <- ps]
-    xmax = maximum [x | (x, y, z) <- ps]
-    ymin = minimum [y | (x, y, z) <- ps]
-    ymax = maximum [y | (x, y, z) <- ps]
-    zmin = minimum [z | (x, y, z) <- ps]
-    zmax = maximum [z | (x, y, z) <- ps]
+    xmin = minimum [x-r | Nanobot (x, y, z) r <- ps]
+    xmax = maximum [x+r | Nanobot (x, y, z) r <- ps]
+    ymin = minimum [y-r | Nanobot (x, y, z) r <- ps]
+    ymax = maximum [y+r | Nanobot (x, y, z) r <- ps]
+    zmin = minimum [z-r | Nanobot (x, y, z) r <- ps]
+    zmax = maximum [z+r | Nanobot (x, y, z) r <- ps]
     maxdim = ((xmax - xmin) `max` (ymax - ymin) `max` (xmax - zmin)) + 1
     size = head $ dropWhile (< maxdim) $ iterate (*2) 1
 
