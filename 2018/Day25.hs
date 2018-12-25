@@ -51,14 +51,14 @@ distance (x1, y1, z1, t1) (x2, y2, z2, t2) =
 components :: Ord a => Graph a -> [Set a]
 components = unfoldr extractComponent
 
--- attempt to extract a non-empty connected component from the graph
+-- extract a non-empty connected component from the graph
 extractComponent :: Ord a => Graph a -> Maybe (Set a, Map a [a])
 extractComponent neighbours =
     fmap (extract . fst) (Map.lookupMin neighbours)
   where
-    extract p = (constellation, Map.withoutKeys neighbours constellation)
+    extract p = (component, Map.withoutKeys neighbours component)
       where
-        constellation = Set.fromList $ concat $ bfs (neighbours!) [p]
+        component = Set.fromList $ concat $ bfs (neighbours!) [p]
 
 tests1 :: [(String, Int)]
 tests1 =
