@@ -320,3 +320,30 @@ have taken 3 weeks of CPU time on this input.
 
 A much better idea from that thread was a directed divide-and-conquer
 approach, which turned out much simpler and faster.
+
+## Day 24: Immune System Simulator 20XX
+
+This problem has a similar structure to Day 15: a simulation of an
+intricate battle game, with the second part adjusting the conditions
+until our side wins.
+
+As with Day 15, there is an obscure situation that is implied by the
+problem description, but not mentioned, and not triggered by the example
+input, though it does arise with the puzzle input.  In this case the
+winkle (the possibility of a draw) arises in the second part, which
+is much less frustrating, as the first part verifies that the basic
+implementation is working.
+
+As my understanding of the problem developed, I changed the data
+representation several times, confident that the static type system
+would catch my errors.
+
+**Lesson:** when writing the termination test for an iteration, also
+stop if the system is deadlocked.
+
+## Day 25: Four-Dimensional Adventure
+
+This was a neat little problem, which amounts to counting the
+[connected components](https://en.wikipedia.org/wiki/Connected_component_(graph_theory))
+of the neighbourhood graph.  (Connected components also occurred on days
+12 and 14 of 2017.)
