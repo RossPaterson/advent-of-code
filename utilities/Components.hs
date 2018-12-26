@@ -2,6 +2,7 @@
 module Components where
 
 import Utilities
+import Data.List
 import Data.Set (Set)
 import qualified Data.Set as Set
 
@@ -11,8 +12,9 @@ component neighbours n = Set.fromList (concat (bfs neighbours [n]))
 
 -- connected components of the graph
 components :: Ord a => (a -> [a]) -> Set a -> [Set a]
-components neighbours ns = case Set.minView ns of
-    Nothing -> []
-    Just (n, _) -> comp:components neighbours (Set.difference ns comp)
+components neighbours = unfoldr extractComponent
+  where
+    extractComponent ns =
+        fmap (extract . component neighbours) (Set.lookupMin ns)
       where
-        comp = component neighbours n
+        extract s = (s, Set.difference ns s)
