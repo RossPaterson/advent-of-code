@@ -4,6 +4,19 @@
 
 (image by Jo Wood)
 
+This was considerably more demanding than 2017, and a bit more than 2016.
+The sustained difficulty of days 19 through 24 was particularly taxing.
+On two occasions I was stuck and looked at the
+[subreddit](https://www.reddit.com/r/adventofcode/) for hints:
+
+* part one of day 15 (for an obscure case I had overlooked) and
+* part two of day 23 (for an efficient approach).
+
+There were a lot of novel puzzles here.  Those I found most enjoyable
+were days 5, 10, 16 and 17, and I learned previously unfamiliar techniques
+from days 11 and 23.  On the other hand, several were drowned in tedious
+detail, particularly days 4, 15, 22, 24.
+
 ## Day 1: Chronal Calibration
 
 An easy one to start with.  The first part was just a sum, while in
@@ -196,7 +209,7 @@ from which both parts can be easily computed.
 
 ## Day 15: Beverage Bandits
 
-This was nasty.  There were some similarities to Day 13, but this was
+This was nasty.  There were some similarities to day 13, but this was
 much more intricate.  The shortest-path calculation can be done cleanly
 with a breadth-first search (used for several of the 2016 problems),
 but the detailed rules took a lot of implementing.  The need to detect
@@ -245,7 +258,7 @@ that the rules are correctly implemented.
 The second part is scaled up so much that the same approach will obviously
 take far too long.  It might be feasible if the states repeat early and
 often enough, and plugging in the repeating list abstraction I wrote
-after thinking about the Day 12 puzzle did the trick.  (On my input,
+after thinking about the day 12 puzzle did the trick.  (On my input,
 the states repeat every 28 steps after an initial 480.)
 
 ## Day 19: Go With The Flow
@@ -253,7 +266,7 @@ the states repeat every 28 steps after an initial 480.)
 A regular appearance on AoC: the first part is implementing a simple
 machine and running the input code on it, while the second part requires
 decompiling the code to create a more efficient equivalent.  The machine
-here uses eight of the instructions from Day 16, though with a twist:
+here uses eight of the instructions from day 16, though with a twist:
 one of the registers holds the instruction pointer.
 
 ## Day 20: A Regular Map
@@ -268,7 +281,7 @@ description:
 
 The challenge is in the second step, mainly in choosing a representation
 for the maze and deciding how to generate it.  A neat feature (also seen
-previously on Days 10 and 12) is that the bounds of the area of interest
+previously on days 10 and 12) is that the bounds of the area of interest
 are not clear in advance, making it difficult to use fixed array structures.
 
 The third step is easy given a breadth-first searcher, and the second
@@ -276,13 +289,13 @@ part is also easily derived from the breadth-first search.
 
 ## Day 21: Chronal Conversion
 
-Another problem using the same assembly code as Days 16 and 19.  It turns
+Another problem using the same assembly code as days 16 and 19.  It turns
 out not to be necessary to decompile the whole thing, just the outer loop,
 and then simulate execution monitoring the termination test of that loop.
 
 It took a little while to realize that the second part is a return to the
 theme of detecting a cycle in the iterations of a function, as seen on
-Days 12 and 18.  Simulating execution to do that took 4 minutes; one would
+days 12 and 18.  Simulating execution to do that took 4 minutes; one would
 have to decompile and optimize the assembly program to make it faster.
 
 The problem description is padded with an irrelevant discussion of the
@@ -323,11 +336,11 @@ approach, which turned out much simpler and faster.
 
 ## Day 24: Immune System Simulator 20XX
 
-This problem has a similar structure to Day 15: a simulation of an
+This problem has a similar structure to day 15: a simulation of an
 intricate battle game, with the second part adjusting the conditions
 until our side wins.
 
-As with Day 15, there is an obscure situation that is implied by the
+As with day 15, there is an obscure situation that is implied by the
 problem description, but not mentioned, and not triggered by the example
 input, though it does arise with the puzzle input.  In this case the
 winkle (the possibility of a draw) arises in the second part, which
