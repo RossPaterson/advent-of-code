@@ -1,10 +1,8 @@
 module Main where
 
+import Components
 import Parser
 import Utilities
-import Control.Applicative
-import Data.Char
-import Data.List
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
 import Data.Set (Set)
@@ -26,17 +24,15 @@ type Point = (Int, Int, Int, Int)
 
 -- number of constellations in the input
 solve1 :: Input -> Int
-solve1 = length . components . neighbourhoodGraph . Map.fromList . zip [0..]
-
--- a directed graph, represented by a list of neighbours for each node
--- (our graphs are indirected: they include the reverse of each edge)
-type Graph a = Map a [a]
-
--- list of points connected to each point
-neighbourhoodGraph :: Map Int Point -> Graph Int
-neighbourhoodGraph ps = Map.mapWithKey neighbours ps
+solve1 ps = length $ components (neighbours point_map) (Map.keysSet point_map)
   where
-    neighbours n1 p1 = [n2 | (n2, p2) <- Map.toList ps, near p1 p2 && n1 /= n2]
+    point_map = Map.fromList (zip [0..] ps)
+
+-- list of points connected to a point
+neighbours :: Map Int Point -> Int -> [Int]
+neighbours m n = case Map.lookup n m of
+    Nothing -> []
+    Just p -> [n' | (n', p') <- Map.toList m, near p p' && n' /= n]
 
 -- two points are connected if their distance is no more than 3
 near :: Point -> Point -> Bool
@@ -46,19 +42,6 @@ near p1 p2 = distance p1 p2 <= 3
 distance :: Point -> Point -> Int
 distance (x1, y1, z1, t1) (x2, y2, z2, t2) =
     abs (x1-x2) + abs (y1-y2) + abs (z1-z2) + abs (t1-t2)
-
--- list of connected components of a graph
-components :: Ord a => Graph a -> [Set a]
-components = unfoldr extractComponent
-
--- extract a non-empty connected component from the graph
-extractComponent :: Ord a => Graph a -> Maybe (Set a, Map a [a])
-extractComponent neighbours =
-    fmap (extract . fst) (Map.lookupMin neighbours)
-  where
-    extract p = (component, Map.withoutKeys neighbours component)
-      where
-        component = Set.fromList $ concat $ bfs (neighbours!) [p]
 
 tests1 :: [(String, Int)]
 tests1 =
