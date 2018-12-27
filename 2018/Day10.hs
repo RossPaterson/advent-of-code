@@ -24,7 +24,7 @@ parse = map (runParser particle) . lines
     point = (,) <$ char '<' <*> coord <* char ',' <*> coord <* char '>'
     coord = many space *> int
 
--- Both parts
+-- Parts One and Two
 
 -- String displaying all the candidate states and when they occur.
 -- There might be more than one, and some may even be more compact than

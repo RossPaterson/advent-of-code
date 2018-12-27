@@ -3,10 +3,14 @@ module Main where
 import Utilities
 import Data.List
 
+-- Input processing
+
 type Input = [String]
 
 parse :: String -> Input
 parse = lines
+
+-- Part One
 
 solve1 :: Input -> Int
 solve1 = checksum

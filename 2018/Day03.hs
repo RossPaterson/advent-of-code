@@ -3,6 +3,8 @@ module Main where
 import Utilities
 import Parser
 
+-- Input processing
+
 type Input = [Claim]
 
 data Claim = Claim Int Square Int Int
@@ -17,6 +19,8 @@ parse = map (runParser claim) . lines
     claim = Claim <$ char '#' <*> nat <* string " @ " <*>
         square <* string ": " <*> nat <* char 'x' <*> nat
     square = Square <$> nat <* char ',' <*> nat
+
+-- Part One
 
 solve1 :: Input -> Int
 solve1 = length . overlaps
