@@ -4,10 +4,14 @@ import Utilities
 import Data.Set (Set)
 import qualified Data.Set as Set
 
+-- Input processing
+
 type Input = [Int]
 
 parse :: String -> Input
 parse = map read . lines . filter (/= '+')
+
+-- Part One
 
 solve1 :: Input -> Int
 solve1 = sum
