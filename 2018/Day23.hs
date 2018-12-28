@@ -11,14 +11,16 @@ import Data.Ord
 
 type Input = System
 
-type System = [Octahedron]
+type System = [Region]
 
 -- The set of points whose Manhattan distance from the position of a
 -- nanobot is no more than the radius is a regular octahedron with its
 -- vertices in the axis directions.
-data Octahedron = Octahedron { centre :: Position, radius :: Int }
+data Region = Octahedron { centre :: Point, radius :: Int }
   deriving Show
-type Position = (Int, Int, Int)
+
+-- point in 3-dimensional space
+type Point = (Int, Int, Int)
 
 parse :: String -> Input
 parse = map (runParser octahedron) . lines
@@ -32,12 +34,16 @@ parse = map (runParser octahedron) . lines
 
 -- number of centres within range of the largest octahedron
 solve1 :: Input -> Int
-solve1 ns = length [n | n <- ns, distance (centre n) p <= r]
+solve1 ns = length [n | n <- ns, inside (centre n) largest]
   where
-    Octahedron p r = maximumBy (comparing radius) ns
+    largest = maximumBy (comparing radius) ns
+
+-- is the point inside the region?
+inside :: Point -> Region -> Bool
+inside p (Octahedron c r) = distance p c <= r
 
 -- Manhattan distance
-distance :: Position -> Position -> Int
+distance :: Point -> Point -> Int
 distance (x1, y1, z1) (x2, y2, z2) = abs (x1-x2) + abs (y1-y2) + abs (z1-z2)
 
 tests1 :: [(String, Int)]
@@ -57,16 +63,16 @@ testInput1 = "\
 -- Part Two
 
 -- shortest distance from the origin of points that are within the
--- most octahedrons.
+-- most regions.
 -- Uses a directed search of cubes of candidate points, starting with a
--- cube containing all the octahedrons, and at each stage examining the
--- code that intersects with the most octahedrons and dividing it into
+-- cube containing all the regions, and at each stage examining the
+-- code that intersects with the most regions and dividing it into
 -- eight subcubes for further consideration.
-solve2 :: [Octahedron] -> Int
+solve2 :: [Region] -> Int
 solve2 ns = searchCubes (add (boundingCube ns) PQ.empty)
   where
     -- The ordering on keys ensures that if the least is a cube of size
-    -- 1, it is a point inside the most octahedrons that has the least
+    -- 1, it is a point inside the most regions that has the least
     -- distance to the origin.
     searchCubes pq = case PQ.extract pq of
         Nothing -> error "empty queue"
@@ -77,12 +83,12 @@ solve2 ns = searchCubes (add (boundingCube ns) PQ.empty)
     -- add a cube to the priority queue in appropriate order
     add c pq = PQ.insert (makeKey ns c) c pq
 
--- cubic region, with bottom corner and size (a power of 2)
-data Cube = Cube Position Int
+-- cubic search area, with bottom corner and size (a power of 2)
+data Cube = Cube Point Int
   deriving Show
 
--- cube containing all the octahedrons
-boundingCube :: [Octahedron] -> Cube
+-- cube containing all the regions
+boundingCube :: [Region] -> Cube
 boundingCube ps = Cube (xmin, ymin, zmin) size
   where
     xmin = minimum [x-r | Octahedron (x, y, z) r <- ps]
@@ -92,6 +98,7 @@ boundingCube ps = Cube (xmin, ymin, zmin) size
     zmin = minimum [z-r | Octahedron (x, y, z) r <- ps]
     zmax = maximum [z+r | Octahedron (x, y, z) r <- ps]
     maxdim = ((xmax - xmin) `max` (ymax - ymin) `max` (xmax - zmin)) + 1
+    -- smallest power of two >= maxdim
     size = head $ dropWhile (< maxdim) $ iterate (*2) 1
 
 -- split the cube into 8 smaller cubes
@@ -102,12 +109,12 @@ splitCube (Cube (x, y, z) s) =
   where
     s2 = s `div` 2
 
--- number of octahedrons containing any point in the cube
-numIntersects :: [Octahedron] -> Cube -> Int
+-- number of regions containing any point in the cube
+numIntersects :: [Region] -> Cube -> Int
 numIntersects ns c = length [n | n <- ns, intersectCube n c]
 
--- does the octahedron share any points with the cube?
-intersectCube :: Octahedron -> Cube -> Bool
+-- does the region share any points with the cube?
+intersectCube :: Region -> Cube -> Bool
 intersectCube (Octahedron (cx, cy, cz) r) (Cube (x, y, z) s) =
     dx + dy + dz <= r
   where
@@ -122,7 +129,7 @@ data Key = Key (Down Int) (Down Int) Int
   deriving (Show, Eq, Ord)
 
 -- priority key for a search cube
-makeKey :: [Octahedron] -> Cube -> Key
+makeKey :: [Region] -> Cube -> Key
 makeKey ns c@(Cube p s) =
     Key (Down (numIntersects ns c)) (Down (distance p (0,0,0))) s
 
