@@ -1,8 +1,8 @@
 module Main where
 
 import Parser
-import PriorityQueue (PQ)
-import qualified PriorityQueue as PQ
+import MaxPriorityQueue (PQ)
+import qualified MaxPriorityQueue as PQ
 import Utilities
 import Data.List
 import Data.Ord
@@ -71,17 +71,16 @@ testInput1 = "\
 solve2 :: [Region] -> Int
 solve2 ns = searchCubes (add (boundingCube ns) PQ.empty)
   where
-    -- The ordering on keys ensures that if the least is a cube of size
-    -- 1, it is a point inside the most regions that has the least
-    -- distance to the origin.
+    -- The priority ordering ensures that if the least is a cube of size 1,
+    -- it is a point inside the most regions that is closest to the origin.
     searchCubes pq = case PQ.extract pq of
         Nothing -> error "empty queue"
-        Just (k@(Key _ (Down dist) s), c, pq')
+        Just (Priority _ s (Down dist), c, pq')
           | s == 1 -> dist
           | otherwise -> searchCubes (foldr add pq' (splitCube c))
 
     -- add a cube to the priority queue in appropriate order
-    add c pq = PQ.insert (makeKey ns c) c pq
+    add c pq = PQ.insert (priority ns c) c pq
 
 -- cubic search area, with bottom corner and size (a power of 2)
 data Cube = Cube Point Int
@@ -101,13 +100,26 @@ boundingCube ps = Cube (xmin, ymin, zmin) size
     -- smallest power of two >= maxdim
     size = head $ dropWhile (< maxdim) $ iterate (*2) 1
 
--- split the cube into 8 smaller cubes
+-- split the cube (with s a power of 2) into 8 smaller cubes
 splitCube :: Cube -> [Cube]
 splitCube (Cube (x, y, z) s) =
     [Cube (x + dx, y + dy, z + dz) s2 |
         dx <- [0, s2], dy <- [0, s2], dz <- [0, s2]]
   where
     s2 = s `div` 2
+
+-- A search cube has greater priority if it intersects with a larger
+-- number of regions, then if it has a larger side, then smaller distance.
+-- This ordering has the properties:
+-- * The priority for a search cube is >= that for any included cube.
+-- * If the highest priority cube has size 1, it is the solution.
+data Priority = Priority Int Int (Down Int)
+  deriving (Show, Eq, Ord)
+
+-- priority for a search cube
+priority :: [Region] -> Cube -> Priority
+priority ns c@(Cube p s) =
+    Priority (numIntersects ns c) s (Down (distance p (0,0,0)))
 
 -- number of regions containing any point in the cube
 numIntersects :: [Region] -> Cube -> Int
@@ -121,17 +133,6 @@ intersectCube (Octahedron (cx, cy, cz) r) (Cube (x, y, z) s) =
     dx = 0 `max` (x - cx) `max` (cx - (x + s - 1))
     dy = 0 `max` (y - cy) `max` (cy - (y + s - 1))
     dz = 0 `max` (z - cz) `max` (cz - (z + s - 1))
-
--- smaller (earlier in the priority queue) if larger number of intersections,
--- then larger cube, then distance.
--- Then if the smallest has size 1, it is the solution.
-data Key = Key (Down Int) (Down Int) Int
-  deriving (Show, Eq, Ord)
-
--- priority key for a search cube
-makeKey :: [Region] -> Cube -> Key
-makeKey ns c@(Cube p s) =
-    Key (Down (numIntersects ns c)) (Down (distance p (0,0,0))) s
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput2, 36)]
