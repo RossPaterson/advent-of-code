@@ -26,7 +26,7 @@ tests2 = [("5 9 2 8\n9 4 7 3\n3 8 6 5\n", 9)]
 
 main :: IO ()
 main = do
-    s <- readFile "input02.txt"
+    s <- readFile "input/02.txt"
     let input = parse s
     putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)

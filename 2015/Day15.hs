@@ -58,7 +58,7 @@ solve2 = maximum . map score . filter ((== 500) . total calories) . selections q
 
 main :: IO ()
 main = do
-    s <- readFile "input15.txt"
+    s <- readFile "input/15.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

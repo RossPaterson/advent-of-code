@@ -34,7 +34,7 @@ test2 = verticalTriples (parse "101 301 501\n102 302 502\n103 303 503\n201 401 6
 
 main :: IO ()
 main = do
-    s <- readFile "input03.txt"
+    s <- readFile "input/03.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

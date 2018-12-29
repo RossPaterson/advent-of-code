@@ -15,7 +15,7 @@ test1 = "eedadn\ndrvtee\neandsr\nraavrd\natevrs\ntsrnev\nsdttsa\nrasrtv\nnssdts\
 
 main :: IO ()
 main = do
-    s <- readFile "input06.txt"
+    s <- readFile "input/06.txt"
     let input = lines s
     putStrLn (solve1 input)
     putStrLn (solve2 input)

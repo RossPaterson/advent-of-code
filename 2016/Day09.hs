@@ -50,7 +50,7 @@ tests2 = ["(3x3)XYZ", "X(8x2)(3x3)ABCY", "(27x12)(20x12)(13x14)(7x10)(1x12)A", "
 
 main :: IO ()
 main = do
-    s <- readFile "input09.txt"
+    s <- readFile "input/09.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

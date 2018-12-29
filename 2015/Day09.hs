@@ -40,7 +40,7 @@ solve2 m =
 
 main :: IO ()
 main = do
-    s <- readFile "input09.txt"
+    s <- readFile "input/09.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

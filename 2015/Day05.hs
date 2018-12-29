@@ -36,7 +36,7 @@ tests2 = [
 
 main :: IO ()
 main = do
-    s <- readFile "input05.txt"
+    s <- readFile "input/05.txt"
     let ls = lines s
     print (solve1 ls)
     print (solve2 ls)

@@ -79,7 +79,7 @@ solve2 instrs = values!"a"
 
 main :: IO ()
 main = do
-    s <- readFile "input07.txt"
+    s <- readFile "input/07.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

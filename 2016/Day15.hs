@@ -60,7 +60,7 @@ solve2 = solve1 . addDisc 11 0
 
 main :: IO ()
 main = do
-    s <- readFile "input15.txt"
+    s <- readFile "input/15.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

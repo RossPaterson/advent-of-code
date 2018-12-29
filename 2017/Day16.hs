@@ -91,7 +91,7 @@ tests2 = [((5, 2, parse testInput), "ceadb")]
 
 main :: IO ()
 main = do
-    s <- readFile "input16.txt"
+    s <- readFile "input/16.txt"
     let input = parse s
     putStr (unlines (failures "solve1" runTest tests1))
     print (solve1 input)

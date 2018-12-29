@@ -59,7 +59,7 @@ test2 = ["aba[bab]xyz", "xyx[xyx]xyx", "aaa[kek]eke", "zazbz[bzb]cdb"]
 
 main :: IO ()
 main = do
-    s <- readFile "input07.txt"
+    s <- readFile "input/07.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

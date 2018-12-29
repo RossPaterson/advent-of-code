@@ -73,7 +73,7 @@ example = "ULL\nRRDDD\nLURDL\nUUUUD\n"
 
 main :: IO ()
 main = do
-    s <- readFile "input02.txt"
+    s <- readFile "input/02.txt"
     let input = parse s
     putStrLn (solve1 input)
     putStrLn (solve2 input)

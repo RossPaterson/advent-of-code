@@ -42,6 +42,6 @@ tests2 = ["^v", "^>v<", "^v^v^v^v^v"]
 
 main :: IO ()
 main = do
-    s <- readFile "input03.txt"
+    s <- readFile "input/03.txt"
     print (solve1 s)
     print (solve2 s)

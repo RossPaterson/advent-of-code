@@ -19,6 +19,6 @@ tests2 = [")", "()())"]
 
 main :: IO ()
 main = do
-    s <- readFile "input01.txt"
+    s <- readFile "input/01.txt"
     print (solve1 s)
     print (solve2 s)

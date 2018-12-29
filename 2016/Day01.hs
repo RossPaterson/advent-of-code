@@ -92,7 +92,7 @@ test4 = solve2 (parse "R8, R4, R4, R8")
 
 main :: IO ()
 main = do
-    s <- readFile "input01.txt"
+    s <- readFile "input/01.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

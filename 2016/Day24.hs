@@ -69,7 +69,7 @@ solve2 m = minimum (map cost (permutations other_ns))
 
 main :: IO ()
 main = do
-    s <- readFile "input24.txt"
+    s <- readFile "input/24.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

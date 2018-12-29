@@ -74,7 +74,7 @@ solve2 = numLights . (!!100) . history2
 
 main :: IO ()
 main = do
-    s <- readFile "input18.txt"
+    s <- readFile "input/18.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

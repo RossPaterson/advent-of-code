@@ -41,7 +41,7 @@ test2 = Room ["qzmt", "zixmtkozy", "ivhz"] 343 ""
 
 main :: IO ()
 main = do
-    s <- readFile "input04.txt"
+    s <- readFile "input/04.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

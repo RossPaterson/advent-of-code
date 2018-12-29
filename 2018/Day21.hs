@@ -59,7 +59,7 @@ init_sets xs = scanl (flip Set.insert) Set.empty xs
 
 main :: IO ()
 main = do
-    s <- readFile "input21.txt"
+    s <- readFile "input/21.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

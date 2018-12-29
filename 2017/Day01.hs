@@ -31,7 +31,7 @@ tests2 = [("1212", 6), ("1221", 0), ("123425", 4), ("123123", 12), ("12131415", 
 
 main :: IO ()
 main = do
-    s <- readFile "input01.txt"
+    s <- readFile "input/01.txt"
     let input = parse s
     putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)
