@@ -130,7 +130,7 @@ attackee :: Units -> Position -> Maybe Position
 attackee units p
   | null inRange = Nothing
   | otherwise =
-    listToMaybe $ map fst $ sortBy (comparing snd <> comparing fst) inRange 
+    listToMaybe $ map fst $ sortBy (comparing snd <> comparing fst) inRange
   where
     u = fst (units!p)
     inRange = [(np, hp) |
