@@ -24,7 +24,7 @@ Some common AoC themes:
 * path finding: days 15, 20 and 22.
 * cellular automata: days 12 and 18.
 
-## Day 1: Chronal Calibration
+## [Day 1: Chronal Calibration](https://adventofcode.com/2018/day/1)
 
 An easy one to start with.  The first part was just a sum, while in
 the second part was easiest broken down into three parts:
@@ -36,7 +36,7 @@ the second part was easiest broken down into three parts:
   another `scanl`, and comparing that with the list of partial sums.
   We can use these infinite lists thanks to lazy evaluation.
 
-## Day 2: Inventory Management System
+## [Day 2: Inventory Management System](https://adventofcode.com/2018/day/2)
 
 The first part was a routine list comprehension, but the second was
 an interesting challenge of moderate size.  Rather than compare each
@@ -45,7 +45,7 @@ possible edits and searching for duplicates by sorting them.  That is
 asymptotically faster, O(*n log n*) vs O(*n*<sup>2</sup>), but for an
 input of this size was slower than the quadratic algorithm.
 
-## Day 3: No Matter How You Slice It
+## [Day 3: No Matter How You Slice It](https://adventofcode.com/2018/day/3)
 
 Another small and enjoyable problem.  I used frequency counting again
 (perhaps because I'd used it the day before), this time of the squares
@@ -54,13 +54,13 @@ in each claim, and it did the job.
 The second part was an easy extension, partly reusing the first part,
 and partly inverting it.
 
-## Day 4: Repose Record
+## [Day 4: Repose Record](https://adventofcode.com/2018/day/4)
 
 This one wasn't difficult, but there was some tedious processing of the
 input before one can start.  Then the two parts are different calculations
 on that data.  The bulk operations on maps were useful here.
 
-## Day 5: Alchemical Reduction
+## [Day 5: Alchemical Reduction](https://adventofcode.com/2018/day/5)
 
 This was fun, and immediately recognizable as normalization in a
 [free group](https://en.wikipedia.org/wiki/Free_group).
@@ -72,7 +72,7 @@ could also be done with a `foldr`.
 The second part is a straightforward comparison of all the possible
 removals, but normalizing the string first makes it faster.
 
-## Day 6: Chronal Coordinates
+## [Day 6: Chronal Coordinates](https://adventofcode.com/2018/day/6)
 
 The first part was a kind of
 [Voronoi diagram](https://en.wikipedia.org/wiki/Voronoi_diagram),
@@ -90,7 +90,7 @@ search area a bit bigger than the smallest bounding rectangle, which
 would be necessary if all the points were close together, but probably
 wasn't needed for the supplied inputs.
 
-## Day 7: The Sum of Its Parts
+## [Day 7: The Sum of Its Parts](https://adventofcode.com/2018/day/7)
 
 The first part was a topological sort, but was easy enough to craft
 by hand.  I decided to stop if there were no runnable tasks, so it
@@ -117,7 +117,7 @@ breakdown made it easy to unroll the loop.  For the advancing step,
 it would suffice to move the clock one tick at a time, but it's just as
 easy to advance to the time when the next job will complete.
 
-## Day 8: Memory Maneuver
+## [Day 8: Memory Maneuver](https://adventofcode.com/2018/day/8)
 
 This was familiar territory, and clearly suggested a recursive tree type.
 The main task was to build the tree by scanning the list of numbers.
@@ -127,7 +127,7 @@ Lazy evaluation came in handy in the second part: one could define a list
 of recursively valued child trees, and then repeated references to the same
 child would only compute it once, and unused children would not be computed.
 
-## Day 9: Marble Mania
+## [Day 9: Marble Mania](https://adventofcode.com/2018/day/9)
 
 This was straightforward, though fiddly in the details.  Because all
 the changes occur near the current position in the circle, a simple
@@ -142,14 +142,14 @@ used less flexible sequence types.)  The deque implementation ran out
 of stack in the interpreter, but compiling it avoided that and was fast
 enough for this input.
 
-## Day 10: The Stars Align
+## [Day 10: The Stars Align](https://adventofcode.com/2018/day/10)
 
 This was fun.  Simulating the motion of the points was easy enough,
 but the spare specification of the end condition made it interesting.
 We had to work out which part of the space to draw, and when it might
 contain a message.
 
-## Day 11: Chronal Charge
+## [Day 11: Chronal Charge](https://adventofcode.com/2018/day/11)
 
 The first part was simple list comprehensions, but using this naive approach
 on the generalization in the second part would be O(*n*<sup>5</sup>),
@@ -179,7 +179,7 @@ This problem is a 2-dimensional
 and perhaps there are algorithms that do not require computing all the sums
 (like Kadane's for the 1-dimensional case).
 
-## Day 12: Subterranean Sustainability
+## [Day 12: Subterranean Sustainability](https://adventofcode.com/2018/day/12)
 
 One of those where the first part is a straightforward implementation
 and the second part asks for the same thing but with many more steps.
@@ -188,7 +188,7 @@ In this case, we are asked to implement a 1-dimensional
 The general case appears intractable, so I tried examining the states
 generated by the supplied input, and the pattern soon became clear.
 
-## Day 13: Mine Cart Madness
+## [Day 13: Mine Cart Madness](https://adventofcode.com/2018/day/13)
 
 The description is complicated, and takes quite a while to process.
 All the tracks seem to be rectangular, but that turns out not to matter.
@@ -203,7 +203,7 @@ start of each step, but by the time we reach a cart, it might already
 have been destroyed in a crash.  As seen before in AoC, this does not
 arise in the example given, but does happen with the supplied input.
 
-## Day 14: Chocolate Charts
+## [Day 14: Chocolate Charts](https://adventofcode.com/2018/day/14)
 
 My original solutions to both parts involved iteratively updating the
 state, with fairly messy termination conditions.  I used the Haskell
@@ -214,7 +214,7 @@ imperative extensible array would also have worked.
 A much neater solution is to generate the infinite list of scores,
 from which both parts can be easily computed.
 
-## Day 15: Beverage Bandits
+## [Day 15: Beverage Bandits](https://adventofcode.com/2018/day/15)
 
 This was nasty.  There were some similarities to day 13, but this was
 much more intricate.  The shortest-path calculation can be done cleanly
@@ -232,7 +232,7 @@ It was easily fixed, at the cost of even messier code.
 
 The second part was an easy extension.
 
-## Day 16: Chronal Classification
+## [Day 16: Chronal Classification](https://adventofcode.com/2018/day/16)
 
 This was a neat inversion of the assembler puzzles of previous years,
 though the input processing is quite messy.
@@ -241,7 +241,7 @@ The first part is straightforward, and suggests a strategy that works for
 the more open second part, at least for this input.  Other inputs might
 also have required the dual strategy.
 
-## Day 17: Reservoir Research
+## [Day 17: Reservoir Research](https://adventofcode.com/2018/day/17)
 
 This is a very novel problem.  The statement is noncommittal about the
 order in which water flows sideways, which guides one towards computing
@@ -255,7 +255,7 @@ right in a hurry is difficult.
 
 The second part is an easy variation.
 
-## Day 18: Settlers of The North Pole
+## [Day 18: Settlers of The North Pole](https://adventofcode.com/2018/day/18)
 
 Another
 [cellular automaton](https://en.wikipedia.org/wiki/Cellular_automaton),
@@ -268,7 +268,7 @@ often enough, and plugging in the repeating list abstraction I wrote
 after thinking about the day 12 puzzle did the trick.  (On my input,
 the states repeat every 28 steps after an initial 480.)
 
-## Day 19: Go With The Flow
+## [Day 19: Go With The Flow](https://adventofcode.com/2018/day/19)
 
 A regular appearance on AoC: the first part is implementing a simple
 machine and running the input code on it, while the second part requires
@@ -276,7 +276,7 @@ decompiling the code to create a more efficient equivalent.  The machine
 here uses eight of the instructions from day 16, though with a twist:
 one of the registers holds the instruction pointer.
 
-## Day 20: A Regular Map
+## [Day 20: A Regular Map](https://adventofcode.com/2018/day/20)
 
 This problem requires three steps, which are clearly laid out in the
 description:
@@ -294,7 +294,7 @@ are not clear in advance, making it difficult to use fixed array structures.
 The third step is easy given a breadth-first searcher, and the second
 part is also easily derived from the breadth-first search.
 
-## Day 21: Chronal Conversion
+## [Day 21: Chronal Conversion](https://adventofcode.com/2018/day/21)
 
 Another problem using the same assembly code as days 16 and 19.  It turns
 out not to be necessary to decompile the whole thing, just the outer loop,
@@ -310,7 +310,7 @@ initial part of the program, which has no effect.  It also seems that
 the "lowest" qualification in both parts is redundant, but included to
 obscure the uniqueness of the solution.
 
-## Day 22: Mode Maze
+## [Day 22: Mode Maze](https://adventofcode.com/2018/day/22)
 
 The first part is building the maze and testing that it is correct
 (though neither the example nor the first question test the area beyond
@@ -331,7 +331,7 @@ Initally I just searched an area substantially beyond the target, but
 later cleaned this up by doing an initial search to get a bound for
 the real search.
 
-## Day 23: Experimental Emergency Teleportation
+## [Day 23: Experimental Emergency Teleportation](https://adventofcode.com/2018/day/23)
 
 After several elaborate descriptions, this one was beautifully clear,
 with an easy first part setting the stage for a very challenging search
@@ -346,7 +346,7 @@ have taken 3 weeks of CPU time on this input.
 A much better idea from that thread was a directed divide-and-conquer
 approach, which turned out much simpler and faster.
 
-## Day 24: Immune System Simulator 20XX
+## [Day 24: Immune System Simulator 20XX](https://adventofcode.com/2018/day/24)
 
 This problem has a similar structure to day 15: a simulation of an
 intricate battle game, with the second part adjusting the conditions
@@ -366,7 +366,7 @@ would catch my errors.
 **Lesson:** when writing the termination test for an iteration, also
 stop if the system is deadlocked.
 
-## Day 25: Four-Dimensional Adventure
+## [Day 25: Four-Dimensional Adventure](https://adventofcode.com/2018/day/25)
 
 This was a neat little problem, which amounts to counting the
 [connected components](https://en.wikipedia.org/wiki/Connected_component_(graph_theory))
