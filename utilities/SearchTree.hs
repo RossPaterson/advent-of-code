@@ -1,6 +1,6 @@
 module SearchTree (SearchTree(..), unfoldTree, dfs, lfs) where
 
-import PriorityQueue
+import MinPriorityQueue
 
 -- General search trees
 
