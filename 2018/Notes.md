@@ -17,6 +17,13 @@ were days 5, 10, 16 and 17, and I learned previously unfamiliar techniques
 from days 11 and 23.  On the other hand, several were drowned in tedious
 detail, particularly days 4, 15, 22, 24.
 
+Some common AoC themes:
+
+* assembly code: days 16, 19 and 21.
+* game simulation: days 13, 15 and 24.
+* path finding: days 15, 20 and 22.
+* cellular automata: days 12 and 18.
+
 ## Day 1: Chronal Calibration
 
 An easy one to start with.  The first part was just a sum, while in
@@ -305,19 +312,24 @@ obscure the uniqueness of the solution.
 
 ## Day 22: Mode Maze
 
-The first part is building the maze and testing that it is correct (though
-neither the example nor the question test the area beyond the target).
-Since we don't know how much of it we will use, the proper approach would
-be a memoized function over the infinite quarter-plane, but I just used
+The first part is building the maze and testing that it is correct
+(though neither the example nor the first question test the area beyond
+the target).  Since we don't know how much of it we will use, we could
+use a memoized function over the infinite quarter-plane, but I just used
 a large enough finite area.  I took a ridiculous amount of time getting
-the details of the cell calculations right.
+the details of calculating region types right.
 
-The second part was a path search, for which I used the breadth-first
-searcher I had to hand.  This approach makes a lot of extra states
-while one is in the process of switching equipment, but it was enough.
-A proper approach would have turned the maze into a weighted graph with
-admissible position-equipment pairs as nodes, and then used a general
-path-finding algorithm.
+The second part was a path search with switching equipment as a
+longer edge.  I used the breadth-first searcher I had to hand, which
+makes a lot of extra states while one is switching.  It worked in
+this case, but the technique seemed to be near its limits.  A proper
+approach would have turned the maze into a weighted graph with
+compatible position-equipment pairs as nodes, and then used a general
+[path-finding](https://en.wikipedia.org/wiki/Pathfinding) algorithm.
+
+Initally I just searched an area substantially beyond the target, but
+later cleaned this up by doing an initial search to get a bound for
+the real search.
 
 ## Day 23: Experimental Emergency Teleportation
 
