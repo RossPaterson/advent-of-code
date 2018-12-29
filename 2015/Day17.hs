@@ -21,7 +21,7 @@ solve2 sizes = length $ head $ group $ sort $
 
 main :: IO ()
 main = do
-    s <- readFile "input17.txt"
+    s <- readFile "input/17.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

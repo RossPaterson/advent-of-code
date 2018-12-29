@@ -38,7 +38,7 @@ solve2 = numSafe . take 400000 . iterate nextRow
 
 main :: IO ()
 main = do
-    s <- readFile "input18.txt"
+    s <- readFile "input/18.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

@@ -40,7 +40,7 @@ tests2 = [
 
 main :: IO ()
 main = do
-    s <- readFile "input10.txt"
+    s <- readFile "input/10.txt"
     let input = parse s
     putStr (unlines (failures "solve1" (uncurry hash1) tests1))
     print (solve1 input)

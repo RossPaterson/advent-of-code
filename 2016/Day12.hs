@@ -79,7 +79,7 @@ solve2 code = run code initState2 ! A
 
 main :: IO ()
 main = do
-    s <- readFile "input12.txt"
+    s <- readFile "input/12.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

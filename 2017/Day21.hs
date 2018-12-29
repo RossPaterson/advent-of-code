@@ -129,7 +129,7 @@ solve2 = solve 18
 
 main :: IO ()
 main = do
-    s <- readFile "input21.txt"
+    s <- readFile "input/21.txt"
     let input = parse s
     putStr (unlines (failures "solve" (\(n, i) -> solve n (parse i)) tests1))
     print (solve1 input)

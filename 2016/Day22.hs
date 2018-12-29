@@ -105,7 +105,7 @@ test =
 
 main :: IO ()
 main = do
-    s <- readFile "input22.txt"
+    s <- readFile "input/22.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

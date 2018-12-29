@@ -121,6 +121,6 @@ testInput = "\
 
 main :: IO ()
 main = do
-    s <- readFile "input10.txt"
+    s <- readFile "input/10.txt"
     let input = parse s
     putStr $ solve input

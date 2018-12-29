@@ -39,7 +39,7 @@ solve2 = (2^32 -) . sum . map sizeRange . mergeRanges . sort
 
 main :: IO ()
 main = do
-    s <- readFile "input20.txt"
+    s <- readFile "input/20.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

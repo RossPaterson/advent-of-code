@@ -42,7 +42,7 @@ tests2 = [("0 3  0  1  -3", 10)]
 
 main :: IO ()
 main = do
-    s <- readFile "input05.txt"
+    s <- readFile "input/05.txt"
     let input = parse s
     putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)

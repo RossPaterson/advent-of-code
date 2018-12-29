@@ -29,7 +29,7 @@ solve2 = sum . map ribbon
 
 main :: IO ()
 main = do
-    s <- readFile "input02.txt"
+    s <- readFile "input/02.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

@@ -71,7 +71,7 @@ solve2 = showScreen . foldl apply blankScreen
 
 main :: IO ()
 main = do
-    s <- readFile "input08.txt"
+    s <- readFile "input/08.txt"
     let input = parse s
     print (solve1 input)
     putStr (solve2 input)

@@ -42,7 +42,7 @@ solve2 lits = sum [length (escape lit) - length lit | lit <- lits]
 
 main :: IO ()
 main = do
-    s <- readFile "input08.txt"
+    s <- readFile "input/08.txt"
     let ls = lines s
     print (solve1 ls)
     print (solve2 ls)

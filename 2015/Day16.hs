@@ -64,7 +64,7 @@ solve2 es = head [n | (n, ps) <- es, match2 results2 ps]
 
 main :: IO ()
 main = do
-    s <- readFile "input16.txt"
+    s <- readFile "input/16.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

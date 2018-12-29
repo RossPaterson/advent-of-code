@@ -63,7 +63,7 @@ solve2 = sum . concat . foldl switch2 (initGrid 0)
 
 main :: IO ()
 main = do
-    s <- readFile "input06.txt"
+    s <- readFile "input/06.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

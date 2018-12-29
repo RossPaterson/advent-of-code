@@ -96,7 +96,7 @@ solve2 program = length $ filter composite [start, start+incr .. finish]
 
 main :: IO ()
 main = do
-    s <- readFile "input23.txt"
+    s <- readFile "input/23.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

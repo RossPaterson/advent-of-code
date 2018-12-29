@@ -61,7 +61,7 @@ solve2 = maximum . Map.elems . points race_time
 
 main :: IO ()
 main = do
-    s <- readFile "input14.txt"
+    s <- readFile "input/14.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

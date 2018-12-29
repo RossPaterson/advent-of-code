@@ -101,7 +101,7 @@ solve2 = value . fromJust . Rep.lookup 1000000000 . Rep.iterate step
 
 main :: IO ()
 main = do
-    s <- readFile "input18.txt"
+    s <- readFile "input/18.txt"
     let input = parse s
     putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)

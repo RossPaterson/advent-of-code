@@ -45,7 +45,7 @@ solve2 m = happiest m ("":guests m)
 
 main :: IO ()
 main = do
-    s <- readFile "input13.txt"
+    s <- readFile "input/13.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

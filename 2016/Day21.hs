@@ -125,7 +125,7 @@ solve2 = foldr (flip invert) text2
 
 main :: IO ()
 main = do
-    s <- readFile "input21.txt"
+    s <- readFile "input/21.txt"
     let input = parse s
     putStrLn (solve1 input)
     putStrLn (solve2 input)

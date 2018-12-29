@@ -118,7 +118,7 @@ tests2 = [((100, testInput), 26), ((10000000, testInput), 2511944)]
 
 main :: IO ()
 main = do
-    s <- readFile "input22.txt"
+    s <- readFile "input/22.txt"
     let input = parse s
     putStr (unlines (failures "solve1" (runParsed burst1) tests1))
     print (solve1 input)

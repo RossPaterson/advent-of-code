@@ -100,7 +100,7 @@ tests2 = [(testInput, 60)]
 
 main :: IO ()
 main = do
-    s <- readFile "input07.txt"
+    s <- readFile "input/07.txt"
     let input = parse s
     putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     putStrLn (solve1 input)

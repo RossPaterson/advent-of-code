@@ -53,7 +53,7 @@ solve2 = minimum . map product . leastBy length . firstGroups 4
 
 main :: IO ()
 main = do
-    s <- readFile "input24.txt"
+    s <- readFile "input/24.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)

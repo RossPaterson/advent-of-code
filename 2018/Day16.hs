@@ -115,7 +115,7 @@ swap (x, y) = (y, x)
 
 main :: IO ()
 main = do
-    s <- readFile "input16.txt"
+    s <- readFile "input/16.txt"
     let input = parse s
     putStr (unlines (failures "solve1" (possibles . parseSample) tests1))
     print (solve1 input)

@@ -331,7 +331,7 @@ test (cavern, units) = showResult cavern (battle (const 3) cavern units)
 
 main :: IO ()
 main = do
-    s <- readFile "input15.txt"
+    s <- readFile "input/15.txt"
     let input = parse s
     putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)

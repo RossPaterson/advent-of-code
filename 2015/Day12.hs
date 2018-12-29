@@ -52,7 +52,7 @@ solve2 = total . prune
 
 main :: IO ()
 main = do
-    s <- readFile "input12.txt"
+    s <- readFile "input/12.txt"
     let input = parse s
     print (solve1 input)
     print (solve2 input)
