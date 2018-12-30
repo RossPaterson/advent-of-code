@@ -6,10 +6,17 @@ import Data.List
 import Data.Sequence (Seq, (|>))
 import qualified Data.Sequence as Seq
 
+-- Input processing
+
+type Input = String
+
+parse :: String -> Input
+parse = head . lines
+
 -- Part One
 
-solve1 :: Int -> String
-solve1 = after 10
+solve1 :: Input -> String
+solve1 = after 10 . read
 
 -- substring of scores of length n starting at position pos
 after :: Int -> Int -> String
@@ -44,14 +51,14 @@ grow (State rs ps) = (added, State rs' ps')
 digits :: Int -> [Int]
 digits = map digitToInt . show
 
-tests1 :: [(Int, String)]
+tests1 :: [(String, String)]
 tests1 = [
-    (9, "5158916779"), (5, "0124515891"),
-    (18, "9251071085"), (2018, "5941429882")]
+    ("9", "5158916779"), ("5", "0124515891"),
+    ("18", "9251071085"), ("2018", "5941429882")]
 
 -- Part Two
 
-solve2 :: String -> Int
+solve2 :: Input -> Int
 solve2 s =
     head $ subsequencePositions (map digitToInt s) (allScores initScores)
 
@@ -65,8 +72,9 @@ tests2 = [("51589", 9), ("01245", 5), ("92510", 18), ("59414", 2018)]
 
 main :: IO ()
 main = do
-    let input = "209231"
+    s <- readFile "input/14.txt"
+    let input = parse s
     putStr (unlines (failures "solve1" solve1 tests1))
-    print (solve1 (read input))
+    print (solve1 input)
     putStr (unlines (failures "solve2" solve2 tests2))
     print (solve2 input)
