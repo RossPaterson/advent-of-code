@@ -8,6 +8,9 @@ import Data.List
 
 type Input = Int
 
+parse :: String -> Input
+parse = read . head . lines
+
 -- Part One
 
 solve1 :: Input -> Position
@@ -139,7 +142,8 @@ tests2 = [(18, (90,269,16)), (42, (232,251,12))]
 
 main :: IO ()
 main = do
-    let input = 8772
+    s <- readFile "input/11.txt"
+    let input = parse s
     putStr (unlines (failures "solve1" solve1 tests1))
     print (solve1 input)
     putStr (unlines (failures "solve2" solve2 tests2))
