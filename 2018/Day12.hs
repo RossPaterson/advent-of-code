@@ -1,16 +1,21 @@
 module Main where
 
 import Parser
+import qualified RepeatingList as RL
 import Utilities
 import Control.Applicative
 import Data.Functor
 import Data.List
+import Data.Maybe
+import Data.Monoid
 import Data.Set (Set)
 import qualified Data.Set as Set
 
 -- Input processing
 
-type Input = ([Bool], Set [Bool])
+type Input = (PlantString, Rules)
+type Rules = Set PlantString
+type PlantString = [Bool]
 
 parse :: String -> Input
 parse s = (s0, rules)
@@ -26,16 +31,25 @@ parse s = (s0, rules)
 -- Part One
 
 solve1 :: Input -> Int
-solve1 = sumPlants . (!!gens1) . generations
+solve1 = sumPlants . getState 20
 
-gens1 :: Int
-gens1 = 20
+-- the state after n steps
+getState :: Int -> (PlantString, Rules) -> Plants
+getState n (bs, gs) = addOffset totalOffset lastState
+  where
+    generations = iterate (growPlants gs . present) (mkPlants 0 bs)
+    totalOffset = sum (map offset (take n generations))
+    lastState = generations!!n
 
 data Plants = Plants {
-    offset :: Int, -- position of leftmost plant
-    present :: [Bool] -- plant present (first and last are True)
+    offset :: Int, -- offset of leftmost plant from previous generation
+    present :: PlantString -- plant present (first and last are True)
     }
-  deriving Show
+  deriving (Show, Eq, Ord)
+
+-- add an offset to a set of plants
+addOffset :: Int -> Plants -> Plants
+addOffset off (Plants pos bs) = Plants (off+pos) bs
 
 showPlants :: Plants -> String
 showPlants (Plants pos bs) =
@@ -45,22 +59,18 @@ showPlants (Plants pos bs) =
 sumPlants :: Plants -> Int
 sumPlants (Plants pos bs) = sum [n | (n, b) <- zip [pos..] bs, b]
 
--- sequence of generations from a start point
-generations :: Input -> [Plants]
-generations (bs, gs) = iterate (growPlants gs) (mkPlants 0 bs)
-
--- normalize a set of plants
-mkPlants :: Int -> [Bool] -> Plants
+-- normalize a set of plants, by removing empties from the ends
+mkPlants :: Int -> PlantString -> Plants
 mkPlants pos bs = Plants { offset = pos + length front, present = back }
   where
     (front, back) = span not $ reverse $ dropWhile not $ reverse bs
 
 -- one growth step
-growPlants :: Set [Bool] -> Plants -> Plants
-growPlants gcs (Plants pos bs) =
-    mkPlants (pos-2) $ map (flip Set.member gcs) $ sublists 5 False bs
+growPlants :: Rules -> PlantString -> Plants
+growPlants gcs bs =
+    mkPlants (-2) $ map (flip Set.member gcs) $ sublists 5 False bs
 
--- sublists of n, padding with v
+-- sublists of length n, padding with v
 sublists :: Int -> a -> [a] -> [[a]]
 sublists n v bs =
     take (len + 2*n - 2) $
@@ -91,25 +101,16 @@ tests1 = [(testInput, 325)]
 
 -- Part Two
 
-solve2 :: Input -> Integer
-solve2 p = fromIntegral b + fromIntegral a * gens2
-  where
-    (a, b) = linearCoeffs (generations p)
+solve2 :: Input -> Int
+solve2 = sumPlants . getStateRL 50000000000
 
-gens2 :: Integer
-gens2 = 50000000000
-
--- Assuming that the pattern of plants becomes fixed after a certain point,
--- the sums of positions will grow linearly as a*n+b thereafter.
--- This function then returns these coefficients (a, b).
-linearCoeffs :: [Plants] -> (Int, Int)
-linearCoeffs gs = (a, b)
+-- same as getState, but using a repeating list
+getStateRL :: Int -> (PlantString, Rules) -> Plants
+getStateRL n (bs, gs) = addOffset totalOffset lastState
   where
-    (front, (ps1@(Plants pos1 bs1), ps2@(Plants pos2 bs2)):rest) =
-        span (not . uncurry (same present)) $ zip gs (tail gs)
-    n = length front
-    a = (pos2 - pos1) * length (filter id bs1)
-    b = sumPlants ps1 - n*a
+    generations = RL.iterate (growPlants gs . present) (mkPlants 0 bs)
+    totalOffset = getSum (RL.foldMapTake (Sum . offset) n generations)
+    lastState = fromJust (RL.lookup n generations)
 
 main :: IO ()
 main = do
