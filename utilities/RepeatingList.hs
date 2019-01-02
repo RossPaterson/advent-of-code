@@ -1,10 +1,10 @@
 -- a sequence that is either finite or repeats from some point
 module RepeatingList where
 
-import Utilities
 import Data.Foldable
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
+import Data.Semigroup
 import Data.Sequence (Seq, ViewL(..), ViewR(..), (<|), (|>), (><))
 import qualified Data.Sequence as Seq
 import Prelude hiding (iterate, lookup)
@@ -44,10 +44,12 @@ lookup n (RepeatingList fr re)
   | Seq.null re = Nothing
   | otherwise = Seq.lookup ((n - Seq.length fr) `mod` Seq.length re) re
 
--- mconcatTake n = mconcat . take n . toList, but faster
-mconcatTake :: Monoid a => Int -> RepeatingList a -> a
-mconcatTake n (RepeatingList fr re)
-  | n <= Seq.length fr || Seq.null re = fold (Seq.take n fr)
-  | otherwise = fold fr <> mtimes q (fold re) <> fold (Seq.take r re)
+-- foldMapTake n = foldMap f . take n . toList, but often faster
+foldMapTake :: Monoid m => (a -> m) -> Int -> RepeatingList a -> m
+foldMapTake f n (RepeatingList fr re)
+  | n <= Seq.length fr || Seq.null re = foldMap f (Seq.take n fr)
+  | q == 0 = foldMap f fr <> foldMap f (Seq.take r re)
+  | otherwise =
+    foldMap f fr <> stimes q (foldMap f re) <> foldMap f (Seq.take r re)
   where
     (q, r) = (n - Seq.length fr) `divMod` Seq.length re
