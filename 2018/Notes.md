@@ -343,8 +343,10 @@ nanobot range and consider intersections of 3 planes.  I got that working,
 but it is an O(*n*<sup>4</sup>) algorithm, and I estimate that it would
 have taken 3 weeks of CPU time on this input.
 
-A much better idea from that thread was a directed divide-and-conquer
-approach, which turned out much simpler and faster.
+A much better idea from that thread was a
+[best-first search](https://en.wikipedia.org/wiki/Best-first_search) of an
+[octree](https://en.wikipedia.org/wiki/Octree),
+which turned out much simpler and faster.
 
 ## [Day 24: Immune System Simulator 20XX](https://adventofcode.com/2018/day/24)
 
