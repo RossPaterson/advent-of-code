@@ -4,6 +4,7 @@ import Parser
 import Utilities
 import Control.Applicative
 import Data.Functor
+import Data.Semigroup
 import Data.Set (Set)
 import qualified Data.Set as Set
 
@@ -23,10 +24,12 @@ parse = Set.fromList . concatMap (runParser vein) . lines
 
 type Position = (Int, Int)
 
+-- a vein of clay
 mkVein :: Dir -> Int -> Int -> Int -> [Position]
 mkVein Vert x y1 y2 = [(x, y) | y <- [y1..y2]]
 mkVein Horiz y x1 x2 = [(x, y) | x <- [x1..x2]]
 
+-- position of the spring
 spring :: Position
 spring = (500, 0)
 
@@ -39,65 +42,116 @@ solve :: Set Position -> (Int, Int)
 solve clay = (ns+nr, ns)
   where
     ymin = minimum (map snd (Set.toList clay))
-    Water standing running = maxGrowth spring clay
-    ns = Set.size standing
-    nr = Set.size (Set.filter inRange running)
+    w = maxFlow spring clay
+    ns = Set.size (standing w)
+    nr = Set.size (Set.filter inRange (running w))
     inRange (x, y) = y >= ymin
 
-maxGrowth :: Position -> Input -> Water
-maxGrowth start clay = convergeBy (same totalSize) (growth start clay)
-
-growth :: Position -> Input -> [Water]
-growth start clay = iterate (grow ymax clay) initWater
+-- all the positions reached by water when it reaches a steady state
+maxFlow :: Position -> Input -> Water
+maxFlow start clay = incremental (flow ymax clay) initWater
   where
     ymax = maximum (map snd (Set.toList clay))
-    initWater = Water Set.empty (Set.singleton start)
+    initWater = runningWater (Set.singleton start)
 
--- positions with standing or running water
-data Water = Water (Set Position) (Set Position)
+-- incrementally compute the fixed point of a function f satisfying:
+--     f mempty = x0
+--     f x = x <> dx, and f (x <> dx) = x <> dx <> g x dx
+--     g x mempty = mempty
+incremental :: (Monoid a, Eq a) => (a -> a -> a) -> a -> a
+incremental g = loop mempty
+  where
+    loop x dx
+      | dx == mempty = x
+      | otherwise = loop (x <> dx) (g x dx)
+
+-- all the steps leading to an incrementally computed fixed point
+incrementalSteps :: (Monoid a, Eq a) => (a -> a -> a) -> a -> [a]
+incrementalSteps g = loop mempty
+  where
+    loop x dx
+      | dx == mempty = [x]
+      | otherwise = x : loop (x <> dx) (g x dx)
+
+-- positions with all water and standing water
+data Water = Water { water :: Set Position, standing :: Set Position }
   deriving (Show, Eq)
 
-totalSize :: Water -> Int
-totalSize (Water standing running) = Set.size standing + Set.size running
+instance Semigroup Water where
+    Water w1 s1 <> Water w2 s2 = Water (Set.union w1 w2) (Set.union s1 s2)
 
+instance Monoid Water where
+    mempty = Water Set.empty Set.empty
+
+-- the water that is not standing
+running :: Water -> Set Position
+running w = Set.difference (water w) (standing w)
+
+-- a set consisting of running water
+runningWater :: Set Position -> Water
+runningWater ps = Water ps Set.empty
+
+-- a set consisting of standing water
+standingWater :: Set Position -> Water
+standingWater ps = Water ps ps
+
+-- display the current state, per the puzzle description
 showState :: Position -> Set Position -> Water -> String
-showState start clay (Water standing running) =
+showState start clay w =
     unlines [[showPos (x, y) | x <- [xmin-1..xmax+1]] | y <- [0..ymax]]
   where
-    xmin = minimum (map fst (Set.toList clay))
-    xmax = maximum (map fst (Set.toList clay))
-    ymin = minimum (map snd (Set.toList clay))
-    ymax = maximum (map snd (Set.toList clay))
+    xmin = minimum (map fst positions)
+    xmax = maximum (map fst positions)
+    ymin = minimum (map snd positions)
+    ymax = maximum (map snd positions)
+    positions = spring:Set.toList clay
     showPos p
       | p == start = '+'
       | Set.member p clay = '#'
-      | Set.member p standing = '~'
-      | Set.member p running = '|'
+      | Set.member p (standing w) = '~'
+      | Set.member p (water w) = '|'
       | otherwise = '.'
+
+-- expand water by one step, given the previous state and previous expansion
+flow :: Int -> Set Position -> Water -> Water -> Water
+flow ymax clay w dw =
+    runningWater newrunning <>
+    mconcat [layerWater (mkLayer blocked p) | p <- Set.toList spreading]
+  where
+    inRange (x, y) = y <= ymax
+    -- water runs into empty space below previously new running water
+    newrunning =
+        Set.filter inRange (Set.map below (running dw))
+            `Set.difference` water w
+            `Set.difference` water dw
+            `Set.difference` clay
+    w' = w <> dw
+    -- barrier to running water
+    blocked = clay `Set.union` standing w'
+    -- running water that will spread out horizontally
+    spreading =
+        -- new running water above clay or standing water
+        Set.map above (Set.map below newrunning `Set.intersection` blocked)
+        `Set.union`
+        -- running water above new standing water
+        (running w' `Set.intersection` Set.map above (standing dw))
+
+-- the position immediately below
+below :: Position -> Position
+below (x, y) = (x, y+1)
+
+-- the position immediately above
+above :: Position -> Position
+above (x, y) = (x, y-1)
 
 -- a horizontal layer of water, at given y-coordinate
 data Layer = Layer Int End End
--- the end of a layer: open if the position below isn't blocked,
--- otherwise closed if the next position is blocked
+-- the end of a layer at an x-coordinate: open if the position below
+-- isn't blocked, otherwise closed if the next position is blocked
 data End = End EndType Int
   deriving Show
 data EndType = Open | Closed
   deriving Show
-
-grow :: Int -> Set Position -> Water -> Water
-grow ymax clay (Water standing running) =
-    foldl addLayer (Water standing running') layers
-  where
-    blocked = Set.union clay standing
-    running' =
-        (Set.filter inRange (below running) `Set.difference` blocked)
-        `Set.union` running
-    layers = map (mkLayer blocked) (Set.toList running')
-    inRange (x, y) = y <= ymax
-
--- the positions immediately below those in s
-below :: Set Position -> Set Position
-below s = Set.fromList [(x, y+1) | (x, y) <- Set.toList s]
 
 -- extend (x,y) into a horizontal layer of water
 mkLayer :: Set Position -> Position -> Layer
@@ -109,16 +163,11 @@ mkLayer blocked (x, y) =
       | Set.member (x2, y) blocked = End Closed x1
       | otherwise = mkEnd (x2:xs)
 
--- the positions of a layer
-layerPositions :: Layer -> Set Position
-layerPositions (Layer y (End _ x1) (End _ x2)) =
-    Set.fromList [(x, y) | x <- [x1..x2]]
-
--- add a layer of standing or running water
-addLayer :: Water -> Layer -> Water
-addLayer (Water standing running) l
-  | closed l = Water (Set.union standing ps) (Set.difference running ps)
-  | otherwise = Water standing (Set.union running ps)
+-- a layer of standing or running water
+layerWater :: Layer -> Water
+layerWater l
+  | closed l = standingWater ps
+  | otherwise = runningWater ps
   where
     ps = layerPositions l
 
@@ -126,6 +175,11 @@ addLayer (Water standing running) l
 closed :: Layer -> Bool
 closed (Layer _ (End Closed _) (End Closed _)) = True
 closed _ = False
+
+-- the positions of a layer
+layerPositions :: Layer -> Set Position
+layerPositions (Layer y (End _ x1) (End _ x2)) =
+    Set.fromList [(x, y) | x <- [x1..x2]]
 
 tests1 :: [(String, Int)]
 tests1 = [(testInput, 57)]

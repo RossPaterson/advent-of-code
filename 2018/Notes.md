@@ -243,17 +243,20 @@ also have required the dual strategy.
 
 ## [Day 17: Reservoir Research](https://adventofcode.com/2018/day/17)
 
-This is a very novel problem.  The statement is noncommittal about the
-order in which water flows sideways, which guides one towards computing
-the full horizontal extent of the flow at once.  I then went for a
-simplistic implementation, spreading water at each step until the set
-of wet tiles converged.  This was fairly easy to get right, and worked
-on the test input.  It seemed to be running forever on the actual input,
-but stopped after 5 minutes with the correct answer.  It could be made
-much faster by focussing on the bits that are growing, but getting that
-right in a hurry is difficult.
+This is a very novel problem.  The second part is an easy variation.
 
-The second part is an easy variation.
+The statement is noncommittal about the order in which water flows
+sideways, which guides one towards computing the full horizontal extent of
+the flow at once.  I then went for a simplistic implementation, spreading
+water at each step until the set of wet tiles converged.  This was
+fairly easy to get right, and worked on the test input.  It seemed to be
+running forever on the actual input, but stopped after 5 minutes with
+the correct answer.  It could be made much faster by focussing on the
+bits that are growing, but getting that right in a hurry is difficult.
+
+Later I went back and reworked it as an incremental calculation, which
+takes 13 seconds.  It could be made faster by updating various intermediate
+sets instead of recomputing them at each step.
 
 ## [Day 18: Settlers of The North Pole](https://adventofcode.com/2018/day/18)
 
