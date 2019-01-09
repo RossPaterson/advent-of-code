@@ -59,7 +59,7 @@ execute s (Instruction EQIR a b c) = Map.insert c (fromEnum (a == s!b)) s
 execute s (Instruction EQRI a b c) = Map.insert c (fromEnum (s!a == b)) s
 execute s (Instruction EQRR a b c) = Map.insert c (fromEnum (s!a == s!b)) s
 
--- Machine with one register desiganeted as the instruction pointer
+-- Machine with one register designated as the instruction pointer
 
 data Program = Program { ip :: Int, instructions :: Map Int Instruction }
   deriving Show
