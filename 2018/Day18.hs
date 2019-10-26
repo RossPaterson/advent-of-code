@@ -5,8 +5,8 @@ import Data.List
 import Data.Maybe
 import Data.Map.Strict (Map, (!))
 import qualified Data.Map.Strict as Map
-import RepeatingList (RepeatingList)
-import qualified RepeatingList as Rep
+import RationalList (RationalList)
+import qualified RationalList as Rep
 
 -- Input processing
 
@@ -94,10 +94,10 @@ testInput = "\
 
 -- Part Two
 
--- similar to solve1, but use RepeatingList to get the larger index
+-- similar to solve1, but use RationalList to get the larger index
 -- in a reasonable time
 solve2 :: Input -> Int
-solve2 = value . fromJust . Rep.lookup 1000000000 . Rep.iterate step
+solve2 = value . fromJust . Rep.elementAt 1000000000 . Rep.iterate step
 
 main :: IO ()
 main = do

@@ -1,7 +1,7 @@
 module Main where
 
 import Parser
-import qualified RepeatingList as RL
+import qualified RationalList as RL
 import Utilities
 import Control.Applicative
 import Data.Functor
@@ -110,7 +110,7 @@ getStateRL n (bs, gs) = addOffset totalOffset lastState
   where
     generations = RL.iterate (growPlants gs . present) (mkPlants 0 bs)
     totalOffset = getSum (RL.foldMapTake (Sum . offset) n generations)
-    lastState = fromJust (RL.lookup n generations)
+    lastState = fromJust (RL.elementAt n generations)
 
 main :: IO ()
 main = do
