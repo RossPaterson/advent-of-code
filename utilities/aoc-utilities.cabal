@@ -1,0 +1,27 @@
+name:         aoc-utilities
+version:      1.0.0.0
+license:      BSD3
+license-file: LICENSE
+author:       Ross Paterson
+maintainer:   Ross Paterson <R.Paterson@city.ac.uk>
+category:     Data Structures
+synopsis:     utilities for Advent of Code
+description:
+    Various useful libraries for Advent of Code solutions.
+build-type: Simple
+cabal-version: >= 1.10
+
+library
+  build-depends: base >= 4.11 && < 6, containers
+  hs-source-dirs: .
+  default-language: Haskell2010
+  exposed-modules:
+    Components
+    MaxPriorityQueue
+    MinPriorityQueue
+    Parser
+    Permutation
+    Primes
+    RationalList
+    SearchTree
+    Utilities
