@@ -69,7 +69,7 @@ testInput1 = "\
 -- code that intersects with the most regions and dividing it into
 -- eight subcubes for further consideration.
 solve2 :: [Region] -> Int
-solve2 ns = searchCubes (add (boundingCube ns) PQ.empty)
+solve2 ns = searchCubes (add (boundingCube ns) mempty)
   where
     -- The priority ordering ensures that if the least is a cube of size 1,
     -- it is a point inside the most regions that is closest to the origin.

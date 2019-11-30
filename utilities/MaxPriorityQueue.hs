@@ -1,29 +1,35 @@
-module MaxPriorityQueue where
-
--- Maximum priority queue, implemented with lazy skew heaps, from
+-- | Maximum priority queue, implemented with lazy skew heaps, from
 -- "Fun with Binary Heap Trees" by Chris Okasaki in
--- "The Fun of Programming", pp 1-16.
+-- /The Fun of Programming/, pp 1-16.
+module MaxPriorityQueue (PQ, singleton, insert, extract) where
 
+-- | Maximum priority queue
 data PQ p a = Null | Fork p a (PQ p a) (PQ p a)
 
--- extract the element with the greatest key
+instance (Ord p) => Semigroup (PQ p a) where
+    (<>) = merge
+
+instance (Ord p) => Monoid (PQ p a) where
+    mempty = Null
+
+-- | Extract the element with the greatest key
 extract :: Ord p => PQ p a -> Maybe (p, a, PQ p a)
 extract Null = Nothing
 extract (Fork p x a b) = Just (p, x, merge a b)
 
--- empty priority queue
+-- | Empty priority queue
 empty :: PQ p a
 empty = Null
 
--- singleton priority queue
+-- | Singleton priority queue
 singleton :: p -> a -> PQ p a
 singleton p x = Fork p x Null Null
 
--- add an item to a priority queue
+-- | Add an item to a priority queue
 insert :: Ord p => p -> a -> PQ p a -> PQ p a
 insert p x a = merge (singleton p x) a
 
--- merge two priority queues
+-- | Merge two priority queues
 merge :: Ord p => PQ p a -> PQ p a -> PQ p a
 merge a Null = a
 merge Null b = b

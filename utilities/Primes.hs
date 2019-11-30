@@ -1,27 +1,34 @@
+-- | Number theory
 module Primes where
 
--- n = product [p^k | (p, k) <- primeFactors n]
--- p's primes in ascending order
+-- | Factorization of the argument:
+--
+-- prop> n = product [p^k | (p, k) <- primeFactors n]
+--
+-- where the @p@'s are primes in ascending order, and each @k@ is positive.
 primeFactors :: Int -> [(Int, Int)]
-primeFactors = factorize primes 0
+primeFactors = factorize primes
   where
-    factorize _ 0 1 = []
-    factorize (p:ps) k n
-      | n `mod` p == 0 = factorize (p:ps) (k+1) (n `div` p)
-      | k > 0 = (p, k):factorize ps 0 n
+    factorize (p:ps) n
+      | n == 1 = []
+      | n `mod` p == 0 = primePower 1 (n `div` p)
       | p*p > n = [(n, 1)]
-      | otherwise = factorize ps 0 n
+      | otherwise = factorize ps n
+      where
+        primePower k m
+          | m `mod` p == 0 = primePower (k+1) (m `div` p)
+          | otherwise = (p, k):factorize ps m
 
--- is n prime?
+-- | Is @n@ prime?
 isPrime :: Int -> Bool
-isPrime n = noFactors primes
+isPrime n = null [p | p <- takeWhile small primes, n `mod` p == 0]
   where
-    noFactors (p:ps) = p*p > n || n `mod` p /= 0 && noFactors ps
+    small p = p*p <= n
 
--- infinite list of prime numbers
+-- | The infinite list of prime numbers
 primes :: [Int]
 primes = 2:filter isPrime [3,5..]
 
--- the sum of all the factors of n
+-- | The sum of all the factors of @n@
 sumOfFactors :: Int -> Int
 sumOfFactors n = product [(p^(k+1) - 1) `div` (p-1) | (p, k) <- primeFactors n]
