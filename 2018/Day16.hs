@@ -91,7 +91,7 @@ reduce ::
 reduce (done, ambiguous) = (done', ambiguous')
   where
     unique =
-        fast_nub (singletons ambiguous ++
+        fastNub (singletons ambiguous ++
             map swap (singletons (invert ambiguous)))
     done' = Map.union done (Map.fromList unique)
     ambiguous' =

@@ -46,7 +46,7 @@ solve2 = shortest
 shortest :: Ord a => FreeGroup a -> Int
 shortest us =
     minimum [length (normalize (filter ((/= t) . absValue) us')) |
-        t <- fast_nub (map absValue us)]
+        t <- fastNub (map absValue us)]
   where
     us' = normalize us -- speeds things up
 

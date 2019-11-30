@@ -22,7 +22,7 @@ parse = Map.fromList . map (runParser statement) . lines
     assoc p1 g p2 = ((p1, p2), g)
 
 guests :: Input -> [Person]
-guests = fast_nub . map snd . Map.keys
+guests = fastNub . map snd . Map.keys
 
 happiness :: Input -> Person -> Person -> Int
 happiness m a b =

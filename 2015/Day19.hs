@@ -27,7 +27,7 @@ parse s = Input
     ls = lines s
 
 replacements :: Input -> [Molecule]
-replacements (Input rules es) = fast_nub $
+replacements (Input rules es) = fastNub $
     [front ++ repl ++ back |
         (front, e:back) <- zip (inits es) (tails es),
         (r :=> repl) <- rules, r == e]

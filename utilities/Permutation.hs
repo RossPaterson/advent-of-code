@@ -1,12 +1,15 @@
+-- | Permutations that are the identity almost everywhere.
 module Permutation (
     Permutation,
     apply,
     invert,
-    cyclic,
+    -- * Properties
     cycles,
     order,
+    -- * Basic permutations
     swap,
     swapRanges,
+    cyclic,
   ) where
 
 import Control.Applicative
@@ -25,7 +28,11 @@ newtype Permutation a = Permutation (Map a a)
 
 -- Only non-identity entries are stored
 permutation :: (Ord a) => [(a, a)] -> Permutation a
-permutation = Permutation . Map.fromList . filter (uncurry (/=))
+permutation xys
+  | sort (map fst xys) /= Set.toList (Set.fromList (map fst xys)) =
+        error "permutation: repeated mappings"
+  | sort (map fst xys) /= sort (map snd xys) = error "permutation: not cyclic"
+  | otherwise = Permutation (Map.fromList (filter (uncurry (/=)) xys))
 
 nonIdentity :: (Ord a) => Permutation a -> Set a
 nonIdentity (Permutation m) = Map.keysSet m
@@ -46,6 +53,7 @@ instance (Ord a) => Semigroup (Permutation a) where
 instance (Ord a) => Monoid (Permutation a) where
     mempty = Permutation Map.empty
 
+-- | The function defined by a permutation.
 apply :: (Ord a) => Permutation a -> a -> a
 apply (Permutation m) x = Map.findWithDefault x x m
 
@@ -90,6 +98,7 @@ order p = foldr lcm 1 (map length (cycles p))
 
 -- Basic permutations
 
+-- | The permutation that swaps the given two values.
 swap :: (Ord a) => a -> a -> Permutation a
 swap i j = cyclic [i, j]
 

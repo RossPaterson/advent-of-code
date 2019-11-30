@@ -24,7 +24,7 @@ getDist m src dest =
     fromMaybe maxBound (Map.lookup (src, dest) m <|> Map.lookup (dest, src) m)
 
 nodes :: Input -> [Node]
-nodes m = fast_nub $ concat [[src, dest] | (src, dest) <- Map.keys m]
+nodes m = fastNub $ concat [[src, dest] | (src, dest) <- Map.keys m]
 
 solve1 :: Input -> Int
 solve1 m =
