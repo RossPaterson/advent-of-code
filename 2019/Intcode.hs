@@ -57,10 +57,9 @@ effect instr mem = case instr of
 
 advance :: State -> Maybe State
 advance s@(State ip mem) = do
+    let (instr, next_ip) = fetch s
     mod <- effect instr mem
     return $ apply mod (State next_ip mem)
-  where
-    (instr, next_ip) = fetch s
 
 -- run the machine until it halts
 run :: Memory -> Memory
@@ -80,7 +79,6 @@ trace :: Memory -> [(Int, Instruction, Modification)]
 trace = unfoldr advanceTrace . State 0
   where
     advanceTrace s@(State ip mem) = do
+        let (instr, next_ip) = fetch s
         mod <- effect instr mem
         return $ ((ip, instr, mod), apply mod (State next_ip mem))
-      where
-        (instr, next_ip) = fetch s
