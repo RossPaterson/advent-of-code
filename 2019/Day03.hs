@@ -30,16 +30,16 @@ parse s = (w1, w2)
 
 type Point = (Int, Int)
 
+addPoints :: Point -> Point -> Point
+addPoints (x1, y1) (x2, y2) = (x1+x2, y1+y2)
+
 -- the points visited by a wire, in order
 wirePoints :: Wire -> [Point]
-wirePoints = concat . snd . mapAccumL segmentPoints (0, 0)
+wirePoints = tail . scanl addPoints (0, 0) . concatMap segmentDeltas
 
--- last point and all point of a segment from a start point
-segmentPoints :: Point -> Segment -> (Point, [Point])
-segmentPoints (x, y) (Segment d n) =
-    ((x + n*dx, y + n*dy), [(x + i*dx, y + i*dy) | i <- [1..n]])
-  where
-    (dx, dy) = direction d
+-- unit moves in a segment
+segmentDeltas :: Segment -> [Point]
+segmentDeltas (Segment d n) = replicate n (direction d)
 
 direction :: Direction -> Point
 direction U = (0, -1)
@@ -52,8 +52,8 @@ manhattan (x, y) = abs x + abs y
 
 -- points visited by both wires
 intersections :: Wire -> Wire -> [Point]
-intersections w1 w2 =
-    Set.elems $ Set.intersection (Set.fromList (wirePoints w1))
+intersections w1 w2 = Set.elems $
+    Set.intersection (Set.fromList (wirePoints w1))
         (Set.fromList (wirePoints w2))
 
 solve1 :: Input -> Int
@@ -84,7 +84,7 @@ tests1 = [(testInput1, 6), (testInput2, 159), (testInput3, 135)]
 
 -- for each point visited by the wire, time of the first visit
 firstVisits :: Wire -> Map Point Int
-firstVisits w = Map.unionsWith min (zipWith Map.singleton (wirePoints w) [1..])
+firstVisits w = Map.fromListWith const (zip (wirePoints w) [1..])
 
 -- for each point visited by both wires, the sum of the times of first visits
 timedVisits :: Wire -> Wire -> Map Point Int
