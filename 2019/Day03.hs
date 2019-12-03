@@ -84,7 +84,7 @@ tests1 = [(testInput1, 6), (testInput2, 159), (testInput3, 135)]
 
 -- for each point visited by the wire, time of the first visit
 firstVisits :: Wire -> Map Point Int
-firstVisits w = Map.fromListWith const (zip (wirePoints w) [1..])
+firstVisits w = Map.fromListWith (const id) (zip (wirePoints w) [1..])
 
 -- for each point visited by both wires, the sum of the times of first visits
 timedVisits :: Wire -> Wire -> Map Point Int
