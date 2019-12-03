@@ -27,3 +27,12 @@ presumably including one to set the instruction pointer from a value in
 memory.  It is a stored-program computer that executes self-modifying
 programs with instructions of different lengths, so it's going to
 be tricky.
+
+## [Day 3: Crossed Wires](https://adventofcode.com/2019/day/3)
+
+Generating the points visited by a wire is similar to previous puzzles.
+The rest was a nice exercise in operating on whole Sets and Maps.
+
+(I initially solved a more general problem, having somehow missed that
+there were only two wires.  That was another nice exercise, using `Map`
+and several applications of `unionsWith`.)
