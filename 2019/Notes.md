@@ -46,3 +46,6 @@ economical generator: even if you ignore the range and use all 10 digits,
 it still only makes 5005 lists.  The second part involves replacing one
 of the tests.  That would have been harder if it had originally been
 integrated with the generator.
+
+It turns out even that was too much optimization.  Simply using the
+range as the generator would be fast enough.
