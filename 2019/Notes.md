@@ -36,3 +36,13 @@ The rest was a nice exercise in operating on whole Sets and Maps.
 (I initially solved a more general problem, having somehow missed that
 there were only two wires.  That was another nice exercise, using `Map`
 and several applications of `unionsWith`.)
+
+## [Day 4: Secure Container](https://adventofcode.com/2019/day/4)
+
+This is a smallish enumeration exercise.  It can be handled with a
+generate-and-test approach, making one of the criteria the generator
+and the others independent tests.  The non-decreasing criterion made an
+economical generator: even if you ignore the range and use all 10 digits,
+it still only makes 5005 lists.  The second part involves replacing one
+of the tests.  That would have been harder if it had originally been
+integrated with the generator.
