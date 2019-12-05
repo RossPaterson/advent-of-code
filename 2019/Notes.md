@@ -49,3 +49,10 @@ integrated with the generator.
 
 It turns out even that was too much optimization.  Simply using the
 range as the generator would be fast enough.
+
+## [Day 5: Sunny with a Chance of Asteroids](https://adventofcode.com/2019/day/5)
+
+The task is to fill out the instruction set of the computer with I/O
+and addressing modes (part 1) and jumps and tests (part 2).  It's all
+straightforward if tedious following of a detailed description.
+The computer now seems complete, presumably for more use later.

@@ -18,6 +18,9 @@ parse = readMemory
 initialize :: Int -> Int -> Memory -> Memory
 initialize n v = Map.insert 1 n . Map.insert 2 v
 
+output :: Memory -> Int
+output mem = mem!0
+
 solve1 :: Input -> Int
 solve1 = output . run . initialize 12 2
 
@@ -44,5 +47,4 @@ main = do
     let input = parse s
     putStr (unlines (failures "solve1" (Map.elems . run . parse) tests1))
     print (solve1 input)
-    putStr $ unlines $ map show $ trace $ initialize 98 20 input
     print (solve2 input)
