@@ -57,14 +57,14 @@ and addressing modes (part 1) and jumps and tests (part 2).  It's all
 straightforward if tedious following of a detailed description.
 The computer now seems complete, presumably for more use later.
 
-## [Day 6: Universal Orbit Map](https://adventofcode.com/2019/day/2)
+## [Day 6: Universal Orbit Map](https://adventofcode.com/2019/day/6)
 
 This was a nice little exercise involving a bottom-up view of trees.
 I used memoization for calculating the depth of each node in the first
 part because it's so easy in a lazy language, but a naive quadratic
 recursion would have been fast enough.
 
-The second part can be cleanly decompomposed into generating paths to the
+The second part can be cleanly decomposed into generating paths to the
 root and using those to count transfers.  The paths require a similar
 accumulation to the first part, so I used the same structure again,
 even though we only need two of them.
