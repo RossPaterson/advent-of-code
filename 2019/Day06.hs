@@ -69,7 +69,7 @@ transfers a b path_map =
 
 -- longest common prefix of two lists
 commonPrefix :: Eq a => [a] -> [a] -> [a]
-commonPrefix xs ys = [x | (x, y) <- zip xs ys, x == y]
+commonPrefix xs ys = map fst $ takeWhile (uncurry (==)) $ zip xs ys
 
 solve2 :: Input -> Int
 solve2 = transfers "YOU" "SAN" . paths
