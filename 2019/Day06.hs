@@ -61,11 +61,15 @@ paths t = path_map
 
 -- sum of the lengths of the different parts of paths from two nodes
 transfers :: Ord a => a -> a -> Map a [a] -> Int
-transfers a b m =
-    length ta + length tb - 2*length (filter id (zipWith (==) ta tb))
+transfers a b path_map =
+    length pa + length pb - 2*length (commonPrefix pa pb)
   where
-    ta = reverse (m!a)
-    tb = reverse (m!b)
+    pa = reverse (path_map!a)
+    pb = reverse (path_map!b)
+
+-- longest common prefix of two lists
+commonPrefix :: Eq a => [a] -> [a] -> [a]
+commonPrefix xs ys = [x | (x, y) <- zip xs ys, x == y]
 
 solve2 :: Input -> Int
 solve2 = transfers "YOU" "SAN" . paths
