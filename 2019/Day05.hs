@@ -19,7 +19,7 @@ solve1 mem
   | all (== 0) (init vs) = last vs
   | otherwise = error $ "diagnostics failed: " ++ show (init vs)
   where
-    vs = snd (runIO [1] mem)
+    vs = fst (runIO [1] mem)
 
 -- program and function it should implement
 type Test = (String, Int -> Int)
@@ -43,7 +43,7 @@ solve2 mem
   | null vs = error "no output"
   | all (== 0) (init vs) = last vs
   where
-    vs = snd (runIO [5] mem)
+    vs = fst (runIO [5] mem)
 
 tests2 :: [Test]
 tests2 = [

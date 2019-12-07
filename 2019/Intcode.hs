@@ -1,4 +1,4 @@
--- toy computer for Days 2, 5, ...
+-- toy computer for Days 2, 5, 7, ...
 module Intcode where
 
 import Utilities
@@ -19,8 +19,7 @@ readMemory s = Map.fromAscList $ zip [0..] $
 data State = State {
     memory :: Memory,
     curr_ip :: Address,
-    inputs :: [Value], -- unread input values
-    outputs :: [Value] -- output values in reverse order
+    inputs :: [Value] -- unread input values
     }
     deriving Show
 
@@ -28,8 +27,7 @@ initState :: [Value] -> Memory -> State
 initState vs mem = State {
     memory = mem,
     curr_ip = 0,
-    inputs = vs,
-    outputs = []
+    inputs = vs
     }
 
 data Action
@@ -40,14 +38,16 @@ data Action
     | Nop
     deriving Show
 
-apply :: Action -> State -> State
-apply (Set addr v) s = s { memory = Map.insert addr v (memory s) }
-apply (Write v) s = s { outputs = v:outputs s }
+-- an action may produce an output value, and can update the state
+apply :: Action -> State -> (Maybe Value, State)
+apply (Set addr v) s =
+    (Nothing, s { memory = Map.insert addr v (memory s) })
+apply (Write v) s = (Just v, s)
 apply (ReadTo addr) s = case (inputs s) of
-    v:vs -> s { memory = Map.insert addr v (memory s), inputs = vs }
+    v:vs -> (Nothing, s { memory = Map.insert addr v (memory s), inputs = vs })
     [] -> error "no input"
-apply (SetIP addr) s = s { curr_ip = addr }
-apply Nop s = s
+apply (SetIP addr) s = (Nothing, s { curr_ip = addr })
+apply Nop s = (Nothing, s)
 
 data Instruction
     = Add Parameter Parameter Address -- Day 2
@@ -109,20 +109,40 @@ effect instr mem = case instr of
     get (Immediate n) = n
 
 -- fetch-execute cycle
-advance :: State -> Maybe State
+advance :: State -> Maybe (Maybe Value, State)
 advance s = do
     let (instr, next_ip) = fetch s
     mod <- effect instr (memory s)
     return $ apply mod (s { curr_ip = next_ip })
 
--- run the machine until it halts
-run :: Memory -> Memory
-run = fst . runIO []
+-- a list with something else on the end
+data ListPlus a b = Cons a (ListPlus a b) | End b
+    deriving Show
 
-runIO :: [Value] -> Memory -> (Memory, [Value])
-runIO vs mem = (memory s, reverse (outputs s))
+listPlus :: (b -> Maybe (Maybe a, b)) -> b -> ListPlus a b
+listPlus step s = case step s of
+    Nothing -> End s
+    Just (Nothing, s') -> listPlus step s'
+    Just (Just v, s') -> Cons v (listPlus step s')
+
+initLP :: ListPlus a b -> [a]
+initLP (End _) = []
+initLP (Cons x rest) = x : initLP rest
+
+lastLP :: ListPlus a b -> b
+lastLP (End y) = y
+lastLP (Cons _ rest) = lastLP rest
+
+-- Run the machine until it halts.
+run :: Memory -> Memory
+run = snd . runIO []
+
+-- Run the machine with input, yielding output and final memory.
+-- The pair and the output list are produced lazily.
+runIO :: [Value] -> Memory -> ([Value], Memory)
+runIO vs mem = (initLP r, memory (lastLP r))
   where
-    s = whileJust advance (initState vs mem)
+    r = listPlus advance (initState vs mem)
 
 -- debugging
 
@@ -141,9 +161,10 @@ advanceTrace :: State -> Maybe ((Address, Instruction, Action), State)
 advanceTrace s = do
     let (instr, next_ip) = fetch s
     mod <- effect instr (memory s)
-    return $ ((curr_ip s, instr, mod), apply mod ( s { curr_ip = next_ip }))
+    return $ ((curr_ip s, instr, mod),
+        snd (apply mod ( s { curr_ip = next_ip })))
 
 -- Run the program with several inputs and return those for which it
 -- produces different outputs than the function.
 testProgram :: Memory -> (Value -> Value) -> [Value] -> [Value]
-testProgram mem f xs = [x | x <- xs, snd (runIO [x] mem) /= [f x]]
+testProgram mem f xs = [x | x <- xs, fst (runIO [x] mem) /= [f x]]
