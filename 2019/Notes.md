@@ -4,6 +4,12 @@
 
 (image by Jo Wood)
 
+The most enjoyable puzzles so far have been days 3, 6 and 7.
+
+Some common AoC themes:
+
+* assembly code: days 2, 5, 7 ...
+
 ## [Day 1: The Tyranny of the Rocket Equation](https://adventofcode.com/2019/day/1)
 
 Another simple one to start with.  The first part is a trivial calculation,
@@ -68,3 +74,13 @@ The second part can be cleanly decomposed into generating paths to the
 root and using those to count transfers.  The paths require a similar
 accumulation to the first part, so I used the same structure again,
 even though we only need two of them.
+
+## [Day 7: Amplification Circuit](https://adventofcode.com/2019/day/7)
+
+This was fun.  Using the Intcode program as a black box, the first part
+is a straightforward left fold over a list of instances with different
+phases.
+
+The second part requires placing a slight modification of that fold
+inside a feedback loop, which is a big win for a lazy language.  Then the
+Intcode computer needed to be updated to produce its outputs lazily.
