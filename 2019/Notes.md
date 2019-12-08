@@ -84,3 +84,8 @@ phases.
 The second part requires placing a slight modification of that fold
 inside a feedback loop, which is a big win for a lazy language.  Then the
 Intcode computer needed to be updated to produce its outputs lazily.
+
+## [Day 8: Space Image Format](https://adventofcode.com/2019/day/8)
+
+There's a lot to read here, but after all that the problem is easy list
+manipulation, using `transpose` twice in the second part.
