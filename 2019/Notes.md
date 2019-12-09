@@ -8,7 +8,7 @@ The most enjoyable puzzles so far have been days 3, 6 and 7.
 
 Some common AoC themes:
 
-* assembly code: days 2, 5, 7 ...
+* assembly code: days 2, 5, 7, 9, ...
 
 ## [Day 1: The Tyranny of the Rocket Equation](https://adventofcode.com/2019/day/1)
 
@@ -92,13 +92,13 @@ manipulation, using `transpose` twice in the second part.
 
 ## [Day 9: Sensor Boost](https://adventofcode.com/2019/day/9)
 
-The task is to add relative addressing to the Intcode computer and too
+The task is to add relative addressing to the Intcode computer and to
 explicitly remove a couple of restrictions that we may have imposed.
 This is fairly straightforward, and the supplied input program does some
-useful testing of the implementation.  We are told that the computer is
-now complete.
+useful testing of the implementation.  The resulting computer also solves
+part 2 with no extra work.  We are told that the computer is now complete.
 
 Now that the computer has relative addressing, it can express recursion.
-For example, in part 2 the program implements `f(A) + B` for constants
-A and B and the function `f(n) = if n < 3 then n else f(n-1) + f (n-3)`
+For example, in part 2 the program implements f(A) + B for constants
+A and B and the function `f(n) = if n < 3 then n else f(n-1) + f(n-3)`
 ([OEIS A097333](https://oeis.org/A097333)).
