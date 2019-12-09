@@ -11,3 +11,8 @@ clean:
 
 Day%: Day%.hs $(LIBDIR)/*.hs
 	/usr/bin/ghc --make -O -i$(LIBDIR) Day$*.hs
+
+Day02: Intcode.hs
+Day05: Intcode.hs
+Day07: Intcode.hs
+Day09: Intcode.hs

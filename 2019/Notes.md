@@ -89,3 +89,11 @@ Intcode computer needed to be updated to produce its outputs lazily.
 
 There's a lot to read here, but after all that the problem is easy list
 manipulation, using `transpose` twice in the second part.
+
+## [Day 9: Sensor Boost](https://adventofcode.com/2019/day/9)
+
+The task is to add relative addressing to the Intcode computer and too
+explicitly remove a couple of restrictions that we may have imposed.
+This is fairly straightforward, and the supplied input program does some
+useful testing of the implementation.  We are told that the computer is
+now complete.
