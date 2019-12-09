@@ -97,3 +97,8 @@ explicitly remove a couple of restrictions that we may have imposed.
 This is fairly straightforward, and the supplied input program does some
 useful testing of the implementation.  We are told that the computer is
 now complete.
+
+Now that the computer has relative addressing, it can express recursion.
+For example, in part 2 the program implements `f(A) + B` for constants
+A and B and the function `f(n) = if n < 3 then n else f(n-1) + f (n-3)`
+([OEIS A097333](https://oeis.org/A097333)).
