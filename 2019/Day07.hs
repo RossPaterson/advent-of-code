@@ -18,7 +18,7 @@ amplifier :: Memory -> Value -> Value -> Value
 amplifier mem input phase = head $ fst $ runIO [phase, input] mem
 
 -- initial input value
-initValue :: Int
+initValue :: Value
 initValue = 0
 
 -- connect amplifiers with different phases in series
@@ -26,10 +26,10 @@ signal :: Memory -> [Value] -> Value
 signal mem vs = foldl (amplifier mem) initValue vs
 
 -- highest output for all possible permutations of the phases
-solve1 :: Input -> Int
+solve1 :: Input -> Value
 solve1 mem = maximum [signal mem vs | vs <- permutations [0..4]]
 
-tests1 :: [(String, Int)]
+tests1 :: [(String, Value)]
 tests1 = [
     ("3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0", 43210),
     ("3,23,3,24,1002,24,10,24,1002,23,-1,23,\
@@ -51,10 +51,10 @@ feedback mem vs = last outputs
     outputs = foldl (multi_amplifier mem) (initValue:outputs) vs
 
 -- highest output for all possible permutations of the feedback phases
-solve2 :: Input -> Int
+solve2 :: Input -> Value
 solve2 mem = maximum [feedback mem vs | vs <- permutations [5..9]]
 
-tests2 :: [(String, Int)]
+tests2 :: [(String, Value)]
 tests2 = [
     ("3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,\
      \27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5", 139629729),

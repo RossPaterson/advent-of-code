@@ -15,16 +15,16 @@ parse = readMemory
 
 -- Part One
 
-initialize :: Int -> Int -> Memory -> Memory
+initialize :: Value -> Value -> Memory -> Memory
 initialize n v = Map.insert 1 n . Map.insert 2 v
 
-output :: Memory -> Int
+output :: Memory -> Value
 output mem = mem!0
 
-solve1 :: Input -> Int
+solve1 :: Input -> Value
 solve1 = output . run . initialize 12 2
 
-tests1 :: [(String, [Int])]
+tests1 :: [(String, [Value])]
 tests1 = [
     ("1,9,10,3,2,3,11,0,99,30,40,50", [3500,9,10,70,2,3,11,0,99,30,40,50]),
     ("1,0,0,0,99", [2,0,0,0,99]),
@@ -34,10 +34,10 @@ tests1 = [
 
 -- Part Two
 
-target2 :: Int
+target2 :: Value
 target2 = 19690720
 
-solve2 :: Input -> Int
+solve2 :: Input -> Value
 solve2 mem = head [100 * noun + verb | noun <- [0..99], verb <- [0..99],
     output (run (initialize noun verb mem)) == target2]
 
