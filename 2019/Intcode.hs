@@ -13,7 +13,7 @@ type Value = Integer
 
 -- comma-separated list of values for locations 0..
 readMemory :: String -> Memory
-readMemory s = Map.fromAscList $ zip [0..] $ 
+readMemory s = Map.fromAscList $ zip [0..] $
     map read (words [if c == ',' then ' ' else c | c <- s])
 
 data State = State {
@@ -22,7 +22,7 @@ data State = State {
     rel_base :: Address, -- base address for Relative addressing
     inputs :: [Value] -- unread input values
     }
-    deriving Show
+    deriving (Eq, Ord, Show)
 
 initState :: [Value] -> Memory -> State
 initState vs mem = State {
@@ -39,7 +39,7 @@ data Action
     | SetIP Value
     | SetRelBase Value
     | Nop
-    deriving Show
+    deriving (Eq, Ord, Show)
 
 -- an action may produce an output value, and can update the state
 apply :: Action -> State -> (Maybe Value, State)
@@ -64,11 +64,11 @@ data Instruction
     | Equals Parameter Parameter Parameter -- Day 5 part 2
     | AdjustRelBase Parameter -- Day 9
     | Halt -- Day 2
-    deriving Show
+    deriving (Eq, Ord, Show)
 
 -- instruction parameter
 data Parameter = Position Address | Immediate Value | Relative Value
-    deriving Show
+    deriving (Eq, Ord, Show)
 
 -- returns decoded instruction and location of the following instruction
 fetch :: State -> (Instruction, Address)
@@ -182,3 +182,83 @@ advanceTrace s = do
     mod <- effect instr s
     return $ ((curr_ip s, instr, mod),
         snd (apply mod ( s { curr_ip = next_ip })))
+
+-- semi-readable summary of execution history
+-- (flaw: doesn't show the halt)
+showSummaryTrace :: [(Address, Instruction, Action)] -> String
+showSummaryTrace = unlines . concatMap showLine . summaryTrace
+
+-- summary trace of an execution
+summaryTrace :: [(Address, Instruction, Action)] ->
+    [((Address, Instruction), Summary Action)]
+summaryTrace = summarize . map (\(x, y, z) -> ((x, y), z))
+
+-- record a count of occurrences, but don't keep more than two values
+data Summary a
+    = Single !Int a
+    | Multiple !Int a !Int a !Int
+    deriving Show
+
+addSummary :: Eq a => a -> Maybe (Summary a) -> Summary a
+addSummary x Nothing = Single 1 x
+addSummary x (Just (Single na a))
+  | x == a = Single (na+1) a
+  | otherwise = Multiple na a 1 x 0
+addSummary x (Just (Multiple na a nb b n))
+  | x == a = Multiple (na+1) a nb b n
+  | x == b = Multiple na a (nb+1) b n
+  | otherwise = Multiple na a nb b (n+1)
+
+summarize :: (Ord k, Eq v) => [(k, v)] -> [(k, Summary v)]
+summarize = Map.assocs . foldl add Map.empty
+  where
+    add m (k, v) = Map.alter (Just . addSummary v) k m
+
+-- semi-readable presentation of a trace line
+showLine :: ((Address, Instruction), Summary Action) -> [String]
+showLine ((addr, instr), summ) =
+    map ((show addr ++ ":\t") ++)
+        (("\t" ++ showInstruction instr):showSummary summ)
+
+showSummary :: Summary Action -> [String]
+showSummary (Single na a) = [show na ++ "\t" ++ showAction a]
+showSummary (Multiple na a nb b n) =
+    [show na ++ "\t" ++ showAction a, show nb ++ "\t" ++ showAction b] ++
+        if n > 0 then [show n ++ "\t???"] else []
+
+showAction :: Action -> String
+showAction (Set addr v) = showAddress addr ++ " = " ++ show v
+showAction (ReadTo addr) = "read " ++ showAddress addr
+showAction (Write v) = "write " ++ show v
+showAction (SetIP v) = "goto " ++ show v
+showAction (SetRelBase v) = "fp = " ++ show v
+showAction Nop = "nop"
+
+showInstruction :: Instruction -> String
+showInstruction (Add a b c) =
+    showParameter c ++ " = " ++ showParameter a ++ " + " ++ showParameter b
+showInstruction (Mul a b c) =
+    showParameter c ++ " = " ++ showParameter a ++ " * " ++ showParameter b
+showInstruction (Input a) = "input " ++ showParameter a
+showInstruction (Output a) = "output " ++ showParameter a
+showInstruction (JumpIfTrue a b) =
+    "if (" ++ showParameter a ++ ") goto " ++ showParameter b
+showInstruction (JumpIfFalse a b) =
+    "if (!" ++ showParameter a ++ ") goto " ++ showParameter b
+showInstruction (LessThan a b c) =
+    showParameter c ++ " = " ++ showParameter a ++ " < " ++ showParameter b
+showInstruction (Equals a b c) =
+    showParameter c ++ " = " ++ showParameter a ++ " == " ++ showParameter b
+showInstruction (AdjustRelBase a) = "fp += " ++ showParameter a
+showInstruction Halt = "halt"
+
+showParameter :: Parameter -> String
+showParameter (Position addr) = showAddress addr
+showParameter (Immediate v) = show v
+showParameter (Relative v)
+  | v < 0 = "*(fp" ++ show v ++ ")"
+  | v == 0 = "*fp"
+  | otherwise = "*(fp+" ++ show v ++ ")"
+
+showAddress :: Address -> String
+showAddress addr = "m" ++ show addr
