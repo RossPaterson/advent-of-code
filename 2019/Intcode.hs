@@ -218,7 +218,7 @@ summarize = Map.assocs . foldl add Map.empty
 showLine :: ((Address, Instruction), Summary Action) -> [String]
 showLine ((addr, instr), summ) =
     map ((show addr ++ ":\t") ++)
-        (("\t" ++ showInstruction instr):showSummary summ)
+        (showInstruction instr:showSummary summ)
 
 showSummary :: Summary Action -> [String]
 showSummary (Single na a) = [show na ++ "\t" ++ showAction a]
