@@ -4,7 +4,7 @@
 
 (image by Jo Wood)
 
-The most enjoyable puzzles so far have been days 3, 6 and 7.
+The most enjoyable puzzles so far have been days 3, 6, 7 and 10.
 
 Some common AoC themes:
 
@@ -102,3 +102,15 @@ Now that the computer has relative addressing, it can express recursion.
 For example, in part 2 the program implements f(A) + B for constants
 A and B and the function `f(n) = if n < 3 then n else f(n-1) + f(n-3)`
 ([OEIS A097333](https://oeis.org/A097333)).
+
+## [Day 10: Monitoring Station](https://adventofcode.com/2019/day/10)
+
+This is an ingenious problem, requiring careful choice of representations
+and multi-stage use of sets and maps.  The first part sets up the scenario,
+while the second takes it further.
+
+In the second part, I constructed a representation of angles in discrete
+2D space that gets them in the right order.  `atan2` on differences would
+be prone to floating point precision problems, which could be fixed by
+cancelling common factors first, but it seems more in the spirit of the
+puzzle to keep everything discrete.
