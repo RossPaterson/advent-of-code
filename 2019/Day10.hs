@@ -20,17 +20,20 @@ parse s =
 
 -- Part One
 
--- direction from p1 to p2 in reduced form, with common divisor
-polar :: Point -> Point -> (Point, Int)
-polar (x1, y1) (x2, y2) = ((dx `div` d, dy `div` d), d)
-  where
-    dx = x2 - x1
-    dy = y2 - y1
-    d = gcd dx dy
-
 -- directions from pos that contain at least one point
 view :: [Point] -> Point -> Set Point
-view ps pos = Set.fromList [fst (polar pos p) | p <- ps, p /= pos]
+view ps pos =
+    Set.fromList [fst (normalize (p `minus` pos)) | p <- ps, p /= pos]
+
+-- direction in reduced form, with common divisor
+normalize :: Point -> (Point, Int)
+normalize (x, y) = ((x `div` d, y `div` d), d)
+  where
+    d = gcd x y
+
+-- difference between points
+minus :: Point -> Point -> Point
+minus (x1, y1) (x2, y2) = (x1 - x2, y1 - y2)
 
 -- point with the most other points in view, plus the count
 best :: [Point] -> (Int, Point)
@@ -108,8 +111,8 @@ multiview :: [Point] -> Point -> Map Angle [Point]
 multiview ps pos =
     fmap Map.elems $
     Map.fromListWith Map.union
-        [(angle dir, Map.singleton d p) |
-            p <- ps, p /= pos, let (dir, d) = polar pos p]
+        [(angle dp, Map.singleton (dist dp) p) |
+            p <- ps, p /= pos, let dp = p `minus` pos]
 
 -- a representation of angles increasing clockwise from straight up
 data Angle = Angle {
@@ -117,14 +120,18 @@ data Angle = Angle {
     tan :: Ratio Int } -- tangent of angle from start of that quadrant
     deriving (Eq, Ord, Show)
 
--- angle of a non-zero direction
+-- angle of a non-zero point
 angle :: Point -> Angle
 angle (x, y)
-  | x >= 0 && y < 0 = Angle 0 (x % (-y))
+  | x >= 0 && y < 0 = Angle 0 (- x % y)
   | y >= 0 && x > 0 = Angle 1 (y % x)
-  | x <= 0 && y > 0 = Angle 2 ((-x) % y)
-  | y <= 0 && x < 0 = Angle 3 ((-y) % (-x))
+  | x <= 0 && y > 0 = Angle 2 (- x % y)
+  | y <= 0 && x < 0 = Angle 3 (y % x)
   | otherwise = error "angle of (0,0)"
+
+-- Manhattan distance
+dist :: Point -> Int
+dist (x, y) = abs x + abs y
 
 viewFromBest :: [Point] -> Map Angle [Point]
 viewFromBest ps = multiview ps (snd (best ps))
