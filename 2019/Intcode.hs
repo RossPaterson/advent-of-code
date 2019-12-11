@@ -1,9 +1,8 @@
 -- toy computer for Days 2, 5, 7, 9, 11, ...
 module Intcode where
 
-import Utilities
 import Data.List
-import Data.Map (Map, (!))
+import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Maybe
 
@@ -131,8 +130,8 @@ fromBool = toInteger . fromEnum
 advance :: State -> Maybe (Maybe Value, State)
 advance s = do
     let (instr, next_ip) = fetch s
-    mod <- effect instr s
-    return $ apply mod (s { curr_ip = next_ip })
+    act <- effect instr s
+    return $ apply act (s { curr_ip = next_ip })
 
 -- a list with something else on the end
 data ListPlus a b = Cons a (ListPlus a b) | End b
@@ -179,9 +178,9 @@ traceIO vs mem = unfoldr advanceTrace (initState vs mem)
 advanceTrace :: State -> Maybe ((Address, Instruction, Action), State)
 advanceTrace s = do
     let (instr, next_ip) = fetch s
-    mod <- effect instr s
-    return $ ((curr_ip s, instr, mod),
-        snd (apply mod ( s { curr_ip = next_ip })))
+    act <- effect instr s
+    return $ ((curr_ip s, instr, act),
+        snd (apply act ( s { curr_ip = next_ip })))
 
 -- semi-readable summary of execution history
 -- (flaw: doesn't show the halt)

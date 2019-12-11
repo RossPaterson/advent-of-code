@@ -2,7 +2,6 @@ module Main where
 
 import Intcode
 import Utilities
-import Data.List
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
 

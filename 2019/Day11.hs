@@ -28,6 +28,7 @@ turn 0 U = L
 turn 0 d = pred d
 turn 1 L = U
 turn 1 d = succ d
+turn n _ = error $ "bad turn instruction " ++ show n
 
 type Point = (Int, Int)
 
@@ -93,15 +94,15 @@ moveRobot r = r { position = move (direction r) (position r) }
 runRobot :: Memory -> Robot -> Robot
 runRobot mem r = last rs
   where
-    rs = allStates r (mkController mem inputs)
-    inputs = map (fromEnum . currPaint) rs
+    rs = allStates r (mkController mem vs)
+    vs = map (fromEnum . currPaint) rs
 
 mkController :: Memory -> [Int] -> [Int]
 mkController mem vs = map fromInteger (fst (runIO (map toInteger vs) mem))
 
 -- initial state and all subsequent states from given input
 allStates :: Robot -> [Int] -> [Robot]
-allStates r = scanl step r . pairs
+allStates r0 = scanl step r0 . pairs
   where
     step r (color, dir) =
         moveRobot $ turnRobot dir $ paintPanel (toEnum color) r
