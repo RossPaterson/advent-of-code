@@ -22,7 +22,6 @@ module Parser (
 import Control.Applicative
 import Data.Char
 import Data.List
-import Data.Traversable
 
 -- | Simple applicative parser
 newtype Parser a = Parser (ReadS a)

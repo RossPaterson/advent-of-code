@@ -41,7 +41,7 @@ tests1 = [
 
 -- amplifier taking multiple inputs and producing multiple outputs
 multi_amplifier :: Memory -> [Value] -> Value -> [Value]
-multi_amplifier mem inputs phase = fst (runIO (phase:inputs) mem)
+multi_amplifier mem vs phase = fst (runIO (phase:vs) mem)
 
 -- last output of a feedback loop of a series of amplifiers with different
 -- phases, given the initial input (zero)

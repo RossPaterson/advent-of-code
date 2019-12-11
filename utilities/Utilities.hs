@@ -33,7 +33,6 @@ module Utilities (
 import Data.List
 import Data.Ord
 import Data.Semigroup
-import Data.Set (Set)
 import qualified Data.Set as Set
 
 -- | All the values of a bounded enumerated type
@@ -60,7 +59,7 @@ takes n = takeWhile (not . null) . map (take n) . iterate (drop n)
 -- | Combine adjacent pairs, halving the size of the list
 pairWith :: (a -> a -> a) -> [a] -> [a]
 pairWith f (x1:x2:xs) = f x1 x2:pairWith f xs
-pairWith f xs = xs
+pairWith _ xs = xs
 
 -- | Unique elements of the input list, paired with their number of occurrences
 frequency :: Ord a => [a] -> [(a, Int)]
@@ -113,14 +112,14 @@ pick xs = [(x, front ++ back) | (front, x:back) <- zip (inits xs) (tails xs)]
 -- | Possible choices of n elements from a list
 choose :: Int -> [a] -> [([a], [a])]
 choose 0 xs = [([], xs)]
-choose n [] = []
+choose _ [] = []
 choose n (x:xs) =
     [(x:ys, rest) | (ys, rest) <- choose (n-1) xs] ++
     [(ys, x:rest) | (ys, rest) <- choose n xs]
 
 -- | Possible choices of between m and n items (m <= n)
 chooseBetween :: Int -> Int -> [a] -> [[a]]
-chooseBetween m n [] = [[] | m == 0]
+chooseBetween m _ [] = [[] | m == 0]
 chooseBetween m n (x:xs) =
     [x:ys | n > 0,
         ys <- chooseBetween (max 0 (m-1)) (n-1) xs] ++ chooseBetween m n xs

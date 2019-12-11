@@ -2,9 +2,7 @@ module Main where
 
 import Utilities
 import Parser
-import Control.Applicative
-import Data.List
-import Data.Map (Map, (!))
+import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set

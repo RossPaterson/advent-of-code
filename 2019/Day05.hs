@@ -1,8 +1,6 @@
 module Main where
 
-import Utilities
 import Intcode
-import Data.List
 
 -- Input processing
 
@@ -47,6 +45,7 @@ solve2 :: Input -> Value
 solve2 mem
   | null vs = error "no output"
   | all (== 0) (init vs) = last vs
+  | otherwise = error $ "diagnostics failed: " ++ show (init vs)
   where
     vs = fst (runIO [5] mem)
 

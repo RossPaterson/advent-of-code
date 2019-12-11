@@ -1,8 +1,6 @@
 module Main where
 
-import Utilities
 import Parser
-import Control.Applicative
 import Data.List
 
 -- Input processing
@@ -19,7 +17,7 @@ parse = runParser range . head . lines
 -- Part One
 
 numDigits :: Range -> Int
-numDigits (l, h) = length (show h)
+numDigits (_, h) = length (show h)
 
 inRange :: Range -> Int -> Bool
 inRange (l, h) n = l <= n && n <= h
