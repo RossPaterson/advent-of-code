@@ -17,7 +17,7 @@ solve1 mem
   | all (== 0) (init vs) = last vs
   | otherwise = error $ "diagnostics failed: " ++ show (init vs)
   where
-    vs = fst (runIO [1] mem)
+    vs = function mem [1]
 
 -- program and function it should implement
 type Test = (String, Value -> Value)
@@ -34,7 +34,7 @@ runTests tests vs = putStr $ unlines $
 -- Run the program with several inputs and return those for which it
 -- produces different outputs than the function.
 testProgram :: Memory -> (Value -> Value) -> [Value] -> [Value]
-testProgram mem f xs = [x | x <- xs, fst (runIO [x] mem) /= [f x]]
+testProgram mem f xs = [x | x <- xs, function mem [x] /= [f x]]
 
 tests1 :: [Test]
 tests1 = [("3,0,4,0,99", id)]
@@ -47,7 +47,7 @@ solve2 mem
   | all (== 0) (init vs) = last vs
   | otherwise = error $ "diagnostics failed: " ++ show (init vs)
   where
-    vs = fst (runIO [5] mem)
+    vs = function mem [5]
 
 tests2 :: [Test]
 tests2 = [

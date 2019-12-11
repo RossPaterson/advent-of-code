@@ -98,7 +98,7 @@ runRobot mem r = last rs
     vs = map (fromEnum . currPaint) rs
 
 mkController :: Memory -> [Int] -> [Int]
-mkController mem vs = map fromInteger (fst (runIO (map toInteger vs) mem))
+mkController mem = map fromInteger . function mem . map toInteger
 
 -- initial state and all subsequent states from given input
 allStates :: Robot -> [Int] -> [Robot]
