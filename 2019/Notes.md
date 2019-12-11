@@ -8,7 +8,7 @@ The most enjoyable puzzles so far have been days 3, 6, 7 and 10.
 
 Some common AoC themes:
 
-* assembly code: days 2, 5, 7, 9, ...
+* assembly code: days 2, 5, 7, 9, ... (used as a black box on day 11)
 
 ## [Day 1: The Tyranny of the Rocket Equation](https://adventofcode.com/2019/day/1)
 
@@ -114,3 +114,9 @@ In the second part, I constructed a representation of angles in discrete
 be prone to floating point precision problems, which could be fixed by
 cancelling common factors first, but it seems more in the spirit of the
 puzzle to keep everything discrete.
+
+## [Day 11: Space Police](https://adventofcode.com/2019/day/11)
+
+A moderate problem combining some previous themes: moving around on a
+2D grid (day 3), running a black box Intcode program in a feedback loop
+(day 7), and displaying a bitmap image (day 8).
