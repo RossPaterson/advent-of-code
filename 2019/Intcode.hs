@@ -155,6 +155,10 @@ lastLP (Cons _ rest) = lastLP rest
 run :: Memory -> Memory
 run = snd . runIO []
 
+-- Function from input to output defined by the machine
+function :: Memory -> [Value] -> [Value]
+function mem vs = fst (runIO vs mem)
+
 -- Run the machine with input, yielding output and final memory.
 -- The pair and the output list are produced lazily.
 runIO :: [Value] -> Memory -> ([Value], Memory)

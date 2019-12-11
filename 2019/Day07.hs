@@ -15,7 +15,7 @@ parse = readMemory
 
 -- amplifier taking a single input and producing a single output
 amplifier :: Memory -> Value -> Value -> Value
-amplifier mem input phase = head $ fst $ runIO [phase, input] mem
+amplifier mem input phase = head (function mem [phase, input])
 
 -- initial input value
 initValue :: Value
@@ -41,7 +41,7 @@ tests1 = [
 
 -- amplifier taking multiple inputs and producing multiple outputs
 multi_amplifier :: Memory -> [Value] -> Value -> [Value]
-multi_amplifier mem vs phase = fst (runIO (phase:vs) mem)
+multi_amplifier mem vs phase = function mem (phase:vs)
 
 -- last output of a feedback loop of a series of amplifiers with different
 -- phases, given the initial input (zero)
