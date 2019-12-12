@@ -1,7 +1,8 @@
 -- | A sequence that is either finite or repeats from some point.
 module RationalList (
     RationalList,
-    finiteList, iterate, elementAt, foldMapTake
+    finiteList, iterate, elementAt, foldMapTake,
+    prefix, repetend
     ) where
 
 import Data.Foldable
@@ -17,6 +18,15 @@ import Prelude hiding (iterate)
 data RationalList a =
     RationalList { front :: !(Seq a), recurring :: !(Seq a) }
   deriving Show
+
+-- | @'prefix' xs@ is the minimal non-repeating part at the front of @xs@.
+prefix :: RationalList a -> [a]
+prefix (RationalList f _) = toList f
+
+-- | @'repetend' xs@ is the minimal repeating part of @xs@, or @[]@
+-- if @xs@ is finite.
+repetend :: RationalList a -> [a]
+repetend (RationalList _ r) = toList r
 
 instance Functor RationalList where
     fmap f (RationalList fr re) = RationalList (fmap f fr) (fmap f re)
