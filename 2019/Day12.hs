@@ -2,7 +2,8 @@ module Main where
 
 import Utilities
 import Parser
-import RationalList
+import Data.Set (Set)
+import qualified Data.Set as Set
 
 -- Input processing
 
@@ -86,9 +87,9 @@ tests1 = [((testInput1, 10), 179), ((testInput2, 100), 1940)]
 
 -- Key insight: all calculations affect each coordinate independently,
 -- so find how long it takes each the x-parts to repeat, and so on.
+-- Also useful: steps are invertible, so cycle starts at initial state.
 
--- Other properties (unused):
--- * steps are invertible, so cycle starts at initial state
+-- Other properties (not used directly, but help with repetition):
 -- * total velocity is zero
 -- * total position is constant
 
@@ -114,13 +115,17 @@ attract1 bs =
 step1 :: [Body Int] -> [Body Int]
 step1 = map move1 . attract1
 
--- number of steps to repeat a value
+-- number of elements of a list before the first repetition
+num_uniq :: Ord a => [a] -> Int
+num_uniq xs = length $ takeWhile not $ zipWith Set.member xs (init_sets xs)
+ 
+-- same as map Set.fromList (inits xs)
+init_sets :: Ord a => [a] -> [Set a]
+init_sets = scanl (flip Set.insert) Set.empty
 
-period :: Ord a => (a -> a) -> a -> Int
-period f = length . RationalList.repetend . RationalList.iterate f
-
+-- time until a repetition of the first value
 repeatTime1 :: [Int] -> Integer
-repeatTime1 = toInteger . period step1 . map stationary1
+repeatTime1 = toInteger . num_uniq . iterate step1 . map stationary1
 
 repeatTime :: [Point Int] -> Integer
 repeatTime ps = rx `lcm` ry `lcm` rz
