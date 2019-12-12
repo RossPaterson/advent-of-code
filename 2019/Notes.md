@@ -120,3 +120,15 @@ puzzle to keep everything discrete.
 A moderate problem combining some previous themes: moving around on a
 2D grid (day 3), running a black box Intcode program in a feedback loop
 (day 7), and displaying a bitmap image (day 8).
+
+## [Day 12: The N-Body Problem](https://adventofcode.com/2019/day/12)
+
+This is a clever little puzzle.  The first part is a routine particle
+system (like day 20 of 2017 and day 10 of 2018).  The problem statement
+for the second part suggests we need a more efficient simulation,
+but we only need to measure cycles (as in days 12 and 18 of 2018).
+This requires an insight into the structure of the system (and forgetting
+about real gravity).
+
+Another question that could have been asked is for the state of the
+system after N steps, for some very large N.
