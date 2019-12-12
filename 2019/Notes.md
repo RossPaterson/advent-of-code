@@ -130,5 +130,10 @@ but we only need to measure cycles (as in days 12 and 18 of 2018).
 This requires an insight into the structure of the system (and forgetting
 about real gravity).
 
-Another question that could have been asked is for the state of the
-system after N steps, for some very large N.
+As pointed out in the
+[reddit thread](https://www.reddit.com/r/adventofcode/comments/e9j0ve/2019_day_12_solutions/),
+there is a second insight which could simplify looking for a cycle,
+but I already had a repeating list abstraction from last year.
+
+With this, we do have a more efficient simulation, with which we could
+compute the state of the system after N steps, for some very large N.
