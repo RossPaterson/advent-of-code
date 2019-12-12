@@ -87,6 +87,11 @@ tests1 = [((testInput1, 10), 179), ((testInput2, 100), 1940)]
 -- Key insight: all calculations affect each coordinate independently,
 -- so find how long it takes each the x-parts to repeat, and so on.
 
+-- Other properties (unused):
+-- * steps are invertible, so cycle starts at initial state
+-- * total velocity is zero
+-- * total position is constant
+
 transPoints :: [Point a] -> Point [a]
 transPoints ps = (map xcoord ps, map ycoord ps, map zcoord ps)
   where
