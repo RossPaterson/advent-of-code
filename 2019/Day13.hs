@@ -94,11 +94,17 @@ updateGame g (Paint p Paddle) =
 updateGame g (Paint p l) = g { screen = Map.insert p l (screen g) }
 updateGame g (Score v) = g { score = v }
 
--- a joystick move whenever the ball moves
+-- A joystick move whenever the ball moves, making the paddle track the ball.
+-- We know that a joystick position is required each time the ball is
+-- drawn, but in a stream model we don't know when they will be demanded.
+-- In particular, when the ball is first drawn, we don't know where the
+-- paddle is yet, and we don't know when the joystick position is required.
+-- Fortunately there's enough slack in the setup to not move at first.
 joystick :: Game -> OutputInstruction -> Maybe Int
-joystick g (Paint (bx, _) Ball) = do
-    (px, _) <- paddlePos g
-    return (signum (bx - px))
+joystick g (Paint (bx, _) Ball) =
+    Just $ case paddlePos g of
+        Just (px, _) -> signum (bx - px)
+        Nothing -> 0
 joystick _ _ = Nothing
 
 finalScore :: Memory -> Int
@@ -110,7 +116,7 @@ finalScore mem = score last_g
 
 -- output of the arcade game, given joystick moves as input
 runArcade :: Memory -> [Int] -> [OutputInstruction]
-runArcade mem moves = decode (intFunction (deposit mem) (0:moves))
+runArcade mem moves = decode (intFunction (deposit mem) moves)
 
 deposit :: Memory -> Memory
 deposit = Map.insert 0 2
