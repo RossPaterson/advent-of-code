@@ -149,3 +149,9 @@ the drawing instructions.  The second requires a lot of exploration
 before it becomes clear what is needed.  Prior familiarity with
 [Breakout](https://en.wikipedia.org/wiki/Breakout_(video_game))
 would have helped a lot here.
+
+This was the first case that pushed against the limits of the lazy stream
+I/O in my Intcode implementation.  The description suggests polling the
+state when the program wants input, and for the first input it's not
+clear when that is.  Fortunately the game as given does not require the
+paddle to move at that point.
