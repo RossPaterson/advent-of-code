@@ -137,3 +137,15 @@ there is a second insight which simplifies looking for a cycle.
 
 Another question we could answer with minor variation on this program is
 to compute the state of the system after N steps, for some very large N.
+
+## [Day 13: Care Package](https://adventofcode.com/2019/day/13)
+
+This was different.  In past years, some of the least popular puzzles
+have been detailed simulations of intricate games (2015 day 22, 2018
+days 15 and 24).  This puzzle turns those around: we have a terse
+description of the game and an Intcode implementation, and we have
+to operate it.  The first part is straightforward interpretation of
+the drawing instructions.  The second requires a lot of exploration
+before it becomes clear what is needed.  Prior familiarity with
+[Breakout](https://en.wikipedia.org/wiki/Breakout_(video_game))
+would have helped a lot here.
