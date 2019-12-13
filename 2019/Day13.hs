@@ -1,0 +1,136 @@
+module Main where
+
+import Utilities
+import Intcode
+import Data.List
+import Data.Maybe
+import Data.Map (Map)
+import qualified Data.Map as Map
+
+-- Input processing
+
+type Input = Memory
+
+parse :: String -> Input
+parse = readMemory
+
+-- Part One
+
+data Tile = Empty | Wall | Block | Paddle | Ball
+    deriving (Enum, Eq, Ord, Show)
+
+showTile :: Tile -> Char
+showTile Empty = '.'
+showTile Wall = '|'
+showTile Block = '@'
+showTile Paddle = '-'
+showTile Ball = 'o'
+
+type Position = (Int, Int)
+
+type Screen = Map Position Tile
+
+showScreen :: Screen -> String
+showScreen s =
+    unlines [
+        [showTile (Map.findWithDefault Empty (x,y) s) | x <- [minX..maxX]] |
+        y <- [minY..maxY]]
+  where
+    minX = minimum (map fst (Map.keys s))
+    maxX = maximum (map fst (Map.keys s))
+    minY = minimum (map snd (Map.keys s))
+    maxY = maximum (map snd (Map.keys s))
+
+initScreen ::Screen
+initScreen = Map.empty
+
+paint :: [Int] -> Screen
+paint = foldl paintOne initScreen . takes 3
+  where
+    paintOne s [x, y, tile] = Map.insert (x, y) (toEnum tile) s
+    paintOne _ _ = error "unbalanced instructions"
+
+-- Intcode program as a function on lists of Ints
+intFunction :: Memory -> [Int] -> [Int]
+intFunction mem = map fromInteger . function mem . map toInteger
+
+solve1 :: Input -> Int
+solve1 = length . filter (== Block) . Map.elems . paint . flip intFunction []
+
+-- Part Two
+
+data OutputInstruction = Paint Position Tile | Score Int
+    deriving Show
+
+decode :: [Int] -> [OutputInstruction]
+decode = map dec . takes 3
+  where
+    dec [x, y, v]
+      | x == -1 && y == 0 = Score v
+      | otherwise = Paint (x, y) (toEnum v)
+    dec _ = error "unbalanced instructions"
+
+-- The screen is handy for debugging, but we only need the paddle position
+-- (to choose a joystick position when the ball moves) and the score.
+data Game = Game {
+    screen :: Screen,
+    paddlePos :: Maybe Position,
+    score :: Int
+    }
+
+showGame :: Game -> String
+showGame g = showScreen (screen g) ++ "Score: " ++ show (score g) ++ "\n"
+
+initGame :: Game
+initGame = Game {
+    screen = initScreen,
+    paddlePos = Nothing,
+    score = 0
+    }
+
+updateGame :: Game -> OutputInstruction -> Game
+updateGame g (Paint p Paddle) =
+    g { screen = Map.insert p Paddle (screen g), paddlePos = Just p }
+updateGame g (Paint p l) = g { screen = Map.insert p l (screen g) }
+updateGame g (Score v) = g { score = v }
+
+-- a joystick move whenever the ball moves
+joystick :: Game -> OutputInstruction -> Maybe Int
+joystick g (Paint (bx, _) Ball) = do
+    (px, _) <- paddlePos g
+    return (signum (bx - px))
+joystick _ _ = Nothing
+
+finalScore :: Memory -> Int
+finalScore mem = score last_g
+  where
+    (last_g, mb_moves) = mapAccumL step initGame outputs
+    outputs = runArcade mem (catMaybes mb_moves)
+    step g instr = (updateGame g instr, joystick g instr)
+
+-- output of the arcade game, given joystick moves as input
+runArcade :: Memory -> [Int] -> [OutputInstruction]
+runArcade mem moves = decode (intFunction (deposit mem) (0:moves))
+
+deposit :: Memory -> Memory
+deposit = Map.insert 0 2
+
+solve2 :: Input -> Int
+solve2 = finalScore
+
+-- full history, for tracing
+gameHistory :: Memory -> [Game]
+gameHistory mem = fmap fst gms
+  where
+    gms = snd $ mapAccumL step initGame outputs
+    outputs = runArcade mem (catMaybes (fmap snd gms))
+    step g instr = (g', (g', joystick g instr))
+      where
+        g' = updateGame g instr
+
+main :: IO ()
+main = do
+    s <- readFile "input/13.txt"
+    let input = parse s
+    print (solve1 input)
+    print (solve2 input)
