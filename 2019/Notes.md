@@ -155,3 +155,12 @@ I/O in my Intcode implementation.  The description suggests polling the
 state when the program wants input, and for the first input it's not
 clear when that is.  Fortunately the game as given does not require the
 paddle to move at that point.
+
+## [Day 14: Space Stoichiometry](https://adventofcode.com/2019/day/14)
+
+This was a novel and challenging puzzle.  It took quite a while to work
+out how to make use of the leftovers, but in the end it comes out quite
+neatly when you traverse the DAG in topological order.
+
+The second part is an inversion of the first, which is economically done
+with binary search.
