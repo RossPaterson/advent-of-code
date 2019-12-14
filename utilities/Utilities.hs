@@ -12,6 +12,7 @@ module Utilities (
     mostCommon,
     leastBy,
     same,
+    tsort,
     -- * Iteration
     whileJust,
     iterateWhileJust,
@@ -26,11 +27,14 @@ module Utilities (
     choose,
     chooseBetween,
     bfs,
+    bsearch,
     -- * Testing
     failures,
     ) where
 
 import Data.List
+import Data.Map ((!))
+import qualified Data.Map as Map
 import Data.Ord
 import Data.Semigroup
 import qualified Data.Set as Set
@@ -141,6 +145,17 @@ same f x y = f x == f y
 fastNub :: Ord a => [a] -> [a]
 fastNub = Set.toList . Set.fromList
 
+-- | Topological sort
+tsort :: Ord a => [(a, a)] -> [a]
+tsort xys = map fst $ sortBy (comparing (Down . snd)) $ Map.assocs depth_map
+  where
+    depth_map = fmap depth $ Map.unionsWith Set.union $
+        [Map.singleton x (Set.singleton y) | (x, y) <- xys] ++
+        [Map.singleton y Set.empty | (_, y) <- xys]
+    depth ys 
+      | Set.null ys = 0::Int
+      | otherwise = maximum [depth_map!y | y <- Set.toList ys] + 1
+
 -- | Breadth-first search.
 -- @'bfs' f xs!!k@ contains all the unique values reachable from @xs@
 -- via @f@ in @k@ steps and no fewer.  All these lists are non-empty (so
@@ -155,6 +170,31 @@ bfs f = takeWhile (not . null) . map fst . iterate step . new_level Set.empty
       | otherwise = (x:ys, seen')
       where
         (ys, seen') = new_level (Set.insert x seen) xs
+
+-- Search the integers.
+--
+-- If @p@ is an upward-closed predicate, @bsearch p@ returns the least
+-- @n@ satisfying @p@.  If no such @n@ exists, either because no integer
+-- satisfies @p@ or all do, @bsearch p@ does not terminate.
+bsearch :: (Integer -> Bool) -> Integer
+bsearch p
+  | p 0 = negate (searchFrom (not . p . negate) 0) + 1
+  | otherwise = searchFrom p 1
+
+searchFrom :: (Integer -> Bool) -> Integer -> Integer
+searchFrom p = search_from 1
+  where
+    search_from step l
+      | p l' = searchIntegerRange p l (l'-1)
+      | otherwise = search_from (2*step) (l'+1)
+      where l' = l + step
+
+searchIntegerRange :: (Integer -> Bool) -> Integer -> Integer -> Integer
+searchIntegerRange p l h
+  | h < l = h+1
+  | p m = searchIntegerRange p l (m-1)
+  | otherwise = searchIntegerRange p (m+1) h
+  where m = (l+h) `div` 2
 
 -- | Run a function on a number of test inputs with expected outputs
 -- and report any mismatches.
