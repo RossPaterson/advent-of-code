@@ -52,7 +52,7 @@ move (Body p v) = Body (p `plus` v) v
 -- (no need to exclude gravity of the body on itself, because that is zero)
 attract :: [Body (Point Int)] -> [Body (Point Int)]
 attract bs =
-    [Body p (foldr plus v (map (gravity p . position) bs)) | b@(Body p v) <- bs]
+    [Body p (foldr plus v (map (gravity p . position) bs)) | Body p v <- bs]
 
 step :: [Body (Point Int)] -> [Body (Point Int)]
 step = map move . attract
@@ -110,7 +110,7 @@ move1 (Body p v) = Body (p + v) v
 
 attract1 :: [Body Int] -> [Body Int]
 attract1 bs =
-    [Body p (foldr (+) v (map (gravity1 p . position) bs)) | b@(Body p v) <- bs]
+    [Body p (foldr (+) v (map (gravity1 p . position) bs)) | Body p v <- bs]
 
 step1 :: [Body Int] -> [Body Int]
 step1 = map move1 . attract1
