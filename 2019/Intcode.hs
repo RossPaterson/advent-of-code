@@ -1,7 +1,16 @@
 -- toy computer for Days 2, 5, 7, 9, 11, ...
-module Intcode where
+module Intcode(
+    Memory, readMemory,
+    Value, fromBool,
+    -- pure function
+    run, streamFunction,
+    -- debugging
+    trace, showSummaryTrace, showState,
+    -- interactive interface
+    Automaton(..), automaton,
+    ListPlus(..), initLP, lastLP
+    ) where
 
-import Data.List
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Maybe
@@ -18,17 +27,15 @@ readMemory s = Map.fromAscList $ zip [0..] $
 data State = State {
     memory :: Memory,
     curr_ip :: Address, -- instruction pointer
-    rel_base :: Address, -- base address for Relative addressing
-    inputs :: [Value] -- unread input values
+    rel_base :: Address -- base address for Relative addressing
     }
     deriving (Eq, Ord, Show)
 
-initState :: [Value] -> Memory -> State
-initState vs mem = State {
+initState :: Memory -> State
+initState mem = State {
     memory = mem,
     curr_ip = 0,
-    rel_base = 0,
-    inputs = vs
+    rel_base = 0
     }
 
 data Action
@@ -38,19 +45,18 @@ data Action
     | SetIP Value
     | SetRelBase Value
     | Nop
+    | Stop
     deriving (Eq, Ord, Show)
 
 -- an action may produce an output value, and can update the state
-apply :: Action -> State -> (Maybe Value, State)
-apply (Set addr v) s =
-    (Nothing, s { memory = Map.insert addr v (memory s) })
-apply (Write v) s = (Just v, s)
-apply (ReadTo addr) s = case (inputs s) of
-    v:vs -> (Nothing, s { memory = Map.insert addr v (memory s), inputs = vs })
-    [] -> error "no input"
-apply (SetIP addr) s = (Nothing, s { curr_ip = addr })
-apply (SetRelBase v) s = (Nothing, s { rel_base = v })
-apply Nop s = (Nothing, s)
+apply :: Action -> State -> State
+apply (Set addr v) s = s { memory = Map.insert addr v (memory s) }
+apply (Write _) _ = error "Write passed to apply"
+apply (ReadTo _) _ = error "ReadTo passed to apply"
+apply (SetIP addr) s = s { curr_ip = addr }
+apply (SetRelBase v) s = s { rel_base = v }
+apply Nop s = s
+apply Stop _ = error "Stop passed to apply"
 
 data Instruction
     = Add Parameter Parameter Parameter -- Day 2
@@ -98,18 +104,18 @@ fetch s = case leadvalue `mod` 100 of
       | otherwise = fromMaybe 0 (Map.lookup addr mem)
     exec_error msg = error (show ip ++ ": " ++ msg)
 
-effect :: Instruction -> State -> Maybe Action
+effect :: Instruction -> State -> Action
 effect instr s = case instr of
-    Add x y r -> Just (Set (target r) (get x + get y))
-    Mul x y r -> Just (Set (target r) (get x * get y))
-    Input r -> Just (ReadTo (target r))
-    Output x -> Just (Write (get x))
-    JumpIfTrue x y -> Just (if get x /= 0 then SetIP (get y) else Nop)
-    JumpIfFalse x y -> Just (if get x == 0 then SetIP (get y) else Nop)
-    LessThan x y r -> Just (Set (target r) (fromBool (get x < get y)))
-    Equals x y r -> Just (Set (target r) (fromBool (get x == get y)))
-    AdjustRelBase x -> Just (SetRelBase (base + get x))
-    Halt -> Nothing
+    Add x y r -> Set (target r) (get x + get y)
+    Mul x y r -> Set (target r) (get x * get y)
+    Input r -> ReadTo (target r)
+    Output x -> Write (get x)
+    JumpIfTrue x y -> if get x /= 0 then SetIP (get y) else Nop
+    JumpIfFalse x y -> if get x == 0 then SetIP (get y) else Nop
+    LessThan x y r -> Set (target r) (fromBool (get x < get y))
+    Equals x y r -> Set (target r) (fromBool (get x == get y))
+    AdjustRelBase x -> SetRelBase (base + get x)
+    Halt -> Stop
   where
     mem = memory s
     base = rel_base s
@@ -126,22 +132,14 @@ effect instr s = case instr of
 fromBool :: Bool -> Value
 fromBool = toInteger . fromEnum
 
--- fetch-execute cycle
-advance :: State -> Maybe (Maybe Value, State)
-advance s = do
-    let (instr, next_ip) = fetch s
-    act <- effect instr s
-    return $ apply act (s { curr_ip = next_ip })
-
 -- a list with something else on the end
 data ListPlus a b = Cons a (ListPlus a b) | End b
     deriving Show
 
-listPlus :: (b -> Maybe (Maybe a, b)) -> b -> ListPlus a b
-listPlus step s = case step s of
+unfoldLP :: (b -> Maybe (a, b)) -> b -> ListPlus a b
+unfoldLP step s = case step s of
     Nothing -> End s
-    Just (Nothing, s') -> listPlus step s'
-    Just (Just v, s') -> Cons v (listPlus step s')
+    Just (v, s') -> Cons v (unfoldLP step s')
 
 initLP :: ListPlus a b -> [a]
 initLP (End _) = []
@@ -151,20 +149,28 @@ lastLP :: ListPlus a b -> b
 lastLP (End y) = y
 lastLP (Cons _ rest) = lastLP rest
 
--- Run the machine until it halts.
-run :: Memory -> Memory
-run = snd . runIO []
+automaton :: Memory -> Automaton
+automaton = runState . initState
 
--- Function from input to output defined by the machine
-function :: Memory -> [Value] -> [Value]
-function mem vs = fst (runIO vs mem)
-
--- Run the machine with input, yielding output and final memory.
--- The pair and the output list are produced lazily.
-runIO :: [Value] -> Memory -> ([Value], Memory)
-runIO vs mem = (initLP r, memory (lastLP r))
+-- fetch-execute cycle
+runState :: State -> Automaton
+runState s = case effect instr s of
+    Stop -> Finish s
+    Write v -> WriteValue v (runState s')
+    ReadTo addr -> ReadValue $ \ v ->
+        runState (s' { memory = Map.insert addr v (memory s') })
+    act -> runState (apply act s')
   where
-    r = listPlus advance (initState vs mem)
+    (instr, next_ip) = fetch s
+    s' = s { curr_ip = next_ip }
+
+-- Run the machine until it halts, returning the final memory.
+run :: Memory -> Memory
+run mem = memory (lastLP (runAutomaton (automaton mem) []))
+
+-- Lazy function from input to output defined by the machine.
+streamFunction :: Memory -> [Value] -> [Value]
+streamFunction mem = initLP . runAutomaton (automaton mem)
 
 -- debugging
 
@@ -173,21 +179,29 @@ showState s = unwords (map show f) ++ "." ++ unwords (map show b)
   where
     (f, b) = splitAt (fromInteger (curr_ip s)) (Map.elems (memory s))
 
-trace :: Memory -> [(Address, Instruction, Action)]
-trace = traceIO []
+trace :: Memory -> [Value] -> [(Address, Instruction, Action)]
+trace mem vs = initLP result ++ [(curr_ip s, Halt, Stop)]
+  where
+    result = unfoldLP advanceTrace (initState mem, vs)
+    (s, _) = lastLP result
 
-traceIO :: [Value] -> Memory -> [(Address, Instruction, Action)]
-traceIO vs mem = unfoldr advanceTrace (initState vs mem)
-
-advanceTrace :: State -> Maybe ((Address, Instruction, Action), State)
-advanceTrace s = do
-    let (instr, next_ip) = fetch s
-    act <- effect instr s
-    return $ ((curr_ip s, instr, act),
-        snd (apply act ( s { curr_ip = next_ip })))
+advanceTrace ::
+    (State, [Value]) -> Maybe ((Address, Instruction, Action), (State, [Value]))
+advanceTrace (s, vs) = case act of
+    Stop -> Nothing
+    Write _ -> Just (entry, (s', vs))
+    ReadTo addr -> case vs of
+        [] -> error "unexpected end of input"
+        v:vs' ->
+            Just (entry, (s' { memory = Map.insert addr v (memory s') }, vs'))
+    _ -> Just (entry, (apply act s', vs))
+  where
+    (instr, next_ip) = fetch s
+    act = effect instr s
+    entry = (curr_ip s, instr, act)
+    s' = s { curr_ip = next_ip }
 
 -- semi-readable summary of execution history
--- (flaw: doesn't show the halt)
 showSummaryTrace :: [(Address, Instruction, Action)] -> String
 showSummaryTrace = unlines . concatMap showLine . summaryTrace
 
@@ -236,6 +250,7 @@ showAction (Write v) = "write " ++ show v
 showAction (SetIP v) = "goto " ++ show v
 showAction (SetRelBase v) = "fp = " ++ show v
 showAction Nop = "nop"
+showAction Stop = "stop"
 
 showInstruction :: Instruction -> String
 showInstruction (Add a b c) =
@@ -265,3 +280,16 @@ showParameter (Relative v)
 
 showAddress :: Address -> String
 showAddress addr = "m" ++ show addr
+
+-- resumption-based interface
+
+data Automaton
+    = ReadValue (Value -> Automaton)
+    | WriteValue Value Automaton
+    | Finish State
+
+runAutomaton :: Automaton -> [Value] -> ListPlus Value State
+runAutomaton (ReadValue k) (v:vs) = runAutomaton (k v) vs
+runAutomaton (ReadValue _) [] = error "no input left"
+runAutomaton (WriteValue r a) vs = Cons r (runAutomaton a vs)
+runAutomaton (Finish s) _ = End s

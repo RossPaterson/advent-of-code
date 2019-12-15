@@ -13,7 +13,7 @@ parse = readMemory
 -- Part One
 
 solve1 :: Input -> Value
-solve1 = head . fst . runIO [1]
+solve1 = head . flip streamFunction [1]
 
 tests1 :: [(String, [Value])]
 tests1 = [
@@ -25,12 +25,13 @@ tests1 = [
 -- Part Two
 
 solve2 :: Input -> Value
-solve2 = head . fst . runIO [2]
+solve2 = head . flip streamFunction [2]
 
 main :: IO ()
 main = do
     s <- readFile "input/09.txt"
     let input = parse s
-    putStr (unlines (failures "runIO" (fst . runIO [] . parse) tests1))
+    putStr (unlines (failures "streamFunction" (flip streamFunction [] . parse) tests1))
+    putStr $ showSummaryTrace $ trace input [2]
     print (solve1 input)
     print (solve2 input)

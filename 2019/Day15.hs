@@ -1,4 +1,4 @@
-module Main(main) where
+module Main where
 
 import Utilities
 import Intcode
@@ -108,7 +108,7 @@ unknown d = listToMaybe [path |
 exploreMaze :: Memory -> Droid
 exploreMaze mem = lastLP history
   where
-    responses = map toResponse $ function mem $ map fromMove moves
+    responses = map toResponse $ streamFunction mem $ map fromMove moves
     droids = scanl addResponse initDroid (zip moves responses)
     moves = concat (initLP history)
     history = drive droids
