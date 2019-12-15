@@ -171,11 +171,11 @@ bfs f = takeWhile (not . null) . map fst . iterate step . new_level Set.empty
       where
         (ys, seen') = new_level (Set.insert x seen) xs
 
--- Search the integers.
+-- | For a non-constant upward-closed predicate @p@, @'bsearch' p@
+-- returns the least @n@ satisfying @p@.
 --
--- If @p@ is an upward-closed predicate, @bsearch p@ returns the least
--- @n@ satisfying @p@.  If no such @n@ exists, either because no integer
--- satisfies @p@ or all do, @bsearch p@ does not terminate.
+-- If no such @n@ exists, either because no integer satisfies @p@ or
+-- all do, @'bsearch' p@ does not terminate.
 bsearch :: (Integer -> Bool) -> Integer
 bsearch p
   | p 0 = negate (searchFrom (not . p . negate) 0) + 1
