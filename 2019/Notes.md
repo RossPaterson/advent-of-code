@@ -164,3 +164,25 @@ neatly when you traverse the DAG in topological order.
 
 The second part is an inversion of the first, which is economically done
 with binary search.
+
+## [Day 15: Oxygen System](https://adventofcode.com/2019/day/15)
+
+This was a return os the path-finding theme from previous years, but in
+a tough problem: a droid bumping around a maze in the dark.  I did the
+first part in two stages: map the maze and then search for a minimal
+path.  Initially I was using an inefficient path finder, and the system
+ground to a halt as the maze grew.  When I fixed that, it just worked.
+Since I now had an all-targets path finder, the second part was trivial.
+
+I ended up using the path finder three times: to direct the droid to the
+closest unknown location, to find a path from the origin to the target
+once the maze was mapped, and to fill the maze in the second part.
+
+On the
+[Reddit thread](https://www.reddit.com/r/adventofcode/comments/eaurfo/2019_day_15_solutions/),
+it seems many people got the first part more quickly using a depth-first
+search, but then had to implement a breadth-first search for the
+second part.  While exploring the maze, I only thought of a sequential
+approach, bit other people used multiple instances of the Intcode
+machine, restarting it from scratch for each branch or cloning it at
+each branch point.
