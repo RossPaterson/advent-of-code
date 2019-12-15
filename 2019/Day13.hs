@@ -52,7 +52,7 @@ paint = foldl paintOne initScreen . takes 3
 
 -- Intcode program as a function on lists of Ints
 intFunction :: Memory -> [Int] -> [Int]
-intFunction mem = map fromInteger . function mem . map toInteger
+intFunction mem = map fromInteger . streamFunction mem . map toInteger
 
 solve1 :: Input -> Int
 solve1 = length . filter (== Block) . Map.elems . paint . flip intFunction []

@@ -17,3 +17,5 @@ Day05: Intcode.hs
 Day07: Intcode.hs
 Day09: Intcode.hs
 Day11: Intcode.hs
+Day13: Intcode.hs
+Day15: Intcode.hs
