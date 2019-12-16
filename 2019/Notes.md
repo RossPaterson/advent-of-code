@@ -186,3 +186,20 @@ second part.  While exploring the maze, I only thought of a sequential
 approach, bit other people used multiple instances of the Intcode
 machine, restarting it from scratch for each branch or cloning it at
 each branch point.
+
+## [Day 16: Flawed Frequency Transmission](https://adventofcode.com/2019/day/16)
+
+This puzzle doesn't require much code: the challenge is finding a useful
+pattern in the process.
+
+The first part is a fiddly calculation, but not too complicated, while
+the second is described as applying the same process to an infeasibly
+large input.  Finding a faster way involves getting some insight into
+enough of the behavour of the process to provide the answer for inputs
+with a certain property, which the given input has.
+
+The first part focusses our attention on the front of the list, but
+the behavour at the back is what matters for the second part (for the
+given input), and that turns out to be much simpler than at the front.
+There's even a formula for *n* phases involving binomial coefficients,
+but executing all the phases is fast enough.
