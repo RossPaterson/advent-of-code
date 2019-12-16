@@ -19,7 +19,7 @@ data Move = N | S | W | E
     deriving (Bounded, Enum, Eq, Ord, Show)
 
 fromMove :: Move -> Value
-fromMove m = toInteger (fromEnum m + 1)
+fromMove d = toInteger (fromEnum d + 1)
 
 type Point = (Int, Int)
 
@@ -57,18 +57,18 @@ initMaze = Maze {
     }
 
 showMaze :: Maze -> String
-showMaze d =
+showMaze maze =
     unlines [[showPos (x,y) | x <- [minX..maxX]] | y <- [minY..maxY]]
   where
-    maze = maze_map d
+    m = maze_map maze
     showPos p
-      | target d == Just p = '*'
+      | target maze == Just p = '*'
       | p == startPoint = '0'
-      | otherwise = maybe ' ' showCell (Map.lookup p maze)
-    minX = minimum (map fst (Map.keys maze))
-    maxX = maximum (map fst (Map.keys maze))
-    minY = minimum (map snd (Map.keys maze))
-    maxY = maximum (map snd (Map.keys maze))
+      | otherwise = maybe ' ' showCell (Map.lookup p m)
+    minX = minimum (map fst (Map.keys m))
+    maxX = maximum (map fst (Map.keys m))
+    minY = minimum (map snd (Map.keys m))
+    maxY = maximum (map snd (Map.keys m))
 
 -- map the maze using the droid program
 mapMaze :: Memory -> Maze
@@ -81,18 +81,18 @@ searchMaze p droid m =
 
 -- consider droid moves to adjacent points
 moveTo :: Automaton -> Maze -> (Move, Point) -> Maze
-moveTo droid m (d, p)
-  | Map.member p maze = m
+moveTo droid maze (d, p)
+  | Map.member p m = maze
   | otherwise = case r of
         Blocked ->
-            m { maze_map = Map.insert p Wall maze }
+            maze { maze_map = Map.insert p Wall m }
         Moved -> searchMaze p droid' $
-            m { maze_map = Map.insert p Space maze }
+            maze { maze_map = Map.insert p Space m }
         Found -> searchMaze p droid' $
-            m { maze_map = Map.insert p Space maze, target = Just p }
+            maze { maze_map = Map.insert p Space m, target = Just p }
   where
     (r, droid') = moveDroid droid d
-    maze = maze_map m
+    m = maze_map maze
 
 -- interact with the droid, attempting to make the move
 moveDroid :: Automaton -> Move -> (Response, Automaton)
@@ -107,22 +107,23 @@ neighbours m p =
     [p' | d <- allValues, let p' = move p d, Map.lookup p' m == Just Space]
 
 solve1 :: Maze -> Int
-solve1 m = case target m of
+solve1 maze = case target maze of
     Nothing -> error "Target not found"
     Just t ->
         length $ takeWhile (t `notElem`) $
-            bfs (neighbours (maze_map m)) [startPoint]
+            bfs (neighbours (maze_map maze)) [startPoint]
 
 -- Part Two
 
 solve2 :: Maze -> Int
-solve2 m = case target m of
+solve2 maze = case target maze of
     Nothing -> error "Target not found"
-    Just t -> length (bfs (neighbours (maze_map m)) [t]) - 1
+    Just t -> length (bfs (neighbours (maze_map maze)) [t]) - 1
 
 main :: IO ()
 main = do
     s <- readFile "input/15.txt"
     let maze = mapMaze (parse s)
+    -- putStr (showMaze maze)
     print (solve1 maze)
     print (solve2 maze)
