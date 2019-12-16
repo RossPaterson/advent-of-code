@@ -2,7 +2,7 @@ module Main where
 
 import Intcode
 import Utilities
-import Data.Map (Map, (!))
+import Data.Map ((!))
 import qualified Data.Map as Map
 
 -- Input processing
