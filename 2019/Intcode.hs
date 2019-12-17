@@ -1,7 +1,7 @@
 -- toy computer for Days 2, 5, 7, 9, 11, ...
 module Intcode(
     Memory, readMemory, setMemory, getMemory, contents,
-    Address, Value, fromBool,
+    Address, Value, toValue, fromValue,
     -- pure function
     run, streamFunction,
     -- debugging
@@ -19,6 +19,12 @@ newtype Memory = Memory (Map Address Value)
 type Address = Integer
 type Value = Integer
 
+toValue :: Enum a => a -> Value
+toValue = toInteger . fromEnum
+
+fromValue :: Enum a => Value -> a
+fromValue = toEnum . fromInteger
+
 -- comma-separated list of values for locations 0..
 readMemory :: String -> Memory
 readMemory s = Memory $ Map.fromAscList $ zip [0..] $
@@ -32,10 +38,10 @@ setMemory addr v (Memory m)
 getMemory :: Address -> Memory -> Value
 getMemory addr (Memory m)
   | addr < 0 = error ("negative address " ++ show addr)
-  | otherwise = Map.findWithDefault addr 0 m
+  | otherwise = Map.findWithDefault 0 addr m
 
 contents :: Memory -> [Value]
-contents (Memory m) = [Map.findWithDefault addr 0 m | addr <- [0..top]]
+contents (Memory m) = [Map.findWithDefault 0 addr m | addr <- [0..top]]
   where
     top = fst (Map.findMax m)
 

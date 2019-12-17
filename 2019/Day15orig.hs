@@ -19,7 +19,7 @@ data Move = N | S | W | E
     deriving (Bounded, Enum, Eq, Ord, Show)
 
 fromMove :: Move -> Value
-fromMove m = toInteger (fromEnum m + 1)
+fromMove m = toValue m + 1
 
 type Point = (Int, Int)
 
@@ -33,7 +33,7 @@ data Response = Blocked | Moved | Found
     deriving (Enum, Show)
 
 toResponse :: Value -> Response
-toResponse = toEnum . fromInteger
+toResponse = fromValue
 
 data Cell = Wall | Space
     deriving (Eq, Show)

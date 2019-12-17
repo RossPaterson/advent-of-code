@@ -32,6 +32,5 @@ main = do
     s <- readFile "input/09.txt"
     let input = parse s
     putStr (unlines (failures "streamFunction" (flip streamFunction [] . parse) tests1))
-    putStr $ showSummaryTrace $ trace input [2]
     print (solve1 input)
     print (solve2 input)
