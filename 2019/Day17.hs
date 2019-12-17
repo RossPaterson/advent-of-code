@@ -4,7 +4,6 @@ import Utilities
 import Intcode
 import Data.Char
 import Data.List
-import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
 
@@ -165,7 +164,7 @@ imagePlans = plans . segments . scanImage
 solve2 :: Input -> Int
 solve2 mem = fromInteger (last (streamFunction bot cmds))
   where
-    bot = Map.insert 0 2 mem
+    bot = setMemory 0 2 mem
     plan = head (imagePlans (getImage mem))
     cmds = map (toInteger . ord) (unlines (showPlan plan ++ ["n"]))
 

@@ -119,7 +119,7 @@ runArcade :: Memory -> [Int] -> [OutputInstruction]
 runArcade mem moves = decode (intFunction (deposit mem) moves)
 
 deposit :: Memory -> Memory
-deposit = Map.insert 0 2
+deposit = setMemory 0 2
 
 solve2 :: Input -> Int
 solve2 = finalScore
