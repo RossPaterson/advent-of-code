@@ -1,8 +1,8 @@
+-- alternative solution using depth first search with cloned droids
 module Main where
 
 import Utilities
 import Intcode
-import Data.Maybe
 import Data.Map (Map)
 import qualified Data.Map as Map
 
@@ -19,9 +19,12 @@ data Move = N | S | W | E
     deriving (Bounded, Enum, Eq, Ord, Show)
 
 fromMove :: Move -> Value
-fromMove m = toInteger (fromEnum m + 1)
+fromMove d = toInteger (fromEnum d + 1)
 
 type Point = (Int, Int)
+
+startPoint :: Point
+startPoint = (0, 0)
 
 move :: Point -> Move -> Point
 move (x, y) N = (x, y+1)
@@ -42,122 +45,85 @@ showCell :: Cell -> Char
 showCell Wall = '#'
 showCell Space = '.'
 
-data Droid = Droid {
-    position :: Point,
+data Maze = Maze {
     target :: Maybe Point,
     maze_map :: Map Point Cell
     }
 
-initDroid :: Droid
-initDroid = Droid {
-    position = (0, 0),
+initMaze :: Maze
+initMaze = Maze {
     target = Nothing,
-    maze_map = Map.singleton (0, 0) Space
+    maze_map = Map.singleton startPoint Space
     }
 
-showDroid :: Droid -> String
-showDroid d =
+showMaze :: Maze -> String
+showMaze maze =
     unlines [[showPos (x,y) | x <- [minX..maxX]] | y <- [minY..maxY]]
   where
-    maze = maze_map d
+    m = maze_map maze
     showPos p
-      | target d == Just p = '*'
-      | p == position d = 'D'
-      | p == (0,0) = '0'
-      | otherwise = maybe ' ' showCell (Map.lookup p maze)
-    minX = minimum (map fst (Map.keys maze))
-    maxX = maximum (map fst (Map.keys maze))
-    minY = minimum (map snd (Map.keys maze))
-    maxY = maximum (map snd (Map.keys maze))
+      | target maze == Just p = '*'
+      | p == startPoint = '0'
+      | otherwise = maybe ' ' showCell (Map.lookup p m)
+    minX = minimum (map fst (Map.keys m))
+    maxX = maximum (map fst (Map.keys m))
+    minY = minimum (map snd (Map.keys m))
+    maxY = maximum (map snd (Map.keys m))
 
--- Minimal paths from a given start node.
--- Each node reachable from start appears in exactly one list, paired with
--- a minimal path to that node.  All paths in the kth list have length k.
-minimalPaths :: Ord n => (n -> [(e, n)]) -> n -> [[(n, [e])]]
-minimalPaths g start = allPaths Map.empty (Map.singleton start [])
+-- map the maze using the droid program
+mapMaze :: Memory -> Maze
+mapMaze mem = searchMaze startPoint (automaton mem) initMaze
+
+-- search from p with a droid positioned at p
+searchMaze :: Point -> Automaton -> Maze -> Maze
+searchMaze p droid m =
+    foldl (moveTo droid) m [(d, move p d) | d <- allValues]
+
+-- consider droid moves to adjacent points
+moveTo :: Automaton -> Maze -> (Move, Point) -> Maze
+moveTo droid maze (d, p)
+  | Map.member p m = maze
+  | otherwise = case r of
+        Blocked ->
+            maze { maze_map = Map.insert p Wall m }
+        Moved -> searchMaze p droid' $
+            maze { maze_map = Map.insert p Space m }
+        Found -> searchMaze p droid' $
+            maze { maze_map = Map.insert p Space m, target = Just p }
   where
-    allPaths done fringe
-      | Map.null fringe = []
-      | otherwise = Map.assocs (fmap reverse fringe) : allPaths done' fringe'
-      where
-        done' = Map.union done fringe
-        fringe' =
-            Map.fromList [(n', e:path) |
-                (n, path) <- Map.assocs fringe, (e, n') <- g n]
-            `Map.difference` done'
+    (r, droid') = moveDroid droid d
+    m = maze_map maze
 
--- minimal path between to points in the maze
-pathBetween :: Map Point Cell  -> Point -> Point -> [Move]
-pathBetween m src dest =
-    head [path | (p, path) <- concat (minimalPaths (steps m) src), p == dest]
+-- interact with the droid, attempting to make the move
+moveDroid :: Automaton -> Move -> (Response, Automaton)
+moveDroid (ReadValue k) d = case k (fromMove d) of
+    WriteValue v droid -> (toResponse v, droid)
+    _ -> error "Droid failed to respond"
+moveDroid _ _ = error "Droid not accepting input"
 
--- moves and destinations the droid can reach in one step from p
-steps :: Map Point Cell -> Point -> [(Move, Point)]
-steps m p =
-    [(d, p') | d <- allValues, let p' = move p d, Map.lookup p' m /= Just Wall]
+-- destinations reachable in one step from p
+neighbours :: Map Point Cell -> Point -> [Point]
+neighbours m p =
+    [p' | d <- allValues, let p' = move p d, Map.lookup p' m == Just Space]
 
--- path from droid's location to the closest unknown cell (if any)
-unknown :: Droid -> Maybe [Move]
-unknown d = listToMaybe [path |
-    (p, path) <- concat (minimalPaths (steps maze) (position d)),
-    Map.lookup p maze == Nothing]
-  where
-    maze = maze_map d
-
--- interact with the program to create a complete map of the maze
-exploreMaze :: Memory -> Droid
-exploreMaze mem = lastLP history
-  where
-    responses = map toResponse $ streamFunction mem $ map fromMove moves
-    droids = scanl addResponse initDroid (zip moves responses)
-    moves = concat (initLP history)
-    history = drive droids
-
--- update the droid and maze from a move and its response
-addResponse :: Droid -> (Move, Response) -> Droid
-addResponse d (dir, r) = case r of
-    Blocked -> d { maze_map = Map.insert p Wall maze }
-    Moved -> d { maze_map = Map.insert p Space maze, position = p }
-    Found ->
-        d { maze_map = Map.insert p Space maze, position = p, target = Just p }
-  where
-    p = move (position d) dir
-    maze = maze_map d
-
--- Produce a sequence of paths, each moving the droid to an unknown cell,
--- and return the final state when no more unknown cells are reachable.
-drive :: [Droid] -> ListPlus [Move] Droid
-drive (d:ds) = case unknown d of
-    Nothing -> End d
-    Just [] -> error "Empty path"
-    Just ms ->
-        let n = length ms - 1 in
-        -- ignore states until but the last move is executed
-        Cons ms (drive (drop n ds))
-drive [] = error "No more droids"
-
--- minimal path from the origin to the target
-minimal :: Droid -> [Move]
-minimal d = case target d of
-    Nothing -> error "No target"
-    Just t -> pathBetween maze (0,0) t
-  where
-    maze = maze_map d
-
-solve1 :: Input -> Int
-solve1 = length . minimal . exploreMaze
+solve1 :: Maze -> Int
+solve1 maze = case target maze of
+    Nothing -> error "Target not found"
+    Just t ->
+        length $ takeWhile (t `notElem`) $
+            bfs (neighbours (maze_map maze)) [startPoint]
 
 -- Part Two
 
-solve2 :: Input -> Int
-solve2 mem = length (minimalPaths (steps (maze_map d)) t) - 1
-  where
-    d = exploreMaze mem
-    Just t = target d
+solve2 :: Maze -> Int
+solve2 maze = case target maze of
+    Nothing -> error "Target not found"
+    Just t -> length (bfs (neighbours (maze_map maze)) [t]) - 1
 
 main :: IO ()
 main = do
     s <- readFile "input/15.txt"
-    let input = parse s
-    print (solve1 input)
-    print (solve2 input)
+    let maze = mapMaze (parse s)
+    -- putStr (showMaze maze)
+    print (solve1 maze)
+    print (solve2 maze)
