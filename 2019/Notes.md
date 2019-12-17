@@ -203,3 +203,14 @@ the behavour at the back is what matters for the second part (for the
 given input), and that turns out to be much simpler than at the front.
 There's even a formula for *n* phases involving binomial coefficients,
 but executing all the phases is fast enough.
+
+## [Day 17: Set and Forget](https://adventofcode.com/2019/day/17)
+
+This was challenging enough, but the description made it look a lot
+harder.  We are told that the "scaffold" is in fact a single path the
+loops back across itself.  The easy first part directs our attention to
+the crossings, but these should be ignored in the second part, where we
+just follow the path.
+
+The second part is a search for a compact encoding of the path.
+The constraints we are given are quite tight, so the search is narrow.
