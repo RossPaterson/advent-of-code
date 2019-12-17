@@ -2,8 +2,6 @@ module Main where
 
 import Intcode
 import Utilities
-import Data.Map ((!))
-import qualified Data.Map as Map
 
 -- Input processing
 
@@ -15,10 +13,10 @@ parse = readMemory
 -- Part One
 
 initialize :: Value -> Value -> Memory -> Memory
-initialize n v = Map.insert 1 n . Map.insert 2 v
+initialize n v = setMemory 1 n . setMemory 2 v
 
 output :: Memory -> Value
-output mem = mem!0
+output mem = getMemory 0 mem
 
 solve1 :: Input -> Value
 solve1 = output . run . initialize 12 2
@@ -44,6 +42,6 @@ main :: IO ()
 main = do
     s <- readFile "input/02.txt"
     let input = parse s
-    putStr (unlines (failures "solve1" (Map.elems . run . parse) tests1))
+    putStr (unlines (failures "solve1" (contents . run . parse) tests1))
     print (solve1 input)
     print (solve2 input)

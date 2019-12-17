@@ -1,7 +1,7 @@
 -- toy computer for Days 2, 5, 7, 9, 11, ...
 module Intcode(
-    Memory, readMemory,
-    Value, fromBool,
+    Memory, readMemory, setMemory, getMemory, contents,
+    Address, Value, fromBool,
     -- pure function
     run, streamFunction,
     -- debugging
@@ -13,16 +13,31 @@ module Intcode(
 
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Maybe
 
-type Memory = Map Address Value
+newtype Memory = Memory (Map Address Value)
+    deriving (Eq, Ord, Show)
 type Address = Integer
 type Value = Integer
 
 -- comma-separated list of values for locations 0..
 readMemory :: String -> Memory
-readMemory s = Map.fromAscList $ zip [0..] $
+readMemory s = Memory $ Map.fromAscList $ zip [0..] $
     map read (words [if c == ',' then ' ' else c | c <- s])
+
+setMemory :: Address -> Value -> Memory -> Memory
+setMemory addr v (Memory m)
+  | addr < 0 = error ("negative address " ++ show addr)
+  | otherwise = Memory (Map.insert addr v m)
+
+getMemory :: Address -> Memory -> Value
+getMemory addr (Memory m)
+  | addr < 0 = error ("negative address " ++ show addr)
+  | otherwise = Map.findWithDefault addr 0 m
+
+contents :: Memory -> [Value]
+contents (Memory m) = [Map.findWithDefault addr 0 m | addr <- [0..top]]
+  where
+    top = fst (Map.findMax m)
 
 data State = State {
     memory :: Memory,
@@ -50,7 +65,7 @@ data Action
 
 -- an action may produce an output value, and can update the state
 apply :: Action -> State -> State
-apply (Set addr v) s = s { memory = Map.insert addr v (memory s) }
+apply (Set addr v) s = s { memory = setMemory addr v (memory s) }
 apply (Write _) _ = error "Write passed to apply"
 apply (ReadTo _) _ = error "ReadTo passed to apply"
 apply (SetIP addr) s = s { curr_ip = addr }
@@ -92,16 +107,13 @@ fetch s = case leadvalue `mod` 100 of
   where
     mem = memory s
     ip = curr_ip s
-    leadvalue = mem_lookup ip
-    parameter n = mode n (mem_lookup (ip+n))
+    leadvalue = getMemory ip mem
+    parameter n = mode n (getMemory (ip+n) mem)
     mode n v = case leadvalue `div` (10^(n+1)) `mod` 10 of
         0 -> Position v
         1 -> Immediate v
         2 -> Relative v
         d -> exec_error $ "bad parameter mode " ++ show d
-    mem_lookup addr
-      | addr < 0 = exec_error $ "negative address " ++ show addr
-      | otherwise = fromMaybe 0 (Map.lookup addr mem)
     exec_error msg = error (show ip ++ ": " ++ msg)
 
 effect :: Instruction -> State -> Action
@@ -119,12 +131,9 @@ effect instr s = case instr of
   where
     mem = memory s
     base = rel_base s
-    mem_lookup addr
-      | addr < 0 = error $ "negative address " ++ show addr
-      | otherwise = fromMaybe 0 (Map.lookup addr mem)
-    get (Position addr) = mem_lookup addr
+    get (Position addr) = getMemory addr mem
     get (Immediate n) = n
-    get (Relative n) = mem_lookup (base + n)
+    get (Relative n) = getMemory (base + n) mem
     target (Position addr) = addr
     target (Immediate n) = error $ "setting immediate " ++ show n
     target (Relative n) = base + n
@@ -158,7 +167,7 @@ runState s = case effect instr s of
     Stop -> Finish s
     Write v -> WriteValue v (runState s')
     ReadTo addr -> ReadValue $ \ v ->
-        runState (s' { memory = Map.insert addr v (memory s') })
+        runState (s' { memory = setMemory addr v (memory s') })
     act -> runState (apply act s')
   where
     (instr, next_ip) = fetch s
@@ -177,7 +186,8 @@ streamFunction mem = initLP . runAutomaton (automaton mem)
 showState :: State -> String
 showState s = unwords (map show f) ++ "." ++ unwords (map show b)
   where
-    (f, b) = splitAt (fromInteger (curr_ip s)) (Map.elems (memory s))
+    (f, b) = splitAt (fromInteger (curr_ip s)) (Map.elems m)
+    Memory m = memory s
 
 trace :: Memory -> [Value] -> [(Address, Instruction, Action)]
 trace mem vs = initLP result ++ [(curr_ip s, Halt, Stop)]
@@ -193,7 +203,7 @@ advanceTrace (s, vs) = case act of
     ReadTo addr -> case vs of
         [] -> error "unexpected end of input"
         v:vs' ->
-            Just (entry, (s' { memory = Map.insert addr v (memory s') }, vs'))
+            Just (entry, (s' { memory = setMemory addr v (memory s') }, vs'))
     _ -> Just (entry, (apply act s', vs))
   where
     (instr, next_ip) = fetch s
