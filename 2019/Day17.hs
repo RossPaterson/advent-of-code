@@ -24,11 +24,11 @@ type Scaffold = Set Point
 data Direction = Up | Dn | Lt | Rt
     deriving (Bounded, Enum, Show)
 
-move :: Point -> Direction -> Point
-move (x, y) Up = (x, y-1)
-move (x, y) Dn = (x, y+1)
-move (x, y) Lt= (x-1, y)
-move (x, y) Rt= (x+1, y)
+move :: Direction -> Point -> Point
+move Up (x, y) = (x, y-1)
+move Dn (x, y) = (x, y+1)
+move Lt (x, y) = (x-1, y)
+move Rt (x, y) = (x+1, y)
 
 dirNames :: String
 dirNames = "^v<>"
@@ -55,7 +55,7 @@ intersections :: State -> [Point]
 intersections s = filter crossing (Set.toList m)
   where
     m = scaffold s
-    crossing p = Set.fromList [p' | d <- allValues, let p' = move p d] `Set.isSubsetOf` m
+    crossing p = Set.fromList [move d p | d <- allValues] `Set.isSubsetOf` m
 
 alignment :: Point -> Int
 alignment (x, y) = x*y
@@ -110,12 +110,12 @@ segmentsFrom :: Set Point -> Point -> Direction -> [Segment]
 segmentsFrom s p d = case tds of
     [] -> []
     [(t, d')] ->
-        let ps = takeWhile (flip Set.member s) (iterate (flip move d') p) in
+        let ps = takeWhile (`Set.member` s) (iterate (move d') p) in
         (t, length ps - 1):segmentsFrom s (last ps) d'
     _ -> error "More than one turn"
   where
     tds = [(t, d') |
-        t <- allValues, let d' = turn t d, Set.member (move p d') s]
+        t <- allValues, let d' = turn t d, move d' p `Set.member` s]
 
 -- A two-level program for traversing the path
 data Plan = Plan {
@@ -140,6 +140,7 @@ validFunction ts = length (showFunction ts) <= 20
 plans :: [Segment] -> [Plan]
 plans = extendPlan (Plan [] [])
 
+-- ways of extending a plan for the current point to the rest of the segments
 extendPlan :: Plan -> [Segment] -> [Plan]
 extendPlan plan [] = [plan]
 extendPlan (Plan ns fs) ts
@@ -151,9 +152,12 @@ extendPlan (Plan ns fs) ts
         plan <- extendPlan (Plan (n:ns) fs) ts'] ++
     [plan | -- use a prefix of the remaining input as a new movement function
         length fs < 3,
-        (f, ts') <- takeWhile (validFunction . fst) $
-            tail $ zip (inits ts) (tails ts),
+        (f, ts') <- takeWhile (validFunction . fst) (tail (splits ts)),
         plan <- extendPlan (Plan (length fs:ns) (fs ++ [f])) ts']
+
+-- all the ways of splitting a list, earliest first
+splits :: [a] -> [([a], [a])]
+splits xs = zip (inits xs) (tails xs)
 
 imagePlans :: String -> [Plan]
 imagePlans = plans . segments . scanImage
