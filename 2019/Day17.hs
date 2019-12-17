@@ -60,7 +60,7 @@ alignment :: Point -> Int
 alignment (x, y) = x*y
 
 getImage :: Memory -> String
-getImage mem = map (chr . fromInteger) (streamFunction mem [])
+getImage mem = map fromValue (streamFunction mem [])
 
 part1 :: String -> Int
 part1 = sum . map alignment . intersections . scanImage
@@ -162,11 +162,11 @@ imagePlans :: String -> [Plan]
 imagePlans = plans . segments . scanImage
 
 solve2 :: Input -> Int
-solve2 mem = fromInteger (last (streamFunction bot cmds))
+solve2 mem = fromValue (last (streamFunction bot cmds))
   where
     bot = setMemory 0 2 mem
     plan = head (imagePlans (getImage mem))
-    cmds = map (toInteger . ord) (unlines (showPlan plan ++ ["n"]))
+    cmds = map toValue (unlines (showPlan plan ++ ["n"]))
 
 testInput2 :: String
 testInput2 =
