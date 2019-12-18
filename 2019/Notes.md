@@ -8,7 +8,9 @@ The most enjoyable puzzles so far have been days 3, 6, 7 and 10.
 
 Some common AoC themes:
 
-* assembly code: days 2, 5, 7, 9, ... (used as a black box on day 11)
+* assembly code: developed on days 2, 5, 7, 9, with black box programs
+  for it suppplied as input on days 11, 13, 15, 17, ...
+* path finding: days 15 and 18.
 
 ## [Day 1: The Tyranny of the Rocket Equation](https://adventofcode.com/2019/day/1)
 
@@ -214,3 +216,13 @@ just follow the path.
 
 The second part is a search for a compact encoding of the path.
 The constraints we are given are quite tight, so the search is narrow.
+
+## [Day 18: Many-Worlds Interpretation](https://adventofcode.com/2019/day/18)
+
+Another maze solver, with the complication of keys and doors.  In the
+second part it becomes vital to control the number of states.
+
+My solution took 15 minutes to solve both parts.  It could be made faster
+by introducing a third level of path finding.
+
+It seems that in all of the supplied inputs the maze is a tree.
