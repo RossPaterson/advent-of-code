@@ -1,5 +1,6 @@
 module Main where
 
+import Geometry
 import Utilities
 import Data.Bits
 import Data.Char
@@ -12,26 +13,25 @@ import qualified Data.Set as Set
 
 -- Input processing
 
-type Input = (Maze, Point)
+type Input = (Maze, Point2)
 
-type Point = (Int, Int)
-
-neighbours :: Point -> [Point]
-neighbours (x, y) = [(x+1, y), (x, y+1), (x-1, y), (x, y-1)]
+neighbours :: Point2 -> [Point2]
+neighbours (Point2 x y) =
+    [Point2 (x+1) y, Point2 x (y+1), Point2 (x-1) y, Point2 x (y-1)]
 
 type Door = Int
 
 data Maze = Maze {
-    passages :: Set Point,
-    keys :: Map Point Door,
-    doors :: Map Point Door
+    passages :: Set Point2,
+    keys :: Map Point2 Door,
+    doors :: Map Point2 Door
     }
     deriving Show
 
 parse :: String -> Input
 parse s = (maze, pos)
   where
-    grid = [((x, y), c) | (y, l) <- zip [0..] (lines s), (x, c) <- zip [0..] l, c /= '#']
+    grid = [(p, c) | (p, c) <- readGrid s, c /= '#']
     open = [(p, c) | (p, c) <- grid, c /= '.']
     maze = Maze {
         passages = Set.fromList (map fst grid),
@@ -56,35 +56,27 @@ addKey :: Door -> Keyring -> Keyring
 addKey d (Keyring ds) = Keyring (setBit ds d)
 
 data State = State {
-    position :: !Point,
+    position :: !Point2,
     collected :: !Keyring
     }
     deriving (Eq, Ord, Show)
 
-initState :: Point -> State
+initState :: Point2 -> State
 initState p = State p noKeys
 
 showState :: Maze -> State -> String
 showState m (State p coll) = showStateAux m [p] coll
 
-showStateAux :: Maze -> [Point] -> Keyring -> String
-showStateAux m ps coll =
-    unlines [[showPosition (x, y) | x <- [minX..maxX]] | y <- [minY..maxY]]
+showStateAux :: Maze -> [Point2] -> Keyring -> String
+showStateAux m ps coll = showGrid '#' $
+    Map.fromList [(p, '@') | p <- ps] `Map.union`
+    fmap key (Map.filter live (keys m)) `Map.union`
+    fmap door (Map.filter live (doors m)) `Map.union`
+    Map.fromSet (const '.') (passages m)
   where
-    open = passages m
-    showPosition p
-      | not (Set.member p open) = '#'
-      | elem p ps = '@'
-      | otherwise =
-        case Map.lookup p (keys m) of
-        Just d | not (hasKey coll d) -> chr (d + ord 'a')
-        _ -> case Map.lookup p (doors m) of
-            Just d | not (hasKey coll d) -> chr (d + ord 'A')
-            _ -> '.'
-    minX = minimum (map fst (Set.toList open)) - 1
-    maxX = maximum (map fst (Set.toList open)) + 1
-    minY = minimum (map snd (Set.toList open)) - 1
-    maxY = maximum (map snd (Set.toList open)) + 1
+    key d = chr (d + ord 'a')
+    door d = chr (d + ord 'A')
+    live d = not (hasKey coll d)
 
 solve1 :: Input -> Int
 solve1 (m, p) =
@@ -104,7 +96,7 @@ getKey m (State pos coll) =
     [(n, State p (addKey d coll)) | (n, p, d) <- keyDistances m coll pos]
 
 -- shortest distance and position of each key reachable from p
-keyDistances :: Maze -> Keyring -> Point -> [(Int, Point, Door)]
+keyDistances :: Maze -> Keyring -> Point2 -> [(Int, Point2, Door)]
 keyDistances m ds pos =
     [(n, p, d) |
         (n, ps) <- zip [0..] (bfs (steps m ds) [pos]),
@@ -113,11 +105,11 @@ keyDistances m ds pos =
         not (hasKey ds d)]
 
 -- neighbouring points that are not walls or locked doors
-steps :: Maze -> Keyring -> Point -> [Point]
+steps :: Maze -> Keyring -> Point2 -> [Point2]
 steps m coll pos = [p | p <- neighbours pos, isOpen m coll p]
 
 -- a cell is open if it is not a wall or a locked door
-isOpen :: Maze -> Keyring -> Point -> Bool
+isOpen :: Maze -> Keyring -> Point2 -> Bool
 isOpen m ds p =
     Set.member p (passages m) && maybe True (hasKey ds) (Map.lookup p (doors m))
 
@@ -173,7 +165,7 @@ tests1 = [
 
 -- now there are multiple searchers
 data State2 = State2 {
-    positions :: ![Point],
+    positions :: ![Point2],
     collected2 :: !Keyring
     }
     deriving (Eq, Ord, Show)
@@ -188,8 +180,10 @@ splitMaze (m, State p coll) = (m', State2 (corners p) coll)
     m' = m { passages = Set.difference (passages m) new_walls }
     new_walls = Set.fromList (p : neighbours p)
 
-corners :: Point -> [Point]
-corners (x, y) = [(x-1, y-1), (x-1, y+1), (x+1, y-1), (x+1, y+1)]
+corners :: Point2 -> [Point2]
+corners (Point2 x y) =
+    [Point2 (x-1) (y-1), Point2 (x-1) (y+1),
+     Point2 (x+1) (y-1), Point2 (x+1) (y+1)]
 
 solve2 :: Input -> Int
 solve2 (m0, p) =
