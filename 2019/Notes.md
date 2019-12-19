@@ -9,7 +9,7 @@ The most enjoyable puzzles so far have been days 3, 6, 7 and 10.
 Some common AoC themes:
 
 * assembly code: developed on days 2, 5, 7, 9, with black box programs
-  for it suppplied as input on days 11, 13, 15, 17, ...
+  for it supplied as input on days 11, 13, 15, 17, 19, ...
 * path finding: days 15 and 18.
 
 ## [Day 1: The Tyranny of the Rocket Equation](https://adventofcode.com/2019/day/1)
@@ -226,3 +226,11 @@ My solution took 15 minutes to solve both parts.  It could be made faster
 by introducing a third level of path finding.
 
 It seems that in all of the supplied inputs the maze is a tree.
+
+## [Day 19: Tractor Beam](https://adventofcode.com/2019/day/19)
+
+This was a novel idea.  The first part was straight forward.  The second
+requires us to map out the beam and perform a calculation on that map.
+In the examples, the horizontal width of the beam is monotonic nondecreasing,
+but that doesn't hold for the input.  The main challenge is then not getting
+all these numbers mixed up and avoidinf off-by-one errors.
