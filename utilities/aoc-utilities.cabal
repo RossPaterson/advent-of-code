@@ -17,6 +17,7 @@ library
   default-language: Haskell2010
   exposed-modules:
     Components
+    Geometry
     MaxPriorityQueue
     MinPriorityQueue
     Parser
