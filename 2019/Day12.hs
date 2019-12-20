@@ -118,7 +118,7 @@ step1 = map move1 . attract1
 -- number of elements of a list before the first repetition
 num_uniq :: Ord a => [a] -> Int
 num_uniq xs = length $ takeWhile not $ zipWith Set.member xs (init_sets xs)
- 
+
 -- same as map Set.fromList (inits xs)
 init_sets :: Ord a => [a] -> [Set a]
 init_sets = scanl (flip Set.insert) Set.empty
