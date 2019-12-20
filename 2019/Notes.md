@@ -10,7 +10,7 @@ Some common AoC themes:
 
 * assembly code: developed on days 2, 5, 7, 9, with black box programs
   for it supplied as input on days 11, 13, 15, 17, 19, ...
-* path finding: days 15 and 18.
+* path finding: days 15, 18 and 20.
 
 ## [Day 1: The Tyranny of the Rocket Equation](https://adventofcode.com/2019/day/1)
 
@@ -234,3 +234,9 @@ requires us to map out the beam and perform a calculation on that map.
 In the examples, the horizontal width of the beam is monotonic nondecreasing,
 but that doesn't hold for the input.  The main challenge is then not getting
 all these numbers mixed up and avoidinf off-by-one errors.
+
+## [Day 20: Donut Maze](https://adventofcode.com/2019/day/20)
+
+Two novel twists on maze solving.  Parsing the input was quite tedious,
+especially locating the 2-letter portals.  After that, each part was a
+neat breadth-first search with a little setup.
