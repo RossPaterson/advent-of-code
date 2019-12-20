@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Geometry
 import Parser
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -25,36 +26,28 @@ parse s = (w1, w2)
 
 -- Part One
 
-type Point = (Int, Int)
-
-addPoints :: Point -> Point -> Point
-addPoints (x1, y1) (x2, y2) = (x1+x2, y1+y2)
-
 -- the points visited by a wire, in order
-wirePoints :: Wire -> [Point]
-wirePoints = tail . scanl addPoints (0, 0) . concatMap segmentDeltas
+wirePoints :: Wire -> [Point2]
+wirePoints = tail . scanl plus2 zero2 . concatMap segmentDeltas
 
 -- unit moves in a segment
-segmentDeltas :: Segment -> [Point]
+segmentDeltas :: Segment -> [Point2]
 segmentDeltas (Segment d n) = replicate n (direction d)
 
-direction :: Direction -> Point
-direction U = (0, -1)
-direction D = (0, 1)
-direction L = (-1, 0)
-direction R = (1, 0)
-
-manhattan :: Point -> Int
-manhattan (x, y) = abs x + abs y
+direction :: Direction -> Point2
+direction U = Point2 0 (-1)
+direction D = Point2 0 1
+direction L = Point2 (-1) 0
+direction R = Point2 1 0
 
 -- points visited by both wires
-intersections :: Wire -> Wire -> [Point]
+intersections :: Wire -> Wire -> [Point2]
 intersections w1 w2 = Set.elems $
     Set.intersection (Set.fromList (wirePoints w1))
         (Set.fromList (wirePoints w2))
 
 solve1 :: Input -> Int
-solve1 = minimum . map manhattan . uncurry intersections
+solve1 = minimum . map manhattan2 . uncurry intersections
 
 testInput1 :: String
 testInput1 = "\
@@ -80,11 +73,11 @@ tests1 = [(testInput1, 6), (testInput2, 159), (testInput3, 135)]
 -- Part Two
 
 -- for each point visited by the wire, time of the first visit
-firstVisits :: Wire -> Map Point Int
+firstVisits :: Wire -> Map Point2 Int
 firstVisits w = Map.fromListWith (const id) (zip (wirePoints w) [1..])
 
 -- for each point visited by both wires, the sum of the times of first visits
-timedVisits :: Wire -> Wire -> Map Point Int
+timedVisits :: Wire -> Wire -> Map Point2 Int
 timedVisits w1 w2 = Map.intersectionWith (+) (firstVisits w1) (firstVisits w2)
 
 solve2 :: Input -> Int

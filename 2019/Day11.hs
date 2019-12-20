@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Geometry
 import Intcode
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -30,13 +31,11 @@ turn 1 L = U
 turn 1 d = succ d
 turn n _ = error $ "bad turn instruction " ++ show n
 
-type Point = (Int, Int)
-
-move :: Direction -> Point -> Point
-move U (x, y) = (x, y-1)
-move R (x, y) = (x+1, y)
-move D (x, y) = (x, y+1)
-move L (x, y) = (x-1, y)
+move :: Direction -> Point2 -> Point2
+move U (Point2 x y) = Point2 x (y-1)
+move R (Point2 x y) = Point2 (x+1) y
+move D (Point2 x y) = Point2 x (y+1)
+move L (Point2 x y) = Point2 (x-1) y
 
 data Paint = Black | White
     deriving (Enum, Show)
@@ -49,32 +48,24 @@ showPaint Black = '.'
 
 data Robot = Robot {
     direction :: Direction,
-    position :: Point,
-    paint :: Map Point Paint
+    position :: Point2,
+    paint :: Map Point2 Paint
     }
     deriving Show
 
 initRobot :: Robot
 initRobot = Robot {
     direction = U,
-    position = (0,0),
+    position = zero2,
     paint = Map.empty
     }
 
 showRobot :: Robot -> String
-showRobot r =
-    unlines [[showPos (x,y) | x <- [minX..maxX]] | y <- [minY..maxY]]
-  where
-    showPos p
-      | p == position r = showDirection (direction r)
-      | otherwise = showPaint (getPaint r p)
-    (rx, ry) = position r
-    minX = minimum (rx:map fst (Map.keys (paint r)))
-    maxX = maximum (rx:map fst (Map.keys (paint r)))
-    minY = minimum (ry:map snd (Map.keys (paint r)))
-    maxY = maximum (ry:map snd (Map.keys (paint r)))
+showRobot r = showGrid ' ' $
+    Map.singleton (position r) (showDirection (direction r)) `Map.union`
+    fmap showPaint (paint r)
 
-getPaint :: Robot -> Point -> Paint
+getPaint :: Robot -> Point2 -> Paint
 getPaint r p = Map.findWithDefault Black p (paint r)
 
 currPaint :: Robot -> Paint
