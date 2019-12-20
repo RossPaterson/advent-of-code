@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Geometry
 import Intcode
 import Data.List
 import Data.Maybe
@@ -26,20 +27,10 @@ showTile Block = '@'
 showTile Paddle = '-'
 showTile Ball = 'o'
 
-type Position = (Int, Int)
-
-type Screen = Map Position Tile
+type Screen = Map Point2 Tile
 
 showScreen :: Screen -> String
-showScreen s =
-    unlines [
-        [showTile (Map.findWithDefault Empty (x,y) s) | x <- [minX..maxX]] |
-        y <- [minY..maxY]]
-  where
-    minX = minimum (map fst (Map.keys s))
-    maxX = maximum (map fst (Map.keys s))
-    minY = minimum (map snd (Map.keys s))
-    maxY = maximum (map snd (Map.keys s))
+showScreen = showGrid '.' . fmap showTile
 
 initScreen ::Screen
 initScreen = Map.empty
@@ -47,7 +38,7 @@ initScreen = Map.empty
 paint :: [Int] -> Screen
 paint = foldl paintOne initScreen . takes 3
   where
-    paintOne s [x, y, tile] = Map.insert (x, y) (toEnum tile) s
+    paintOne s [x, y, tile] = Map.insert (Point2 x y) (toEnum tile) s
     paintOne _ _ = error "unbalanced instructions"
 
 -- Intcode program as a function on lists of Ints
@@ -59,7 +50,7 @@ solve1 = length . filter (== Block) . Map.elems . paint . flip intFunction []
 
 -- Part Two
 
-data OutputInstruction = Paint Position Tile | Score Int
+data OutputInstruction = Paint Point2 Tile | Score Int
     deriving Show
 
 decode :: [Int] -> [OutputInstruction]
@@ -67,14 +58,14 @@ decode = map dec . takes 3
   where
     dec [x, y, v]
       | x == -1 && y == 0 = Score v
-      | otherwise = Paint (x, y) (toEnum v)
+      | otherwise = Paint (Point2 x y) (toEnum v)
     dec _ = error "unbalanced instructions"
 
 -- The screen is handy for debugging, but we only need the paddle position
 -- (to choose a joystick position when the ball moves) and the score.
 data Game = Game {
     screen :: Screen,
-    paddlePos :: Maybe Position,
+    paddlePos :: Maybe Point2,
     score :: Int
     }
 
@@ -101,9 +92,9 @@ updateGame g (Score v) = g { score = v }
 -- paddle is yet, and we don't know when the joystick position is required.
 -- Fortunately there's enough slack in the setup to not move at first.
 joystick :: Game -> OutputInstruction -> Maybe Int
-joystick g (Paint (bx, _) Ball) =
+joystick g (Paint (Point2 bx _) Ball) =
     Just $ case paddlePos g of
-        Just (px, _) -> signum (bx - px)
+        Just (Point2 px _) -> signum (bx - px)
         Nothing -> 0
 joystick _ _ = Nothing
 

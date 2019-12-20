@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Geometry
 import Data.List
 import Data.Ratio
 import Data.Map (Map)
@@ -10,45 +11,38 @@ import qualified Data.Set as Set
 
 -- Input processing
 
-type Input = [Point]
-
-type Point = (Int, Int) -- (0,0) is top left
+type Input = [Point2] -- (0,0) is top left
 
 parse :: String -> Input
-parse s =
-    [(x, y) | (y, l) <- zip [0..] (lines s), (x, c) <- zip [0..] l, c == '#']
+parse s = [p | (p, c) <- readGrid s, c == '#']
 
 -- Part One
 
 -- directions from pos that contain at least one point
-view :: [Point] -> Point -> Set Point
+view :: [Point2] -> Point2 -> Set Point2
 view ps pos =
-    Set.fromList [fst (normalize (p `minus` pos)) | p <- ps, p /= pos]
+    Set.fromList [fst (normalize (p `minus2` pos)) | p <- ps, p /= pos]
 
 -- direction in reduced form, with common divisor
-normalize :: Point -> (Point, Int)
-normalize (x, y) = ((x `div` d, y `div` d), d)
+normalize :: Point2 -> (Point2, Int)
+normalize (Point2 x y) = (Point2 (x `div` d) (y `div` d), d)
   where
     d = gcd x y
 
--- difference between points
-minus :: Point -> Point -> Point
-minus (x1, y1) (x2, y2) = (x1 - x2, y1 - y2)
-
 -- point with the most other points in view, plus the count
-best :: [Point] -> (Int, Point)
+best :: [Point2] -> (Int, Point2)
 best ps = maximum [(Set.size (view ps p), p) | p <- ps]
 
 solve1 :: Input -> Int
 solve1 = fst . best
 
-tests1 :: [(String, (Int, Point))]
+tests1 :: [(String, (Int, Point2))]
 tests1 = [
     (".#..#\n\
      \.....\n\
      \#####\n\
      \....#\n\
-     \...##\n", (8, (3,4))),
+     \...##\n", (8, Point2 3 4)),
     ("......#.#.\n\
      \#..#.#....\n\
      \..#######.\n\
@@ -58,7 +52,7 @@ tests1 = [
      \#..#....#.\n\
      \.##.#..###\n\
      \##...#..#.\n\
-     \.#....####\n", (33, (5,8))),
+     \.#....####\n", (33, Point2 5 8)),
     ("#.#...#.#.\n\
      \.###....#.\n\
      \.#....#...\n\
@@ -68,7 +62,7 @@ tests1 = [
      \..#...##..\n\
      \..##....##\n\
      \......#...\n\
-     \.####.###.\n", (35, (1,2))),
+     \.####.###.\n", (35, Point2 1 2)),
     (".#..#..###\n\
      \####.###.#\n\
      \....###.#.\n\
@@ -78,8 +72,8 @@ tests1 = [
      \..#.#..#.#\n\
      \#..#.#.###\n\
      \.##...##.#\n\
-     \.....#.#..\n", (41, (6,3))),
-    (largeExample, (210, (11,13)))]
+     \.....#.#..\n", (41, Point2 6 3)),
+    (largeExample, (210, Point2 11 13))]
 
 largeExample :: String
 largeExample =
@@ -107,12 +101,12 @@ largeExample =
 -- Part Two
 
 -- for each angle, a non-empty list of points at that angle, closest first
-multiview :: [Point] -> Point -> Map Angle [Point]
+multiview :: [Point2] -> Point2 -> Map Angle [Point2]
 multiview ps pos =
     fmap Map.elems $
     Map.fromListWith Map.union
-        [(angle dp, Map.singleton (dist dp) p) |
-            p <- ps, p /= pos, let dp = p `minus` pos]
+        [(angle dp, Map.singleton (manhattan2 dp) p) |
+            p <- ps, p /= pos, let dp = p `minus2` pos]
 
 -- a representation of angles increasing clockwise from straight up
 data Angle = Angle {
@@ -121,29 +115,25 @@ data Angle = Angle {
     deriving (Eq, Ord, Show)
 
 -- angle of a non-zero point
-angle :: Point -> Angle
-angle (x, y)
+angle :: Point2 -> Angle
+angle (Point2 x y)
   | x >= 0 && y < 0 = Angle 0 (- x % y)
   | y >= 0 && x > 0 = Angle 1 (y % x)
   | x <= 0 && y > 0 = Angle 2 (- x % y)
   | y <= 0 && x < 0 = Angle 3 (y % x)
   | otherwise = error "angle of (0,0)"
 
--- Manhattan distance
-dist :: Point -> Int
-dist (x, y) = abs x + abs y
-
-viewFromBest :: [Point] -> Map Angle [Point]
+viewFromBest :: [Point2] -> Map Angle [Point2]
 viewFromBest ps = multiview ps (snd (best ps))
 
 -- points in order encountered in clockwise sweeps
-vaporize :: Map Angle [Point] -> [Point]
+vaporize :: Map Angle [Point2] -> [Point2]
 vaporize = concat . transpose . Map.elems
 
 solve2 :: Input -> Int
 solve2 ps = 100*x + y
   where
-    (x, y) = vaporize (viewFromBest ps)!!199
+    Point2 x y = vaporize (viewFromBest ps)!!199
 
 tests2 :: [(String, Int)]
 tests2 = [(largeExample, 802)]

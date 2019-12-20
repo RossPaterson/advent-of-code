@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Geometry
 import Intcode
 import Data.Char
 import Data.List
@@ -16,25 +17,23 @@ parse = readMemory
 
 -- Part One
 
-type Point = (Int, Int)
-
-type Scaffold = Set Point
+type Scaffold = Set Point2
 
 data Direction = Up | Dn | Lt | Rt
     deriving (Bounded, Enum, Show)
 
-move :: Direction -> Point -> Point
-move Up (x, y) = (x, y-1)
-move Dn (x, y) = (x, y+1)
-move Lt (x, y) = (x-1, y)
-move Rt (x, y) = (x+1, y)
+move :: Direction -> Point2 -> Point2
+move Up (Point2 x y) = Point2 x (y-1)
+move Dn (Point2 x y) = Point2 x (y+1)
+move Lt (Point2 x y) = Point2 (x-1) y
+move Rt (Point2 x y) = Point2 (x+1) y
 
 dirNames :: String
 dirNames = "^v<>"
 
 data State = State {
-    scaffold :: Set Point,
-    botPosition :: Point,
+    scaffold :: Set Point2,
+    botPosition :: Point2,
     botDirection :: Maybe Direction
     }
     deriving Show
@@ -46,18 +45,18 @@ scanImage s = State {
     botDirection = mb_dir
     }
   where
-    pcs = [((x, y), c) | (y, l) <- zip [0..] (lines s), (x, c) <- zip [0..] l]
+    pcs = readGrid s
     (bp, bc) = head [(p, c) | (p, c) <- pcs, c `elem` "X^v<>"]
     mb_dir = lookup bc (zip "^v<>" allValues)
 
-intersections :: State -> [Point]
+intersections :: State -> [Point2]
 intersections s = filter crossing (Set.toList m)
   where
     m = scaffold s
     crossing p = Set.fromList [move d p | d <- allValues] `Set.isSubsetOf` m
 
-alignment :: Point -> Int
-alignment (x, y) = x*y
+alignment :: Point2 -> Int
+alignment (Point2 x y) = x*y
 
 getImage :: Memory -> String
 getImage mem = map fromValue (streamFunction mem [])
@@ -105,7 +104,7 @@ segments :: State -> [Segment]
 segments (State s p (Just d)) = segmentsFrom s p d
 segments (State _ _ Nothing) = error "No bot"
 
-segmentsFrom :: Set Point -> Point -> Direction -> [Segment]
+segmentsFrom :: Set Point2 -> Point2 -> Direction -> [Segment]
 segmentsFrom s p d = case tds of
     [] -> []
     [(t, d')] ->
