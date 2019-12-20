@@ -139,7 +139,7 @@ as pointed out in the
 [reddit thread](https://www.reddit.com/r/adventofcode/comments/e9j0ve/2019_day_12_solutions/),
 there is a second insight which simplifies looking for a cycle.
 
-Another question we could answer with minor variation on this program is
+Another question we could answer with a minor variation on this program is
 to compute the state of the system after N steps, for some very large N.
 
 ## [Day 13: Care Package](https://adventofcode.com/2019/day/13) \*\*\*\*
@@ -171,7 +171,7 @@ with binary search.
 
 ## [Day 15: Oxygen System](https://adventofcode.com/2019/day/15) \*\*\*\*
 
-This was a return os the path-finding theme from previous years, but in
+This was a return of the path-finding theme from previous years, but in
 a tough problem: a droid bumping around a maze in the dark.  I did the
 first part in two stages: map the maze and then search for a minimal
 path.  Initially I was using an inefficient path finder, and the system
@@ -199,11 +199,11 @@ pattern in the process.
 The first part is a fiddly calculation, but not too complicated, while
 the second is described as applying the same process to an infeasibly
 large input.  Finding a faster way involves getting some insight into
-enough of the behavour of the process to provide the answer for inputs
+enough of the behaviour of the process to provide the answer for inputs
 with a certain property, which the given input has.
 
 The first part focusses our attention on the front of the list, but
-the behavour at the back is what matters for the second part (for the
+the behaviour at the back is what matters for the second part (for the
 given input), and that turns out to be much simpler than at the front.
 There's even a formula for *n* phases involving binomial coefficients,
 but executing all the phases is fast enough.
@@ -235,7 +235,7 @@ This was a novel idea.  The first part was straight forward.  The second
 requires us to map out the beam and perform a calculation on that map.
 In the examples, the horizontal width of the beam is monotonic nondecreasing,
 but that doesn't hold for the input.  The main challenge is then not getting
-all these numbers mixed up and avoidinf off-by-one errors.
+all these numbers mixed up and avoiding off-by-one errors.
 
 ## [Day 20: Donut Maze](https://adventofcode.com/2019/day/20) \*\*
 
