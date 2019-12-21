@@ -9,7 +9,7 @@ The most enjoyable puzzles so far have been days 3, 6, 7 and 10.
 Some common AoC themes:
 
 * assembly code: developed on days 2, 5, 7, 9, with black box programs
-  for it supplied as input on days 11, 13, 15, 17, 19, ...
+  for it supplied as input on days 11, 13, 15, 17, 19, 21, ...
 * path finding: days 15, 18 and 20.
 
 I have added difficulty ratings based on how long each puzzle took.
@@ -242,3 +242,21 @@ all these numbers mixed up and avoiding off-by-one errors.
 Two novel twists on maze solving.  Parsing the input was quite tedious,
 especially locating the 2-letter portals.  After that, each part was a
 neat breadth-first search with a little setup.
+
+## [Day 21: Springdroid Adventure](https://adventofcode.com/2019/day/18) \*\*\*
+
+This was quite complicated, but ultimately unsatisfactory.
+We have to construct a propositional formula for when the droid should
+jump, translate it into a restricted instruction set, and test that on
+an Intcode computer.  It takes a bit of experimentation to understand
+what is going on.  After all that there seems to be a clear best formula
+for the first part.
+
+For the second part, with more lookahead, it's harder to work out clear
+criteria for comparing formulas.  One of my experiments succeeded, but
+so does a more elaborate formula, and it's not clear whether they both
+handle all possible situations.
+
+From the discussion on Reddit, it emerges that simpler solutions to the
+first part are accepted, because the input program doesn't use tests like
+`##.##.#.#`.  I wonder whether the second part has similar issues.
