@@ -27,7 +27,7 @@ solve1 mem = last $ streamFunction mem $ map toValue springProg1
 
 -- Part Two
 
--- #AB.DE....
+-- This works, but not sure if it's complete
 -- NOT (A AND B AND C) AND NOT D AND (E OR H)
 springProg2 :: String
 springProg2 =
@@ -42,6 +42,7 @@ springProg2 =
     \AND T J\n\
     \RUN\n"
 
+-- This also works
 -- NOT (A AND B AND C) AND NOT D AND ((E AND (F OR I)) OR H)
 springProg2a :: String
 springProg2a =
@@ -65,5 +66,4 @@ main = do
     s <- readFile "input/21.txt"
     let input = parse s
     print (solve1 input)
-    interact $ map fromValue . streamFunction input . map toValue
     print (solve2 input)
