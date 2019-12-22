@@ -33,7 +33,11 @@ primes = 2:filter isPrime [3,5..]
 sumOfFactors :: Int -> Int
 sumOfFactors n = product [(p^(k+1) - 1) `div` (p-1) | (p, k) <- primeFactors n]
 
--- | @'bezout' a b = (x, y)@ such that @a*x + b*y = 'gcd' a b@.
+-- | @'bezout' a b = (x, y)@ such that @a*x + b*y = 'gcd' a b@
+-- (Bézout's identity).
+--
+-- In particular, if @a@ and @b@ are coprime, @y@ is the multiplicative
+-- inverse of @b@ modulo @a@.
 bezout :: Integral a => a -> a -> (a, a)
 bezout a b = (signum a * approx 1 0 qs, signum b * approx 0 1 qs)
   where
