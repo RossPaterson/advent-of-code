@@ -20,9 +20,9 @@ library
     Geometry
     MaxPriorityQueue
     MinPriorityQueue
+    Numbers
     Parser
     Permutation
-    Primes
     RationalList
     SearchTree
     Utilities

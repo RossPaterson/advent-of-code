@@ -1,6 +1,6 @@
 module Main where
 
-import Primes
+import Numbers
 
 input :: Int
 input = 29000000
