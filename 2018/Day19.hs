@@ -1,7 +1,7 @@
 module Main where
 
 import AssemblyCode
-import Primes
+import Numbers
 import Utilities
 import Data.Maybe
 import Data.Map (Map, (!))
