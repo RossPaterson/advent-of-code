@@ -4,7 +4,7 @@
 
 (image by Jo Wood)
 
-The most enjoyable puzzles so far have been days 3, 6, 7 and 10.
+The most enjoyable puzzles so far have been days 3, 6, 7, 10 and 22.
 
 Some common AoC themes:
 
@@ -260,3 +260,23 @@ handle all possible situations.
 From the discussion on Reddit, it emerges that simpler solutions to the
 first part are accepted, because the input program doesn't use tests like
 `##.##.#.#`.  I wonder whether the second part has similar issues.
+
+## [Day 22: Slam Shuffle](https://adventofcode.com/2019/day/22) \*\*\*\*
+
+This was a fun challenge, with some similarities to day 16 of 2017.
+The setup is described in terms of lists, and such a representation
+is adequate of the first part, but is already a bit slow, and will
+clearly not be adequate, when (as expected) things get much bigger
+(in two directions) in the second part.
+
+The huge number of steps suggests that we'll be defining a semigroup
+of permutations so that we can use the log-time repetition algorithm.
+The huge size of a permutation suggests we need a compact representation
+for a subset of permutations including the primitive shuffles and closed
+under composition.  Getting this right is tricky, and I went through a
+series of representations, convincing myself that each was equivalent
+to the one before.
+
+The final question asks us to go in the reverse direction, so we need to
+be able to invert our permutations, for which we need to brush up on a bit
+of [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic).
