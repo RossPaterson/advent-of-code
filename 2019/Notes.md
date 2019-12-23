@@ -9,7 +9,7 @@ The most enjoyable puzzles so far have been days 3, 6, 7, 10 and 22.
 Some common AoC themes:
 
 * assembly code: developed on days 2, 5, 7, 9, with black box programs
-  for it supplied as input on days 11, 13, 15, 17, 19, 21, ...
+  for it supplied as input on days 11, 13, 15, 17, 19, 21, 23, ...
 * path finding: days 15, 18 and 20.
 
 I have added difficulty ratings based on how long each puzzle took.
@@ -280,3 +280,8 @@ to the one before.
 The final question asks us to go in the reverse direction, so we need to
 be able to invert our permutations, for which we need to brush up on a bit
 of [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic).
+
+## [Day 23: Category Six](https://adventofcode.com/2019/day/22) \*\*
+
+Setting up a network of Intcode computers.  Both parts are just following
+the instructions, with no particular challenge.
