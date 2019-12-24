@@ -2,7 +2,7 @@
 
 ![Completion times 2019](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2019.png)
 
-(image by Jo Wood)
+(image by @jwoLondon)
 
 The most enjoyable puzzles so far have been days 3, 6, 7, 10 and 22.
 
@@ -281,7 +281,17 @@ The final question asks us to go in the reverse direction, so we need to
 be able to invert our permutations, for which we need to brush up on a bit
 of [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic).
 
-## [Day 23: Category Six](https://adventofcode.com/2019/day/22) \*\*
+## [Day 23: Category Six](https://adventofcode.com/2019/day/23) \*\*
 
 Setting up a network of Intcode computers.  Both parts are just following
 the instructions, with no particular challenge.
+
+## [Day 24: Planet of Discord](https://adventofcode.com/2019/day/24) \*\*\*
+
+Another cellular automaton: routine in part one, but with an interesting
+twist in part two.  In the first part, I took the hint from the rating
+function to use a bitwise representation of grids, but that probably
+wasn't necessary.  In the second, I had a correct implementation but
+didn't realize it for quite a while because the example omits empty
+grids at both ends.
+
