@@ -2,7 +2,7 @@
 
 ![Completion times 2019](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2019.png)
 
-(image by @jwoLondon)
+(image by [Jo Wood](https://github.com/jwoLondon))
 
 The most enjoyable puzzles so far have been days 3, 6, 7, 10 and 22.
 
