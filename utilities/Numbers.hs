@@ -9,6 +9,7 @@ module Numbers where
 primeFactors :: Int -> [(Int, Int)]
 primeFactors = factorize primes
   where
+    factorize [] _ = error "run out of primes"
     factorize (p:ps) n
       | n == 1 = []
       | n `mod` p == 0 = primePower 1 (n `div` p)
@@ -43,7 +44,7 @@ bezout a b = (signum a * approx 1 0 qs, signum b * approx 0 1 qs)
   where
     qs = quotients (abs a) (abs b)
 
-    quotients x 0 = []
+    quotients _ 0 = []
     quotients x y = q:quotients y r
       where
         (q, r) = quotRem x y
