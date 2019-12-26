@@ -3,7 +3,6 @@ module Main where
 import Utilities
 import Geometry
 import Intcode
-import Data.List
 import Data.Maybe
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -50,80 +49,60 @@ solve1 = length . filter (== Block) . Map.elems . paint . flip intFunction []
 
 -- Part Two
 
-data OutputInstruction = Paint Point2 Tile | Score Int
-    deriving Show
-
-decode :: [Int] -> [OutputInstruction]
-decode = map dec . takes 3
-  where
-    dec [x, y, v]
-      | x == -1 && y == 0 = Score v
-      | otherwise = Paint (Point2 x y) (toEnum v)
-    dec _ = error "unbalanced instructions"
-
--- The screen is handy for debugging, but we only need the paddle position
--- (to choose a joystick position when the ball moves) and the score.
+-- The screen is handy for debugging, but we only need the paddle and ball
+-- positions (to choose a joystick position) and the score.
 data Game = Game {
+    machine :: Automaton,
     screen :: Screen,
     paddlePos :: Maybe Point2,
+    ballPos :: Maybe Point2,
     score :: Int
     }
 
 showGame :: Game -> String
 showGame g = showScreen (screen g) ++ "Score: " ++ show (score g) ++ "\n"
 
-initGame :: Game
-initGame = Game {
+initGame :: Memory -> Game
+initGame mem = Game {
+    machine = automaton (deposit mem),
     screen = initScreen,
     paddlePos = Nothing,
+    ballPos = Nothing,
     score = 0
     }
-
-updateGame :: Game -> OutputInstruction -> Game
-updateGame g (Paint p Paddle) =
-    g { screen = Map.insert p Paddle (screen g), paddlePos = Just p }
-updateGame g (Paint p l) = g { screen = Map.insert p l (screen g) }
-updateGame g (Score v) = g { score = v }
-
--- A joystick move whenever the ball moves, making the paddle track the ball.
--- We know that a joystick position is required each time the ball is
--- drawn, but in a stream model we don't know when they will be demanded.
--- In particular, when the ball is first drawn, we don't know where the
--- paddle is yet, and we don't know when the joystick position is required.
--- Fortunately there's enough slack in the setup to not move at first.
-joystick :: Game -> OutputInstruction -> Maybe Int
-joystick g (Paint (Point2 bx _) Ball) =
-    Just $ case paddlePos g of
-        Just (Point2 px _) -> signum (bx - px)
-        Nothing -> 0
-joystick _ _ = Nothing
-
-finalScore :: Memory -> Int
-finalScore mem = score last_g
-  where
-    (last_g, mb_moves) = mapAccumL step initGame outputs
-    outputs = runArcade mem (catMaybes mb_moves)
-    step g instr = (updateGame g instr, joystick g instr)
-
--- output of the arcade game, given joystick moves as input
-runArcade :: Memory -> [Int] -> [OutputInstruction]
-runArcade mem moves = decode (intFunction (deposit mem) moves)
 
 deposit :: Memory -> Memory
 deposit = setMemory 0 2
 
-solve2 :: Input -> Int
-solve2 = finalScore
+updateGame :: Point2 -> Tile -> Game -> Game
+updateGame p Paddle g =
+    g { screen = Map.insert p Paddle (screen g), paddlePos = Just p }
+updateGame p Ball g =
+    g { screen = Map.insert p Ball (screen g), ballPos = Just p }
+updateGame p l g = g { screen = Map.insert p l (screen g) }
 
--- full history, for tracing
-gameHistory :: Memory -> [Game]
-gameHistory mem = fmap fst gms
-  where
-    gms = snd $ mapAccumL step initGame outputs
-    outputs = runArcade mem (catMaybes (fmap snd gms))
-    step g instr = (g', (g', joystick g instr))
+-- joystick values: -1 tilt left, 0 neutral, 1 tilt right
+-- chosen to move the paddle toward the ball
+joystick :: Game -> Int
+joystick g = fromMaybe 0 $ do
+    Point2 px _ <- paddlePos g
+    Point2 bx _ <- ballPos g
+    return (signum (bx - px))
+
+step :: Game -> Maybe Game
+step g = case machine g of
+    ReadValue k -> Just (g { machine = k (toValue (joystick g)) })
+    WriteValue x (WriteValue y (WriteValue v a))
+      | x == -1 -> Just (g' { score = fromValue v })
+      | otherwise -> Just (updateGame p (fromValue v) g')
       where
-        g' = updateGame g instr
+        g' = g { machine = a }
+        p = Point2 (fromValue x) (fromValue y)
+    Finish _ -> Nothing
+    _ -> error "unbalanced instructions"
+
+solve2 :: Input -> Int
+solve2 mem = score $ whileJust step $ initGame mem
 
 main :: IO ()
 main = do
