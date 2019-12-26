@@ -1,4 +1,4 @@
--- toy computer for Days 2, 5, 7, 9, 11, ...
+-- toy computer for Days 2, 5, 7, 9, and all odd-numbered days thereafter
 module Intcode(
     Memory, readMemory, setMemory, getMemory, contents,
     Address, Value, toValue, fromValue,
