@@ -7,7 +7,7 @@ module Intcode(
     -- debugging
     trace, showSummaryTrace, showState,
     -- interactive interface
-    Automaton(..), automaton,
+    Automaton(..), automaton, runPartial,
     ListPlus(..), initLP, lastLP
     ) where
 
@@ -164,6 +164,9 @@ lastLP :: ListPlus a b -> b
 lastLP (End y) = y
 lastLP (Cons _ rest) = lastLP rest
 
+splitLP :: ListPlus a b -> ([a], b)
+splitLP lp = (initLP lp, lastLP lp)
+
 automaton :: Memory -> Automaton
 automaton = runState . initState
 
@@ -309,3 +312,11 @@ runAutomaton (ReadValue k) (v:vs) = runAutomaton (k v) vs
 runAutomaton (ReadValue _) [] = error "no input left"
 runAutomaton (WriteValue r a) vs = Cons r (runAutomaton a vs)
 runAutomaton (Finish s) _ = End s
+
+-- run until input exhausted
+runPartial :: Automaton -> [Value] -> ([Value], Automaton)
+runPartial a input = splitLP (part_run a input)
+  where
+    part_run (ReadValue k) (v:vs) = part_run (k v) vs
+    part_run (WriteValue r a') vs = Cons r (part_run a' vs)
+    part_run a' _ = End a'
