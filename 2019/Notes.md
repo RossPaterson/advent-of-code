@@ -9,10 +9,16 @@ The most enjoyable puzzles so far have been days 3, 6, 7, 10 and 22.
 Some common AoC themes:
 
 * assembly code: developed on days 2, 5, 7, 9, with black box programs
-  for it supplied as input on days 11, 13, 15, 17, 19, 21, 23, ...
+  for it supplied as input on each odd-numbered day thereafter.
 * path finding: days 15, 18 and 20.
 
 I have added difficulty ratings based on how long each puzzle took.
+
+The puzzles started to get harder from day 13, but didn't have the sustained
+demands of the last half of 2018, and I managed to solve all of them
+without help.  The major twist this year was the extensive use of the
+Intcode computer, which saved on parsing, but often limited our access
+to the real input.
 
 ## [Day 1: The Tyranny of the Rocket Equation](https://adventofcode.com/2019/day/1) \*
 
@@ -295,3 +301,11 @@ wasn't necessary.  In the second, I had a correct implementation but
 didn't realize it for quite a while because the example omits empty
 grids at both ends.
 
+## [Day 25: Cryostasis](https://adventofcode.com/2019/day/25) \*\*\*
+
+In a cute twist, we are given an Intcode computer running a simple relative
+of the [Colossal Cave Adventure](https://en.wikipedia.org/wiki/Colossal_Cave_Adventure) (aka ADVENT).
+The simplest approach is to explore the game by hand and write an
+exhaustive search for the blind knapsack problem at the end.
+The shape of the maze and the names of the portable items vary between
+different users' inputs, though.
