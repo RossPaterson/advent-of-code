@@ -1,5 +1,6 @@
 module Main where
 
+import Numbers
 import Parser
 import Control.Applicative
 import Data.List
@@ -42,8 +43,9 @@ chineseRemainder = foldr1 match . sortBy (comparing cycle_size)
   where
     -- Mod k (p*n) such that k == i (mod p) and k == j (mod n)
     -- assumes gcd p n == 1
-    match (Mod i p) (Mod j n) =
-        Mod (head [m | k <- [0..p-1], let m = j + k*n, m `mod` p == i]) (p*n)
+    match (Mod i p) (Mod j n) = Mod ((i*y*n + j*x*p) `mod` (p*n)) (p*n)
+      where
+        (x, y) = bezout p n -- x*p + y*n = 1
 
 solve1 :: Input -> Integer
 solve1 = remainder . chineseRemainder . map positionToMod
