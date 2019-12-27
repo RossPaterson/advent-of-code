@@ -2,6 +2,7 @@
 module Main where
 
 import Utilities
+import Graph
 import Geometry
 import Intcode
 import Data.Map (Map)

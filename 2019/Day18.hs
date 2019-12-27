@@ -1,6 +1,7 @@
 module Main where
 
 import Geometry
+import Graph
 import Utilities
 import Data.Bits
 import Data.Char

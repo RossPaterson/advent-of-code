@@ -1,7 +1,8 @@
 module Main where
 
-import Parser
 import Utilities
+import Graph
+import Parser
 import Control.Applicative
 import Data.List
 import Data.Map (Map, (!))

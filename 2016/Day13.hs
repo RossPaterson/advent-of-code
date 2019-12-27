@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Graph
 import Data.Bits
 
 type Point = (Int, Int)

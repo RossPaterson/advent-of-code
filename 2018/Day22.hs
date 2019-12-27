@@ -2,6 +2,7 @@ module Main where
 
 import Parser
 import Utilities
+import Graph
 import Data.Array
 
 -- Input processing
