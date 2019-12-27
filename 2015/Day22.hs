@@ -35,9 +35,9 @@ success s = boss_hit_points s <= 0
 -- initial states
 
 startState :: HitPoints -> Mana -> HitPoints -> HitPoints -> State
-startState player_hp mana boss_hp boss_damage = State {
+startState player_hp mana boss_hp boss_dmg = State {
     boss_hit_points = boss_hp,
-    boss_damage = boss_damage,
+    boss_damage = boss_dmg,
     player_hit_points = player_hp,
     player_armor = 0,
     mana_points = mana,

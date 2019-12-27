@@ -1,5 +1,6 @@
 module Main where
 
+import Utilities
 import Data.Char
 
 type Row = [Bool]
@@ -18,27 +19,26 @@ nextRow r = zipWith (/=) (tail r ++ [False]) (False:r)
 numSafe :: [Row] -> Int
 numSafe = sum . map (length . filter not)
 
-test :: String -> Int -> IO ()
-test s n = do
-    putStrLn $ unlines $ map showRow rows
-    putStrLn $ "There are " ++ show (numSafe rows) ++ " safe tiles"
-  where
-    rows = take n $ iterate nextRow $ parse s
+tests1 :: [((Int, String), Int)]
+tests1 = [
+    ((3, "..^^."), 6),
+    ((10, ".^^.^.^^^^"), 38)]
 
-test1 = test "..^^." 3
-test2 = test ".^^.^.^^^^" 10
+safeCount :: Int -> Input -> Int
+safeCount n = numSafe . take n . iterate nextRow
 
 solve1 :: Input -> Int
-solve1 = numSafe . take 40 . iterate nextRow
+solve1 = safeCount 40
 
 -- Part Two --
 
 solve2 :: Input -> Int
-solve2 = numSafe . take 400000 . iterate nextRow
+solve2 = safeCount 400000
 
 main :: IO ()
 main = do
     s <- readFile "input/18.txt"
     let input = parse s
+    putStr (unlines (failures "safeCount" (uncurry safeCount . fmap parse) tests1))
     print (solve1 input)
     print (solve2 input)

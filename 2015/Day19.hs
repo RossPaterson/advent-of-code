@@ -35,7 +35,9 @@ replacements (Input rules es) = fastNub $
 solve1 :: Input -> Int
 solve1 = length . replacements
 
-test = "H => HO\n\
+test :: String
+test =
+    "H => HO\n\
     \H => OH\n\
     \O => HH\n\
     \\n\

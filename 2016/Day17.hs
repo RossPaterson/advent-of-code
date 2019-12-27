@@ -1,7 +1,6 @@
 module Main where
 
 import Utilities
-import Graph
 import Control.Monad
 import Data.Functor
 import Data.Maybe
@@ -46,8 +45,8 @@ moves passcode (State pos path) =
     [State pos' (path ++ [d]) |
         d <- open passcode path, pos' <- maybeToList (move d pos)]
 
-solve :: String -> String
-solve passcode =
+solve1 :: String -> String
+solve1 passcode =
     showPath $ history $ head $ filter finished $
         concat $ simple_bfs (moves passcode) [start]
 
@@ -56,11 +55,11 @@ solve passcode =
 simple_bfs :: (a -> [a]) -> [a] -> [[a]]
 simple_bfs f = takeWhile (not . null) . iterate (concatMap f)
 
-test1 = solve "ihgpwlah"
-test2 = solve "kglvqrro"
-test3 = solve "ulqzkmiv"
-
-input = "qljzarfv"
+tests1 :: [(String, String)]
+tests1 = [
+    ("ihgpwlah", "DDRRRD"),
+    ("kglvqrro", "DDUDRLRRUDRD"),
+    ("ulqzkmiv", "DRURDRUDDLLDLUURRDULRLDUUDDDRR")]
 
 -- Part Two
 
@@ -74,11 +73,18 @@ solve2 passcode =
     length $ history $ last $ filter finished $
         concat $ simple_bfs (moves2 passcode) [start]
 
-test4 = solve2 "ihgpwlah"
-test5 = solve2 "kglvqrro"
-test6 = solve2 "ulqzkmiv"
+tests2 :: [(String, Int)]
+tests2 = [
+    ("ihgpwlah", 370),
+    ("kglvqrro", 492),
+    ("ulqzkmiv", 830)]
+
+input :: String
+input = "qljzarfv"
 
 main :: IO ()
 main = do
-    putStrLn (solve input)
+    putStr (unlines (failures "solve1" solve1 tests1))
+    putStrLn (solve1 input)
+    putStr (unlines (failures "solve2" solve2 tests2))
     print (solve2 input)

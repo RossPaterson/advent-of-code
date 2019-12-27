@@ -59,6 +59,17 @@ solve1 m = minimum (map cost (permutations other_ns))
     other_ns = filter (/= startNode) (nodes m)
     g = mkGraph m
 
+testInput :: String
+testInput =
+    "###########\n\
+    \#0.1.....2#\n\
+    \#.#######.#\n\
+    \#4.......3#\n\
+    \###########\n"
+
+tests1 :: [(String, Int)]
+tests1 = [(testInput, 14)]
+
 -- Part Two --
 
 solve2 :: Input -> Int
@@ -72,5 +83,6 @@ main :: IO ()
 main = do
     s <- readFile "input/24.txt"
     let input = parse s
+    putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)
     print (solve2 input)

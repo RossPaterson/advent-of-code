@@ -1,5 +1,6 @@
 module Main where
 
+import Utilities
 import Parser
 import Control.Applicative
 import Data.List
@@ -89,12 +90,28 @@ move x y s = front' ++ [cx] ++ back'
     (front, cx:back) = splitAt x s
     (front', back') = splitAt y (front++back)
 
+text :: String
 text = "abcdefgh"
 
-solve1 :: Input -> String
-solve1 = foldl apply text
+scramble :: String -> Input -> String
+scramble = foldl apply
 
-test = "swap position 4 with position 0\nswap letter d with letter b\nreverse positions 0 through 4\nrotate left 1 step\nmove position 1 to position 4\nmove position 3 to position 0\nrotate based on position of letter b\nrotate based on position of letter d\n"
+solve1 :: Input -> String
+solve1 = scramble text
+
+testInput :: String
+testInput =
+    "swap position 4 with position 0\n\
+    \swap letter d with letter b\n\
+    \reverse positions 0 through 4\n\
+    \rotate left 1 step\n\
+    \move position 1 to position 4\n\
+    \move position 3 to position 0\n\
+    \rotate based on position of letter b\n\
+    \rotate based on position of letter d\n"
+
+tests1 :: [((String, String), String)]
+tests1 = [(("abcde", testInput), "decab")]
 
 -- Part Two --
 
@@ -118,6 +135,7 @@ findRotation :: (String -> String) -> String -> String
 findRotation f s =
    head [s' | i <- [0..length s-1], let s' = rotateLeft i s, f s' == s]
 
+text2 :: String
 text2 = "fbgdceah"
 
 solve2 :: Input -> String
@@ -127,5 +145,6 @@ main :: IO ()
 main = do
     s <- readFile "input/21.txt"
     let input = parse s
+    putStr (unlines (failures "scramble" (uncurry scramble . fmap parse) tests1))
     putStrLn (solve1 input)
     putStrLn (solve2 input)

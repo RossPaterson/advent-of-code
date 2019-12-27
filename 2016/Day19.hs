@@ -1,5 +1,6 @@
 module Main where
 
+import Utilities
 import Data.Sequence (Seq, ViewL(..), ViewR(..), (|>), (><))
 import qualified Data.Sequence as Seq
 
@@ -19,6 +20,9 @@ play elves = case Seq.viewl elves of
 solve1 :: Int -> Int
 solve1 = play . initState
 
+tests1 :: [(Int, Int)]
+tests1 = [(5, 3)]
+
 -- Part Two --
 
 play2 :: State -> Int
@@ -34,10 +38,15 @@ play2 elves = case Seq.viewl elves of
 solve2 :: Int -> Int
 solve2 = play2 . initState
 
+tests2 :: [(Int, Int)]
+tests2 = [(5, 2)]
+
 input :: Int
 input = 3017957
 
 main :: IO ()
 main = do
+    putStr (unlines (failures "solve1" solve1 tests1))
     print (solve1 input)
+    putStr (unlines (failures "solve2" solve2 tests2))
     print (solve2 input)

@@ -36,7 +36,7 @@ parse = map (runParser instruction) . lines
         LSHIFT <$> value <* string " LSHIFT " <*> nat <|>
         RSHIFT <$> value <* string " RSHIFT " <*> nat <|>
         NOT <$ string "NOT " <*> value
-    value = (Literal . fromIntegral) <$> nat <|> Wire <$> wire
+    value = Literal <$> nat <|> Wire <$> wire
     wire = some (satisfy isLower)
 
 evalCircuit :: Input -> Map Wire Word16 -> Map Wire Word16
@@ -60,6 +60,7 @@ solve1 instrs = values!"a"
   where -- memoize the value map
     values = evalCircuit instrs values
 
+test :: String
 test =
     "123 -> x\n\
     \456 -> y\n\

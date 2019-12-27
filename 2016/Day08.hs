@@ -1,5 +1,6 @@
 module Main where
 
+import Utilities
 import Parser
 import Control.Applicative
 import Data.List
@@ -10,7 +11,7 @@ data Screen = Screen [[Bool]]
 showScreen :: Screen -> String
 showScreen (Screen bits) = unlines (map (map showBit) bits)
   where
-    showBit False = '-'
+    showBit False = '.'
     showBit True = '#'
 
 data Operation
@@ -55,14 +56,22 @@ updatePrefix :: Int -> (a -> a) -> [a] -> [a]
 updatePrefix n f xs = map f (take n xs) ++ drop n xs
 
 rotate :: Int -> [a] -> [a]
-rotate n [] = []
+rotate _ [] = []
 rotate n xs = drop k xs ++ take k xs
   where k = length xs - n
 
 solve1 :: Input -> Int
 solve1 = numLit . foldl apply blankScreen
 
-test = "rect 3x2\nrotate column x=1 by 1\nrotate row y=0 by 4\nrotate column x=1 by 1\n"
+testInput :: String
+testInput =
+    "rect 3x2\n\
+    \rotate column x=1 by 1\n\
+    \rotate row y=0 by 4\n\
+    \rotate column x=1 by 1\n"
+
+tests1 :: [(String, Int)]
+tests1 = [(testInput, 6)]
 
 -- Part Two --
 
@@ -73,5 +82,6 @@ main :: IO ()
 main = do
     s <- readFile "input/08.txt"
     let input = parse s
+    putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)
     putStr (solve2 input)

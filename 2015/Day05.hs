@@ -11,6 +11,7 @@ nice s =
     or (zipWith (==) s (tail s)) &&
     not (or [bad `isInfixOf` s | bad <- ["ab", "cd", "pq", "xy"]])
 
+tests :: [String]
 tests = [
     "ugknbfddgicrmopn",
     "aaa",
@@ -28,6 +29,7 @@ nice2 s =
     or [take 2 t `isInfixOf` drop 2 t | t <- tails s, length t >= 2] &&
     not (null [c1 | c1:_:c3:_ <- tails s, c1 == c3])
 
+tests2 :: [String]
 tests2 = [
     "qjhvhtzxzqqjkmpb",
     "xxyxx",

@@ -26,7 +26,7 @@ parse = map (runParser statement) . lines
     name = some letter
 
 distance :: Performance -> Time -> Distance
-distance (Performance n speed dur rest) t = speed * flight_time
+distance (Performance _ speed dur rest) t = speed * flight_time
   where
     nsteps = t `div` (dur + rest)
     flight_time = nsteps*dur + min dur (t `mod` (dur + rest))
@@ -40,9 +40,13 @@ race_time = 2503
 solve1 :: Input -> Int
 solve1 = furtherest race_time
 
-test =
+testInput :: String
+testInput =
     "Comet can fly 14 km/s for 10 seconds, but then must rest for 127 seconds.\n\
     \Dancer can fly 16 km/s for 11 seconds, but then must rest for 162 seconds.\n"
+
+tests1 :: [((Int, String), Int)]
+tests1 = [((1000, testInput), 1120)]
 
 -- Part Two --
 
@@ -56,12 +60,20 @@ winners t ps =
 points :: Time -> Input ->  Map Name Int
 points end ps = Map.unionsWith (+) [winners t ps | t <- [1..end]]
 
+score :: Time -> Input -> Int
+score t = maximum . Map.elems . points t
+
 solve2 :: Input -> Int
-solve2 = maximum . Map.elems . points race_time
+solve2 = score race_time
+
+tests2 :: [((Int, String), Int)]
+tests2 = [((1000, testInput), 689)]
 
 main :: IO ()
 main = do
     s <- readFile "input/14.txt"
     let input = parse s
+    putStr (unlines (failures "solve1" (uncurry furtherest . fmap parse) tests1))
     print (solve1 input)
+    putStr (unlines (failures "solve2" (uncurry score . fmap parse) tests2))
     print (solve2 input)

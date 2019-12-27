@@ -26,12 +26,12 @@ parse :: String -> Input
 parse = Map.fromList . zip [0..] . map (runParser instruction) . lines
   where
     instruction =
-        Copy <$ string "cpy " <*> value <* char ' ' <*> value <|>
-        Incr <$ string "inc " <*> value <|>
-        Decr <$ string "dec " <*> value <|>
-        JNZ <$ string "jnz " <*> value <* char ' ' <*> value <|>
-        Toggle <$ string "tgl " <*> value
-    value = Value <$> int <|> Reg <$> reg
+        Copy <$ string "cpy " <*> val <* char ' ' <*> val <|>
+        Incr <$ string "inc " <*> val <|>
+        Decr <$ string "dec " <*> val <|>
+        JNZ <$ string "jnz " <*> val <* char ' ' <*> val <|>
+        Toggle <$ string "tgl " <*> val
+    val = Value <$> int <|> Reg <$> reg
     reg = A <$ char 'a' <|> B <$ char 'b' <|> C <$ char 'c' <|> D <$ char 'd'
 
 toggle :: Instruction -> Instruction
@@ -56,7 +56,7 @@ initState :: Code -> State
 initState code = State 0 (Map.insert A 7 zeroRegisters) code
 
 fetch :: State -> Maybe Instruction
-fetch (State pc regs code) = Map.lookup pc code
+fetch (State pc _regs code) = Map.lookup pc code
 
 execute :: Instruction -> State -> State
 execute (Copy val (Reg r)) (State pc regs code) =
@@ -90,7 +90,8 @@ solve1 code = run (initState code) ! A
 run_code :: Input -> Int -> Registers
 run_code code i = run (State 0 (Map.insert A i zeroRegisters) code)
 
-test =
+testInput :: String
+testInput =
     "cpy 2 a\n\
     \tgl a\n\
     \tgl a\n\
@@ -98,6 +99,9 @@ test =
     \cpy 1 a\n\
     \dec a\n\
     \dec a\n"
+
+tests1 :: [(String, Int)]
+tests1 = [(testInput, 3)]
 
 -- Part Two --
 
@@ -131,11 +135,12 @@ combination n
   | otherwise = product [1..n] + 73*80
 
 solve2 :: Input -> Int
-solve2 code = combination 12
+solve2 _ = combination 12
 
 main :: IO ()
 main = do
     s <- readFile "input/23.txt"
     let input = parse s
+    putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)
     print (solve2 input)

@@ -9,8 +9,10 @@ look_and_say = iterate count
     count s = concat [show (length g) ++ [head g] | g <- group s]
 
 -- A005150 in OEIS
+test :: [String]
 test = take 6 (look_and_say "1")
 
+input :: String
 input = "1321131112"
 
 solve1 :: String -> Int

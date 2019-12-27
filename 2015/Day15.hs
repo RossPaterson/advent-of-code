@@ -1,5 +1,6 @@
 module Main where
 
+import Utilities
 import Parser
 import Control.Applicative
 
@@ -44,9 +45,13 @@ selections :: Int -> [a] -> [[(a, Int)]]
 selections n [] = [[] | n == 0]
 selections n (x:xs) = [(x, m):ys | m <- [1..n], ys <- selections (n-m) xs]
 
-test =
+testInput :: String
+testInput =
     "Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8\n\
     \Cinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3\n"
+
+tests1 :: [(String, Int)]
+tests1 = [(testInput, 62842880)]
 
 solve1 :: Input -> Int
 solve1 = maximum . map score . selections quantity
@@ -56,9 +61,14 @@ solve1 = maximum . map score . selections quantity
 solve2 :: Input -> Int
 solve2 = maximum . map score . filter ((== 500) . total calories) . selections quantity
 
+tests2 :: [(String, Int)]
+tests2 = [(testInput, 57600000)]
+
 main :: IO ()
 main = do
     s <- readFile "input/15.txt"
     let input = parse s
+    putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)
+    putStr (unlines (failures "solve2" (solve2 . parse) tests2))
     print (solve2 input)
