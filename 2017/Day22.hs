@@ -78,8 +78,8 @@ solve1 :: Input -> Int
 solve1 = infections . times 10000 burst1
 
 testInput :: String
-testInput = "\
-    \..#\n\
+testInput =
+    "..#\n\
     \#..\n\
     \...\n"
 

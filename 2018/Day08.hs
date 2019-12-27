@@ -19,6 +19,7 @@ takeTree (nc:nd:xs) = (Tree children vs, rest)
   where
     (children, xs') = takeTrees nc xs
     (vs, rest) = splitAt nd xs'
+takeTree _ = error "list does not describe a tree"
 
 -- Scan n trees from the list
 takeTrees :: Int -> [Int] -> ([Tree], [Int])

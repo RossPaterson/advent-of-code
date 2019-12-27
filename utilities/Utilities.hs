@@ -21,7 +21,6 @@ module Utilities (
     convergeBy,
     times,
     compose,
-    mtimes,
     -- * Searching
     pick,
     choose,
@@ -37,7 +36,6 @@ import Data.List
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
 import Data.Ord
-import Data.Semigroup
 import Data.Set (Set)
 import qualified Data.Set as Set
 
@@ -105,12 +103,6 @@ times n f = compose (replicate n f)
 compose :: [a -> a] -> a -> a
 compose fs x = foldr id x fs
 
--- | @'mtimes' k p = 'mconcat' ('replicate' k) p@, but with O(log k) operations
-mtimes :: Monoid a => Int -> a -> a
-mtimes k p
-  | k == 0 = mempty
-  | otherwise = stimes k p
-
 -- | Ways of picking one element from a list
 pick :: [a] -> [(a, [a])]
 pick xs = [(x, front ++ back) | (front, x:back) <- zip (inits xs) (tails xs)]
@@ -154,7 +146,7 @@ tsort xys = map fst $ sortBy (comparing (Down . snd)) $ Map.assocs depth_map
     depth_map = fmap depth $ Map.unionsWith Set.union $
         [Map.singleton x (Set.singleton y) | (x, y) <- xys] ++
         [Map.singleton y Set.empty | (_, y) <- xys]
-    depth ys 
+    depth ys
       | Set.null ys = 0::Int
       | otherwise = maximum [depth_map!y | y <- Set.toList ys] + 1
 

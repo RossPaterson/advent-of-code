@@ -1,9 +1,8 @@
 module Main where
 
 import Utilities
-import Data.List
 import qualified Data.Map as Map
-import Data.Map (Map, (!))
+import Data.Map ((!))
 
 type Input = [Int]
 
@@ -28,11 +27,12 @@ findRepetition = iter Map.empty 0
     iter s n (x:xs)
       | Map.member x s = (s!x, Map.size s)
       | otherwise = iter (Map.insert x n s) (n+1) xs
+    iter _ _ [] = error "No repeated element"
 
 solve1 :: Input -> Int
 solve1 xs = p2
   where
-    (p1, p2) = findRepetition (iterate redistribute xs)
+    (_, p2) = findRepetition (iterate redistribute xs)
 
 tests1 :: [(String, Int)]
 tests1 = [("0 2 7 0", 5)]

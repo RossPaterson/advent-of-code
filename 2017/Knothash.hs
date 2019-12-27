@@ -41,9 +41,9 @@ step s len = incrSkip $ advance (skipSize s) id $ advance len reverse s
 
 -- apply n rounds of the list of lengths to the initial state
 hashRounds :: Int -> Int -> [Int] -> [Int]
-hashRounds n size lengths = numbers (times n round (initState size))
+hashRounds n size lengths = numbers (times n hash_round (initState size))
   where
-    round s = foldl step s lengths
+    hash_round s = foldl step s lengths
 
 knothash :: String -> [Int]
 knothash s = dense (hashRounds 64 256 lengths)

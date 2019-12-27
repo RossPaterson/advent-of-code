@@ -6,10 +6,9 @@ module RationalList (
     ) where
 
 import Data.Foldable
-import Data.Map (Map, (!))
 import qualified Data.Map as Map
 import Data.Semigroup
-import Data.Sequence (Seq, ViewL(..), ViewR(..), (<|), (|>), (><))
+import Data.Sequence (Seq, (|>))
 import qualified Data.Sequence as Seq
 import Prelude hiding (iterate)
 
@@ -48,12 +47,12 @@ finiteList xs = RationalList (Seq.fromList xs) Seq.empty
 iterate :: Ord a => (a -> a) -> a -> RationalList a
 iterate f = loop Seq.empty Map.empty
   where
-    loop prefix position x = case Map.lookup x position of
+    loop pre position x = case Map.lookup x position of
         Nothing ->
-            loop (prefix |> x) (Map.insert x (Seq.length prefix) position) (f x)
+            loop (pre |> x) (Map.insert x (Seq.length pre) position) (f x)
         Just pos -> RationalList fr re
           where
-            (fr, re) = Seq.splitAt pos prefix
+            (fr, re) = Seq.splitAt pos pre
 
 -- | @'elementAt' i xs@ is the element of @xs@ at position @i@
 -- (counting from zero), or 'Nothing' if @xs@ has fewer than @i@ elements.

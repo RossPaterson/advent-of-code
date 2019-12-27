@@ -1,7 +1,6 @@
 module Main where
 
 import Parser
-import MaxPriorityQueue (PQ)
 import qualified MaxPriorityQueue as PQ
 import Utilities
 import Data.List
@@ -49,16 +48,17 @@ distance (x1, y1, z1) (x2, y2, z2) = abs (x1-x2) + abs (y1-y2) + abs (z1-z2)
 tests1 :: [(String, Int)]
 tests1 = [(testInput1, 7)]
 
-testInput1 = "\
-\pos=<0,0,0>, r=4\n\
-\pos=<1,0,0>, r=1\n\
-\pos=<4,0,0>, r=3\n\
-\pos=<0,2,0>, r=1\n\
-\pos=<0,5,0>, r=3\n\
-\pos=<0,0,3>, r=1\n\
-\pos=<1,1,1>, r=1\n\
-\pos=<1,1,2>, r=1\n\
-\pos=<1,3,1>, r=1\n"
+testInput1 :: String
+testInput1 =
+    "pos=<0,0,0>, r=4\n\
+    \pos=<1,0,0>, r=1\n\
+    \pos=<4,0,0>, r=3\n\
+    \pos=<0,2,0>, r=1\n\
+    \pos=<0,5,0>, r=3\n\
+    \pos=<0,0,3>, r=1\n\
+    \pos=<1,1,1>, r=1\n\
+    \pos=<1,1,2>, r=1\n\
+    \pos=<1,3,1>, r=1\n"
 
 -- Part Two
 
@@ -90,13 +90,13 @@ data Cube = Cube Point Int
 boundingCube :: [Region] -> Cube
 boundingCube ps = Cube (xmin, ymin, zmin) size
   where
-    xmin = minimum [x-r | Octahedron (x, y, z) r <- ps]
-    xmax = maximum [x+r | Octahedron (x, y, z) r <- ps]
-    ymin = minimum [y-r | Octahedron (x, y, z) r <- ps]
-    ymax = maximum [y+r | Octahedron (x, y, z) r <- ps]
-    zmin = minimum [z-r | Octahedron (x, y, z) r <- ps]
-    zmax = maximum [z+r | Octahedron (x, y, z) r <- ps]
-    maxdim = ((xmax - xmin) `max` (ymax - ymin) `max` (xmax - zmin)) + 1
+    xmin = minimum [x-r | Octahedron (x, _, _) r <- ps]
+    xmax = maximum [x+r | Octahedron (x, _, _) r <- ps]
+    ymin = minimum [y-r | Octahedron (_, y, _) r <- ps]
+    ymax = maximum [y+r | Octahedron (_, y, _) r <- ps]
+    zmin = minimum [z-r | Octahedron (_, _, z) r <- ps]
+    zmax = maximum [z+r | Octahedron (_, _, z) r <- ps]
+    maxdim = ((xmax - xmin) `max` (ymax - ymin) `max` (zmax - zmin)) + 1
     -- smallest power of two >= maxdim
     size = head $ dropWhile (< maxdim) $ iterate (*2) 1
 
@@ -137,13 +137,14 @@ intersectCube (Octahedron (cx, cy, cz) r) (Cube (x, y, z) s) =
 tests2 :: [(String, Int)]
 tests2 = [(testInput2, 36)]
 
-testInput2 = "\
-\pos=<10,12,12>, r=2\n\
-\pos=<12,14,12>, r=2\n\
-\pos=<16,12,12>, r=4\n\
-\pos=<14,14,14>, r=6\n\
-\pos=<50,50,50>, r=200\n\
-\pos=<10,10,10>, r=5\n"
+testInput2 :: String
+testInput2 =
+    "pos=<10,12,12>, r=2\n\
+    \pos=<12,14,12>, r=2\n\
+    \pos=<16,12,12>, r=4\n\
+    \pos=<14,14,14>, r=6\n\
+    \pos=<50,50,50>, r=200\n\
+    \pos=<10,10,10>, r=5\n"
 
 main :: IO ()
 main = do

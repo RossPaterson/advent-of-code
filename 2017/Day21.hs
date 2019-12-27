@@ -41,9 +41,9 @@ data CompactGrid = Grid2 Int | Grid3 Int
 
 toCompact :: Grid -> CompactGrid
 toCompact (Grid n bss) = (if n == 2 then Grid2 else Grid3) $
-    foldr (addRow n) 0 (map (foldr addBit 0) bss)
+    foldr addRow 0 (map (foldr addBit 0) bss)
   where
-    addRow n x y = x .|. shift y n
+    addRow x y = x .|. shift y n
     addBit True x = shift x 1 .|. bit 0
     addBit False x = shift x 1
 
@@ -101,7 +101,6 @@ rewrite rs g = head [rhs | Rule nlhs _ rhs <- rs, nlhs == ng]
 onCount :: Grid -> Int
 onCount (Grid _ bss) = sum (map (length . filter id) bss)
 
--- 
 solve :: Int -> [Rule] -> Int
 solve n rs = onCount (times n (step rs) start)
 
@@ -115,8 +114,8 @@ solve1 :: Input -> Int
 solve1 = solve 5
 
 testInput :: String
-testInput = "\
-    \../.# => ##./#../...\n\
+testInput =
+    "../.# => ##./#../...\n\
     \.#./..#/### => #..#/..../..../#..#\n"
 
 tests1 :: [((Int, String), Int)]

@@ -4,9 +4,9 @@ import Parser
 import Permutation
 import Utilities
 import Control.Applicative
-import Data.Array
 import Data.Char
 import Data.Monoid
+import Data.Semigroup
 
 data Move = Spin Int | Exchange Int Int | Partner Int Int
     deriving Show
@@ -60,8 +60,8 @@ type Dance = Wrap (Permutation Int)
 
 danceMove :: Int -> Move -> Dance
 danceMove n (Spin i) = (mempty, spin n i)
-danceMove n (Exchange i j) = (mempty, swap i j)
-danceMove n (Partner i j) = (Dual (swap i j), mempty)
+danceMove _ (Exchange i j) = (mempty, swap i j)
+danceMove _ (Partner i j) = (Dual (swap i j), mempty)
 
 showDance :: Int -> Dance -> String
 showDance n = showPerm n . wrap
@@ -79,12 +79,12 @@ tests1 :: [((Int, Int, [Move]), String)]
 tests1 = [((5, 1, parse testInput), "baedc")]
 
 runTest :: (Int, Int, [Move]) -> String
-runTest (size, rep, ms) = showDance size (mtimes rep (dance size ms))
+runTest (size, rep, ms) = showDance size (stimesMonoid rep (dance size ms))
 
 -- Part Two
 
 solve2 :: Input -> String
-solve2 = showDance 16 . mtimes 1000000000 . dance 16
+solve2 = showDance 16 . stimesMonoid 1000000000 . dance 16
 
 tests2 :: [((Int, Int, [Move]), String)]
 tests2 = [((5, 2, parse testInput), "ceadb")]

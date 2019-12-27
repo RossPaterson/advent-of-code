@@ -4,7 +4,7 @@ import AssemblyCode
 import Numbers
 import Utilities
 import Data.Maybe
-import Data.Map (Map, (!))
+import Data.Map ((!))
 import qualified Data.Map as Map
 
 -- Input processing
@@ -26,15 +26,15 @@ tests1 :: [(String, Int)]
 tests1 = [(testInput, 7)]
 
 testInput :: String
-testInput = "\
-\#ip 0\n\
-\seti 5 0 1\n\
-\seti 6 0 2\n\
-\addi 0 1 0\n\
-\addr 1 2 3\n\
-\setr 1 0 0\n\
-\seti 8 0 4\n\
-\seti 9 0 5\n"
+testInput =
+    "#ip 0\n\
+    \seti 5 0 1\n\
+    \seti 6 0 2\n\
+    \addi 0 1 0\n\
+    \addr 1 2 3\n\
+    \setr 1 0 0\n\
+    \seti 8 0 4\n\
+    \seti 9 0 5\n"
 
 -- Part Two
 
@@ -71,7 +71,7 @@ target :: Int -> Program -> Int
 target v p =
     head [s!b |
         s <- iterate (step p) (Map.insert 0 v (initState numRegisters)),
-        Instruction GTRR a b c <-
+        Instruction GTRR _ b _ <-
             maybeToList (Map.lookup (s!ip p) (instructions p))]
 
 main :: IO ()

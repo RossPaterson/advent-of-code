@@ -2,7 +2,7 @@ module Main where
 
 import Utilities
 import Data.Foldable
-import Data.Sequence (Seq, (<|), (|>), (><))
+import Data.Sequence (Seq, (|>), (><))
 import qualified Data.Sequence as Seq
 
 type Input = Int
@@ -60,4 +60,3 @@ main = do
     print (solve1 input)
     putStr (unlines (failures "solve2" (uncurry valFollowing0) tests2))
     print (solve2 input)
-

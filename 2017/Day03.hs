@@ -24,7 +24,7 @@ coord n = times side rotate (ring, ring - pos - 1)
   where
     -- spiral inside ring r contains (2*r - 1)^2 elements
     ring = floor ((sqrt (fromIntegral (n-1)) + 1)/2)
-    posOnRing = n-1 - (2*ring - 1)^2
+    posOnRing = n-1 - (2*ring - 1)^(2::Int)
 
     -- each of the 4 sides of the ring r has 2*r elements
     (side, pos) = divMod posOnRing (2*ring)

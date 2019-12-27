@@ -1,5 +1,6 @@
 module Main where
 
+import Numbers
 import Parser
 import Utilities
 import Control.Applicative
@@ -69,7 +70,7 @@ step program s
     loc = pc s
 
 isMul :: Instruction -> Bool
-isMul (Mul r x) = True
+isMul (Mul _ _) = True
 isMul _ = False
 
 solve1 :: Input -> Int
@@ -80,12 +81,13 @@ solve1 program = length $ filter (isMul . (program!)) $ init $
 
 -- n has non-trivial factors
 composite :: Int -> Bool
-composite n = or [n `mod` f == 0 | f <- takeWhile ((<= n) . (^2)) [2..]]
+composite n = not (isPrime n)
 
 getValue :: Instruction -> Int
-getValue (Set r (Value x)) = x
-getValue (Sub r (Value x)) = x
-getValue (Mul r (Value x)) = x
+getValue (Set _ (Value x)) = x
+getValue (Sub _ (Value x)) = x
+getValue (Mul _ (Value x)) = x
+getValue instr = error $ "unexpected instruction " ++ show instr
 
 solve2 :: Input -> Int
 solve2 program = length $ filter composite [start, start+incr .. finish]

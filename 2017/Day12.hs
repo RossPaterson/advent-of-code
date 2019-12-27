@@ -5,8 +5,6 @@ import Parser
 import Utilities
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
-import Data.Set (Set)
-import qualified Data.Set as Set
 
 type Node = Int
 -- out-edges from each node
@@ -22,6 +20,7 @@ parse = Map.fromList . map (runParser node) . lines
 solve1 :: Input -> Int
 solve1 g = length (component (g!) 0)
 
+testInput :: String
 testInput =
     "0 <-> 2\n\
     \1 <-> 1\n\

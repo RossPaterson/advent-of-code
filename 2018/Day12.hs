@@ -4,7 +4,6 @@ import Parser
 import qualified RationalList as RL
 import Utilities
 import Control.Applicative
-import Data.Functor
 import Data.List
 import Data.Maybe
 import Data.Monoid
@@ -78,23 +77,24 @@ sublists n v bs =
   where
     len = length bs
 
-testInput = "\
-\initial state: #..#.#..##......###...###\n\
-\\n\
-\...## => #\n\
-\..#.. => #\n\
-\.#... => #\n\
-\.#.#. => #\n\
-\.#.## => #\n\
-\.##.. => #\n\
-\.#### => #\n\
-\#.#.# => #\n\
-\#.### => #\n\
-\##.#. => #\n\
-\##.## => #\n\
-\###.. => #\n\
-\###.# => #\n\
-\####. => #\n"
+testInput :: String
+testInput =
+    "initial state: #..#.#..##......###...###\n\
+    \\n\
+    \...## => #\n\
+    \..#.. => #\n\
+    \.#... => #\n\
+    \.#.#. => #\n\
+    \.#.## => #\n\
+    \.##.. => #\n\
+    \.#### => #\n\
+    \#.#.# => #\n\
+    \#.### => #\n\
+    \##.#. => #\n\
+    \##.## => #\n\
+    \###.. => #\n\
+    \###.# => #\n\
+    \####. => #\n"
 
 tests1 :: [(String, Int)]
 tests1 = [(testInput, 325)]

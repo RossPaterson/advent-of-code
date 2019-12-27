@@ -1,11 +1,9 @@
 module Main where
 
 import Utilities
-import Data.List
 import Data.Maybe
-import Data.Map.Strict (Map, (!))
+import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import RationalList (RationalList)
 import qualified RationalList as Rep
 
 -- Input processing
@@ -22,6 +20,7 @@ parse = map (map acre) . lines
     acre '.' = Open
     acre '|' = Trees
     acre '#' = Lumberyard
+    acre c = error $ "unexpected character '" ++ [c] ++ "'"
 
 showLandscape :: [[Acre]] -> String
 showLandscape = unlines . map (map showAcre)
@@ -56,7 +55,7 @@ rule Lumberyard neighbours
   | Map.findWithDefault 0 Lumberyard neighbours == 0 = Open
 rule Lumberyard neighbours
   | Map.findWithDefault 0 Trees neighbours == 0 = Open
-rule t neighbours = t
+rule t _ = t
 
 type Triple a = (a, a, a)
 
@@ -80,17 +79,18 @@ triplesWith f pad xs = zipWith3 f (pad:xs) xs (tail xs ++ [pad])
 tests1 :: [(String, Int)]
 tests1 = [(testInput, 1147)]
 
-testInput = "\
-\.#.#...|#.\n\
-\.....#|##|\n\
-\.|..|...#.\n\
-\..|#.....#\n\
-\#.#|||#|#|\n\
-\...#.||...\n\
-\.|....|...\n\
-\||...#|.#|\n\
-\|.||||..|.\n\
-\...#.|..|.\n"
+testInput :: String
+testInput =
+    ".#.#...|#.\n\
+    \.....#|##|\n\
+    \.|..|...#.\n\
+    \..|#.....#\n\
+    \#.#|||#|#|\n\
+    \...#.||...\n\
+    \.|....|...\n\
+    \||...#|.#|\n\
+    \|.||||..|.\n\
+    \...#.|..|.\n"
 
 -- Part Two
 

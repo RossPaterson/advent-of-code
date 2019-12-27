@@ -2,8 +2,6 @@ module Main where
 
 import Parser
 import Utilities
-import Data.Map (Map)
-import qualified Data.Map as Map
 
 type Layer = (Int, Int)
 type Wall = [Layer]

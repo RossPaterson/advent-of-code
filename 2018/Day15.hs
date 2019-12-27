@@ -78,7 +78,7 @@ fullRound attackPower cavern units =
 unitTurns ::
     (Unit -> Int) -> Cavern -> Units -> Set Position -> [Position] ->
     Either Units Units
-unitTurns attackPower cavern units _ [] = Right units
+unitTurns _ _ units _ [] = Right units
 unitTurns attackPower cavern units dead (p:ps)
   | Set.member p dead = unitTurns attackPower cavern units dead ps
   | otherwise = case unitTurn attackPower cavern units dead p of
@@ -93,7 +93,7 @@ unitTurns attackPower cavern units dead (p:ps)
 -- on this turn (if any).
 unitTurn :: (Unit -> Int) -> Cavern -> Units -> Set Position -> Position ->
     Maybe (Units, Maybe Position)
-unitTurn attackPower cavern units dead p
+unitTurn attackPower cavern units _ p
   | null targets = Nothing
   | otherwise = Just $ case attackee units p of
         Just ap -> attack ap apower units
@@ -313,7 +313,7 @@ solve2 (cavern, units) =
     n = numElves units
 
 numElves :: Units -> Int
-numElves units = length [u | (u, hp) <- Map.elems units, u == Elf]
+numElves units = length [u | (u, _hp) <- Map.elems units, u == Elf]
 
 adjustAttackPower :: Int -> Unit -> Int
 adjustAttackPower _ Goblin = 3
@@ -324,9 +324,12 @@ tests2 =
     [(example4, 4988), (example6, 31284), (example7, 3478),
      (example8, 6474), (example9, 1140)]
 
+fullTest :: (Cavern, Units) -> String
 fullTest (cavern, units) =
     unlines ["After " ++ show n ++ " rounds:\n" ++ showState cavern s |
         (n, s) <- zip [0..] (iterateWhileRight (fullRound (const 3) cavern) units)]
+
+test :: (Cavern, Units) -> String
 test (cavern, units) = showResult cavern (battle (const 3) cavern units)
 
 main :: IO ()

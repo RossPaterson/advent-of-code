@@ -95,8 +95,8 @@ step :: Machine -> TMState -> TMState
 step mc s = apply (selectPair (cursor (tape s)) (mc!current s)) s
 
 selectPair :: Bool -> (a, a) -> a
-selectPair False (f, t) = f
-selectPair True (f, t) = t
+selectPair False = fst
+selectPair True = snd
 
 apply :: Transition -> TMState -> TMState
 apply (Transition value dir newState) s = TMState {
@@ -108,8 +108,8 @@ solve1 input = checksum $ tape $
     times (stopAfter input) (step (tm input)) (initState (startState input))
 
 testInput :: String
-testInput = "\
-    \Begin in state A.\n\
+testInput =
+    "Begin in state A.\n\
     \Perform a diagnostic checksum after 6 steps.\n\
     \\n\
     \In state A:\n\
