@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Graph
 import Control.Monad
 import Data.Functor
 import Data.Maybe

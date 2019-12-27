@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Graph
 import Geometry
 import Data.Char
 import Data.Maybe

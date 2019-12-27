@@ -1,6 +1,6 @@
 module Main where
 
-import Components
+import Graph
 import Parser
 import Utilities
 import Data.Map (Map, (!))

@@ -1,6 +1,6 @@
 module Main where
 
-import Components
+import Graph
 import Knothash
 import Utilities
 import Data.Bits
