@@ -2,7 +2,6 @@ module Main where
 
 import Intcode
 import Data.List
-import Data.Maybe
 
 -- Input processing
 
@@ -54,21 +53,12 @@ tour = [
 allItems :: [Item]
 allItems = [drop 5 cmd | cmd <- tour, take 5 cmd == "take "]
 
--- Given a game positioned at Security Checkpoint and carrying all the
--- safe items, try to get past the Pressure-Sensitive Floor by dropping
--- the specified items.
-tryDropping :: Automaton -> [Item] -> Maybe String
-tryDropping a items = case quotes output of
-    response:rest
-      | not ("Alert!" `isPrefixOf` response) -> Just (head rest)
-      | otherwise -> Nothing
-    [] -> error "No response"
-  where
-    input = unlines (map ("drop " ++) items ++ ["east"])
-    output = map fromValue $ fst $ runPartial a $ map toValue $ input
-
-dropAll :: [Command]
-dropAll = map ("drop " ++) allItems
+-- Collect all the safe items, move to the Security Checkpoint and try to
+-- get past the Pressure-Sensitive Floor by trying all subsets of items.
+script :: [String]
+script = tour ++ concat
+    [map ("drop " ++) items ++ ["east"] ++ map ("take " ++) items |
+        items <- subsequences allItems]
 
 -- quoted strings in the input
 quotes :: String -> [String]
@@ -78,10 +68,12 @@ quotes s = case dropWhile (/= '"') s of
         (_, []) -> error "Unbalanced quotes"
         (front, _:back) -> front : quotes back
 
+-- Error messages from the PSF start with "Alert!".  Otherwise we have
+-- a success message from the PSF, followed by a message with the password.
 solve1 :: Input -> String
-solve1 mem = head $ mapMaybe (tryDropping checkpoint) $ subsequences allItems
-  where
-    checkpoint = snd $ runPartial (automaton mem) $ map toValue $ unlines tour
+solve1 mem =
+    head $ tail $ dropWhile ("Alert!" `isPrefixOf`) $ quotes $
+        map fromValue . streamFunction mem . map toValue $ unlines $ script
 
 -- there is no Part Two on Day 25
 
