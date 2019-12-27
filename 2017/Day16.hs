@@ -1,7 +1,7 @@
 module Main where
 
 import Parser
-import Permutation
+import SmallPermutation
 import Utilities
 import Control.Applicative
 import Data.Char
@@ -30,12 +30,12 @@ letterToProgram c = ord c - ord 'a'
 
 -- Dances perform permutations of [0..n-1]
 
-showPerm :: Int -> Permutation Int -> String
+showPerm :: Int -> SmallPermutation Int -> String
 showPerm n p = map (programLetter . apply p) [0..n-1]
 
 -- Basic permutation
 
-spin :: Int -> Int -> Permutation Int
+spin :: Int -> Int -> SmallPermutation Int
 spin n i = swapRanges 0 (n-i) n
 
 {-
@@ -56,7 +56,7 @@ type Wrap a = (Dual a, a)
 wrap :: Monoid a => Wrap a -> a
 wrap (Dual pf, pb) = pf <> pb
 
-type Dance = Wrap (Permutation Int)
+type Dance = Wrap (SmallPermutation Int)
 
 danceMove :: Int -> Move -> Dance
 danceMove n (Spin i) = (mempty, spin n i)
