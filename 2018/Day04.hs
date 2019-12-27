@@ -19,7 +19,7 @@ data Timestamp = Timestamp Int Int Int Int Int
   deriving Show
 
 minutes :: Timestamp -> Int
-minutes (Timestamp yr mo dy h m) = m
+minutes (Timestamp _yr _mo _dy _h m) = m
 
 data Event = Start Int | Sleeps | Wakes
   deriving Show
@@ -57,6 +57,7 @@ getShifts ((_, Start n):rs) =
       where
         (naps', rest') = getNaps rs'
     getNaps rs' = ([], rs')
+getShifts _ = error "malformed shift"
 
 -- Part One
 
@@ -91,24 +92,24 @@ asleep :: Nap -> [Int]
 asleep (Nap t1 t2) = [t1..t2-1]
 
 testInput :: String
-testInput = "\
-\[1518-11-01 00:00] Guard #10 begins shift\n\
-\[1518-11-01 00:05] falls asleep\n\
-\[1518-11-01 00:25] wakes up\n\
-\[1518-11-01 00:30] falls asleep\n\
-\[1518-11-01 00:55] wakes up\n\
-\[1518-11-01 23:58] Guard #99 begins shift\n\
-\[1518-11-02 00:40] falls asleep\n\
-\[1518-11-02 00:50] wakes up\n\
-\[1518-11-03 00:05] Guard #10 begins shift\n\
-\[1518-11-03 00:24] falls asleep\n\
-\[1518-11-03 00:29] wakes up\n\
-\[1518-11-04 00:02] Guard #99 begins shift\n\
-\[1518-11-04 00:36] falls asleep\n\
-\[1518-11-04 00:46] wakes up\n\
-\[1518-11-05 00:03] Guard #99 begins shift\n\
-\[1518-11-05 00:45] falls asleep\n\
-\[1518-11-05 00:55] wakes up\n"
+testInput =
+    "[1518-11-01 00:00] Guard #10 begins shift\n\
+    \[1518-11-01 00:05] falls asleep\n\
+    \[1518-11-01 00:25] wakes up\n\
+    \[1518-11-01 00:30] falls asleep\n\
+    \[1518-11-01 00:55] wakes up\n\
+    \[1518-11-01 23:58] Guard #99 begins shift\n\
+    \[1518-11-02 00:40] falls asleep\n\
+    \[1518-11-02 00:50] wakes up\n\
+    \[1518-11-03 00:05] Guard #10 begins shift\n\
+    \[1518-11-03 00:24] falls asleep\n\
+    \[1518-11-03 00:29] wakes up\n\
+    \[1518-11-04 00:02] Guard #99 begins shift\n\
+    \[1518-11-04 00:36] falls asleep\n\
+    \[1518-11-04 00:46] wakes up\n\
+    \[1518-11-05 00:03] Guard #99 begins shift\n\
+    \[1518-11-05 00:45] falls asleep\n\
+    \[1518-11-05 00:55] wakes up\n"
 
 -- In the test input, Guard #10 spent the most time asleep (50 minutes),
 -- was asleep the most times at minute 24 (two times).

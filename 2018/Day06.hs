@@ -5,7 +5,6 @@ import Utilities
 import Data.List
 import Data.Maybe
 import Data.Ord
-import Data.Set (Set)
 import qualified Data.Set as Set
 
 -- Input processing
@@ -75,13 +74,14 @@ closest p cs =
     unique [x] = Just x
     unique _ = Nothing
 
-testInput = "\
-\1, 1\n\
-\1, 6\n\
-\8, 3\n\
-\3, 4\n\
-\5, 5\n\
-\8, 9\n"
+testInput :: String
+testInput =
+    "1, 1\n\
+    \1, 6\n\
+    \8, 3\n\
+    \3, 4\n\
+    \5, 5\n\
+    \8, 9\n"
 
 tests1 :: [(String, Int)]
 tests1 = [(testInput, 17)]

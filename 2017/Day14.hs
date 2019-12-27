@@ -16,11 +16,11 @@ parse :: String -> Input
 parse = mkGrid
 
 mkGrid :: String -> Grid
-mkGrid key = Set.fromList [(r, pos*8 + bit) |
+mkGrid key = Set.fromList [(r, pos*8 + b) |
     r <- [0..127],
     (pos, h) <- zip [0..] (knothash (key ++ "-" ++ show r)),
-    bit <- [0..7],
-    testBit h (7-bit)]
+    b <- [0..7],
+    testBit h (7-b)]
 
 showGrid :: Grid -> String
 showGrid g =

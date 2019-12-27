@@ -63,8 +63,8 @@ solve1 :: Input -> String
 solve1 = filter isAlpha . path
 
 testInput :: String
-testInput = "\
-    \     |          \n\
+testInput =
+    "     |          \n\
     \     |  +--+    \n\
     \     A  |  C    \n\
     \ F---|----E|--+ \n\

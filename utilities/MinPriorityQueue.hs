@@ -10,7 +10,7 @@ instance (Ord p) => Semigroup (PQ p a) where
     (<>) = merge
 
 instance (Ord p) => Monoid (PQ p a) where
-    mempty = Null
+    mempty = empty
 
 -- | Extract the element with the least key
 extract :: Ord p => PQ p a -> Maybe (p, a, PQ p a)

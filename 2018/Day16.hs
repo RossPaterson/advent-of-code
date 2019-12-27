@@ -41,7 +41,7 @@ splitSamples ls = (map unlines (init (takes 4 sample_lines)), code_lines)
 -- Part One
 
 solve1 :: Input -> Int
-solve1 (samples, code) = length [s | s <- samples, length (possibles s) >= 3]
+solve1 (samples, _code) = length [s | s <- samples, length (possibles s) >= 3]
 
 -- Possible opcodes for the instruction in a given sample
 possibles :: Sample -> [OpCode]
@@ -52,11 +52,12 @@ possibles (before, instr, after) = [opcode |
 tests1 :: [(String, [OpCode])]
 tests1 = [(testInput, [ADDI,MULR,SETI])]
 
-testInput = "\
-\Before: [3, 2, 1, 1]\n\
-\9 2 1 2\n\
-\After:  [3, 2, 2, 1]\n\
-\\n"
+testInput :: String
+testInput =
+    "Before: [3, 2, 1, 1]\n\
+    \9 2 1 2\n\
+    \After:  [3, 2, 2, 1]\n\
+    \\n"
 
 -- Part Two
 
@@ -77,7 +78,7 @@ analyse :: [Sample] -> Map Int (Set OpCode)
 analyse samples =
     Map.unionsWith Set.intersection
         [Map.singleton opcode (Set.fromList (possibles s)) |
-         s@(before, Instruction opcode a b c, after) <- samples]
+            s@(_, Instruction opcode _ _ _, _) <- samples]
 
 -- At each stage we have values for which we know the opcode and values
 -- for each of which we have a set of opcodes.
@@ -95,8 +96,8 @@ reduce (done, ambiguous) = (done', ambiguous')
             map swap (singletons (invert ambiguous)))
     done' = Map.union done (Map.fromList unique)
     ambiguous' =
-        compose [fmap (Set.delete opcode) | (i, opcode) <- unique] $
-        foldr Map.delete ambiguous [i | (i, opcode) <- unique]
+        compose [fmap (Set.delete opcode) | (_, opcode) <- unique] $
+        foldr Map.delete ambiguous [i | (i, _) <- unique]
 
 -- mappings to a unique value
 singletons :: (Ord a, Ord b) => Map a (Set b) -> [(a, b)]

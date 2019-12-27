@@ -3,8 +3,6 @@ module Main where
 import Parser
 import Utilities
 import Control.Applicative
-import Data.Functor
-import Data.Semigroup
 import Data.Set (Set)
 import qualified Data.Set as Set
 
@@ -45,7 +43,7 @@ solve clay = (ns+nr, ns)
     w = maxFlow spring clay
     ns = Set.size (standing w)
     nr = Set.size (Set.filter inRange (running w))
-    inRange (x, y) = y >= ymin
+    inRange (_, y) = y >= ymin
 
 -- all the positions reached by water when it reaches a steady state
 maxFlow :: Position -> Input -> Water
@@ -102,7 +100,6 @@ showState start clay w =
   where
     xmin = minimum (map fst positions)
     xmax = maximum (map fst positions)
-    ymin = minimum (map snd positions)
     ymax = maximum (map snd positions)
     positions = spring:Set.toList clay
     showPos p
@@ -118,7 +115,7 @@ flow ymax clay w dw =
     runningWater newrunning <>
     mconcat [layerWater (mkLayer blocked p) | p <- Set.toList spreading]
   where
-    inRange (x, y) = y <= ymax
+    inRange (_, y) = y <= ymax
     -- water runs into empty space below previously new running water
     newrunning =
         Set.filter inRange (Set.map below (running dw))
@@ -162,6 +159,7 @@ mkLayer blocked (x, y) =
       | not (Set.member (x1, y+1) blocked) = End Open x1
       | Set.member (x2, y) blocked = End Closed x1
       | otherwise = mkEnd (x2:xs)
+    mkEnd _ = error "end of infinite list"
 
 -- a layer of standing or running water
 layerWater :: Layer -> Water
@@ -185,15 +183,15 @@ tests1 :: [(String, Int)]
 tests1 = [(testInput, 57)]
 
 testInput :: String
-testInput = "\
-\x=495, y=2..7\n\
-\y=7, x=495..501\n\
-\x=501, y=3..7\n\
-\x=498, y=2..4\n\
-\x=506, y=1..2\n\
-\x=498, y=10..13\n\
-\x=504, y=10..13\n\
-\y=13, x=498..504\n"
+testInput =
+    "x=495, y=2..7\n\
+    \y=7, x=495..501\n\
+    \x=501, y=3..7\n\
+    \x=498, y=2..4\n\
+    \x=506, y=1..2\n\
+    \x=498, y=10..13\n\
+    \x=504, y=10..13\n\
+    \y=13, x=498..504\n"
 
 -- Part Two
 

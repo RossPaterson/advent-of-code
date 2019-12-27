@@ -34,14 +34,14 @@ solve2 = head . nearRepetitions
 -- The cost for n lists of length k is O(nk log n).
 nearRepetitions :: Ord a => [[a]] -> [[a]]
 nearRepetitions xss =
-    [rest | ((p, rest), n) <- frequency (sort (concatMap removals xss)), n > 1]
+    [rest | ((_, rest), n) <- frequency (sort (concatMap removals xss)), n > 1]
 
 -- All the ways of removing one element from a list.
 -- Each pair (p, ys) is a position p and a list ys obtained by removing the
 -- element of xs at position p.
 removals :: [a] -> [(Int, [a])]
 removals xs =
-    [(length front, front++back) | (front, x:back) <- zip (inits xs) (tails xs)]
+    [(length front, front++back) | (front, _:back) <- zip (inits xs) (tails xs)]
 
 -- Another way of finding the shared part of a list that is repeated
 -- except for the value at one position.

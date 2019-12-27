@@ -18,10 +18,10 @@ data Dependency a = Before a a
 parse :: String -> Input
 parse = prerequisites . map (runParser dependency) . lines
   where
-    dependency = Before <$ string "Step " <*> letter <*
-        string " must be finished before step " <*> letter <*
+    dependency = Before <$ string "Step " <*> capital <*
+        string " must be finished before step " <*> capital <*
         string " can begin."
-    letter = satisfy isUpper
+    capital = satisfy isUpper
 
 -- set of prerequisites for each task
 type Prerequisites a = Map a (Set a)
@@ -30,7 +30,7 @@ prerequisites :: Ord a => [Dependency a] -> Prerequisites a
 prerequisites ds = Map.unionsWith Set.union
     ([Map.singleton after (Set.singleton before) | Before before after <- ds]
     ++
-    [Map.singleton before Set.empty | Before before after <- ds])
+    [Map.singleton before Set.empty | Before before _after <- ds])
 
 -- Part One
 
@@ -48,14 +48,14 @@ runnable :: Ord a => Prerequisites a -> Set a -> [a]
 runnable ds ts = [t | t <- Set.toList ts, Set.disjoint (ds!t) ts]
 
 testInput :: String
-testInput = "\
-\Step C must be finished before step A can begin.\n\
-\Step C must be finished before step F can begin.\n\
-\Step A must be finished before step B can begin.\n\
-\Step A must be finished before step D can begin.\n\
-\Step B must be finished before step E can begin.\n\
-\Step D must be finished before step E can begin.\n\
-\Step F must be finished before step E can begin.\n"
+testInput =
+    "Step C must be finished before step A can begin.\n\
+    \Step C must be finished before step F can begin.\n\
+    \Step A must be finished before step B can begin.\n\
+    \Step A must be finished before step D can begin.\n\
+    \Step B must be finished before step E can begin.\n\
+    \Step D must be finished before step E can begin.\n\
+    \Step F must be finished before step E can begin.\n"
 
 tests1 :: [(String, String)]
 tests1 = [(testInput, "CABDFE")]
@@ -96,11 +96,11 @@ start ds = State {
 -- start idle workers on available tasks
 startJobs :: Ord a => (a -> Int) -> Int -> Prerequisites a -> State a -> State a
 startJobs cost nworkers ds s = s {
-    running = [(n, t + cost n) | n <- ready] ++ running s,
+    running = [(n, now + cost n) | n <- ready] ++ running s,
     queue = Set.difference (queue s) (Set.fromList ready)
     }
   where
-    t = clock s
+    now = clock s
     idle = nworkers - length (running s)
     ready = take idle
         [t | t <- Set.toList (queue s), Set.isSubsetOf (ds!t) (completed s)]

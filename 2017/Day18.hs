@@ -64,12 +64,12 @@ advance :: Thread -> Thread
 advance s = s { pc = pc s + 1 }
 
 execute :: Thread -> Instruction -> Thread
-execute s (Snd x) = error "undefined snd instruction"
+execute _ (Snd _) = error "undefined snd instruction"
 execute s (Set r x) = advance (set s r (get s x))
 execute s (Add r x) = advance (set s r (get s (Reg r) + get s x))
 execute s (Mul r x) = advance (set s r (get s (Reg r) * get s x))
 execute s (Mod r x) = advance (set s r (get s (Reg r) `mod` get s x))
-execute s (Rcv r) = error "undefined rcv instruction"
+execute _ (Rcv _) = error "undefined rcv instruction"
 execute s (Jgz x y)
   | get s x > 0 = s { pc = pc s + get s y }
   | otherwise = advance s
@@ -102,8 +102,8 @@ solve1 :: Input -> Int
 solve1 = snd . run1 . code
 
 testInput :: String
-testInput = "\
-    \set a 1\n\
+testInput =
+    "set a 1\n\
     \add a 2\n\
     \mul a a\n\
     \mod a 5\n\
@@ -210,6 +210,7 @@ testInput2 = "\
     \rcv c\n\
     \rcv d\n"
 
+tests2 :: [(String, Int)]
 tests2 = [(testInput2, 3)]
 
 main :: IO ()

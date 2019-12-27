@@ -2,9 +2,6 @@ module Main where
 
 import Knothash
 import Utilities
-import Data.Bits
-import Data.Char
-import Data.List
 import Numeric
 
 type Input = [Int]
@@ -24,7 +21,7 @@ tests1 = [((5, [3, 4, 1, 5]), [3, 4, 2, 1, 0])]
 -- Part Two
 
 solve2 :: String -> String
-solve2 = hex . knothash 
+solve2 = hex . knothash
   where
     hex = concatMap hexDigit
     hexDigit n

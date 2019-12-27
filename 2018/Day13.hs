@@ -120,22 +120,24 @@ curveUp D = L
 curveUp L = D
 curveUp U = R
 
-testStraight = "\
-\|\n\
-\v\n\
-\|\n\
-\|\n\
-\|\n\
-\^\n\
-\|\n"
+testStraight :: String
+testStraight =
+    "|\n\
+    \v\n\
+    \|\n\
+    \|\n\
+    \|\n\
+    \^\n\
+    \|\n"
 
-testInput = "\
-\/->-\\        \n\
-\|   |  /----\\\n\
-\| /-+--+-\\  |\n\
-\| | |  | v  |\n\
-\\\-+-/  \\-+--/\n\
-\  \\------/   \n"
+testInput :: String
+testInput =
+    "/->-\\        \n\
+    \|   |  /----\\\n\
+    \| /-+--+-\\  |\n\
+    \| | |  | v  |\n\
+    \\\-+-/  \\-+--/\n\
+    \  \\------/   \n"
 
 tests1 :: [(String, Position)]
 tests1 = [(testStraight, (0,3)), (testInput, (7,3))]

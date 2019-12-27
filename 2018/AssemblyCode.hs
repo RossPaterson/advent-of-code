@@ -50,8 +50,8 @@ execute s (Instruction BANR a b c) = Map.insert c (s!a .&. s!b) s
 execute s (Instruction BANI a b c) = Map.insert c (s!a .&. b) s
 execute s (Instruction BORR a b c) = Map.insert c (s!a .|. s!b) s
 execute s (Instruction BORI a b c) = Map.insert c (s!a .|. b) s
-execute s (Instruction SETR a b c) = Map.insert c (s!a) s
-execute s (Instruction SETI a b c) = Map.insert c a s
+execute s (Instruction SETR a _ c) = Map.insert c (s!a) s
+execute s (Instruction SETI a _ c) = Map.insert c a s
 execute s (Instruction GTIR a b c) = Map.insert c (fromEnum (a > s!b)) s
 execute s (Instruction GTRI a b c) = Map.insert c (fromEnum (s!a > b)) s
 execute s (Instruction GTRR a b c) = Map.insert c (fromEnum (s!a > s!b)) s
@@ -67,10 +67,10 @@ data Program = Program { ip :: Int, instructions :: Map Int Instruction }
 -- parse a program designating a register as instruction pointer
 parseProgram :: String -> Program
 parseProgram s =
-    Program (runParser ip (head ls))
+    Program (runParser set_ip (head ls))
         (Map.fromList (zip [0..] (map parseInstruction (tail ls))))
   where
-    ip = string "#ip " *> nat
+    set_ip = string "#ip " *> nat
     ls = lines s
 
 -- run code from initial state to completion

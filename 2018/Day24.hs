@@ -4,7 +4,6 @@ import Parser
 import Utilities
 import Control.Applicative
 import Data.Char
-import Data.Functor
 import Data.List
 import Data.Maybe
 import Data.Ord
@@ -49,14 +48,14 @@ parse :: String -> Input
 parse s =
     State {
         immuneSystem =
-            makeArmy (map (runParser group) (tail immune_system_lines)),
+            makeArmy (map (runParser unit_group) (tail immune_system_lines)),
         infection =
-            makeArmy (map (runParser group) (tail infection_lines))
+            makeArmy (map (runParser unit_group) (tail infection_lines))
     }
   where
     ls = lines s
     (immune_system_lines, "":infection_lines) = span (not . null) ls
-    group =
+    unit_group =
         Group <$> nat <* string " units each with " <*> unit_type
     unit_type =
         mkUnitType <$> nat <* string " hit points " <*> properties <*
@@ -64,12 +63,12 @@ parse s =
             attack_type <* string " damage at initiative " <*> nat
     properties = optional $ char '(' *> props <* string ") "
     props =
-        (,) <$> weaknesses <*>
-            (fromMaybe [] <$> optional (string "; " *> immunities)) <|>
-        flip (,) <$> immunities <*>
-            (fromMaybe [] <$> optional (string "; " *> weaknesses))
-    weaknesses = string "weak to " *> sepBy1 attack_type (string ", ")
-    immunities = string "immune to " *> sepBy1 attack_type (string ", ")
+        (,) <$> weak_to <*>
+            (fromMaybe [] <$> optional (string "; " *> immune_to)) <|>
+        flip (,) <$> immune_to <*>
+            (fromMaybe [] <$> optional (string "; " *> weak_to))
+    weak_to = string "weak to " *> sepBy1 attack_type (string ", ")
+    immune_to = string "immune to " *> sepBy1 attack_type (string ", ")
     attack_type =
         foldr1 (<|>) [c <$ string (map toLower (show c)) | c <- allValues]
     mkUnitType hp Nothing = UnitType hp [] []
@@ -135,7 +134,7 @@ armyTargets attackers defenders =
   where
     attacker_nos = Map.keys attackers
     defender_nos = Map.keys defenders
-    sel [] ds = []
+    sel [] _ = []
     sel (a:as) ds = case mb_target of
         Nothing -> sel as rest
         Just target -> (a, target):sel as rest
@@ -212,14 +211,14 @@ tests1 :: [(String, Int)]
 tests1 = [(testInput, 5216)]
 
 testInput :: String
-testInput = "\
-\Immune System:\n\
-\17 units each with 5390 hit points (weak to radiation, bludgeoning) with an attack that does 4507 fire damage at initiative 2\n\
-\989 units each with 1274 hit points (immune to fire; weak to bludgeoning, slashing) with an attack that does 25 slashing damage at initiative 3\n\
-\\n\
-\Infection:\n\
-\801 units each with 4706 hit points (weak to radiation) with an attack that does 116 bludgeoning damage at initiative 1\n\
-\4485 units each with 2961 hit points (immune to radiation; weak to fire, cold) with an attack that does 12 slashing damage at initiative 4\n"
+testInput =
+    "Immune System:\n\
+    \17 units each with 5390 hit points (weak to radiation, bludgeoning) with an attack that does 4507 fire damage at initiative 2\n\
+    \989 units each with 1274 hit points (immune to fire; weak to bludgeoning, slashing) with an attack that does 25 slashing damage at initiative 3\n\
+    \\n\
+    \Infection:\n\
+    \801 units each with 4706 hit points (weak to radiation) with an attack that does 116 bludgeoning damage at initiative 1\n\
+    \4485 units each with 2961 hit points (immune to radiation; weak to fire, cold) with an attack that does 12 slashing damage at initiative 4\n"
 
 -- Part Two
 

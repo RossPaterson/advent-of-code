@@ -23,7 +23,7 @@ parse = runParser tree . head . lines
 sumDepth :: Tree -> Int
 sumDepth = sd 1
   where
-    sd n (Garbage _) = 0
+    sd _ (Garbage _) = 0
     sd n (Group ts) = n + sum [sd (n+1) t | t <- ts]
 
 solve1 :: Input -> Int

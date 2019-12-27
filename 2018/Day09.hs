@@ -2,7 +2,7 @@ module Main where
 
 import Parser
 import Utilities
-import Data.Map (Map, (!))
+import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Sequence (Seq, ViewL(..), ViewR(..), (<|), (|>), (><))
 import qualified Data.Sequence as Seq

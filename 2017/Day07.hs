@@ -34,6 +34,7 @@ root m = case Set.toList (Set.difference (Map.keysSet m) (nonRoot m)) of
 solve1 :: Input -> Name
 solve1 = root
 
+testInput :: String
 testInput =
     "pbga (66)\n\
     \xhth (57)\n\
@@ -65,20 +66,20 @@ mkTower m = mk (root m)
         Just (w, labels) -> Program label w (map mk labels)
 
 weight :: Tower -> Weight
-weight (Program n w ts) = w + sum (map weight ts)
+weight (Program _ w ts) = w + sum (map weight ts)
 
 allsame :: Eq a => [a] -> Bool
 allsame [] = True
 allsame (x:xs) = all (== x) xs
 
 balanced :: Tower -> Bool
-balanced (Program n w ts) = allsame (map weight ts)
+balanced (Program _ _ ts) = allsame (map weight ts)
 
 majority :: Ord a => [a] -> a
 majority xs = head (maximumBy (comparing length) (group (sort xs)))
 
 rebalance :: Tower -> Int
-rebalance (Program n w ts) =
+rebalance (Program _ _ ts) =
     case filter (not . balanced) ts of
         [] -> balanceChildren ts
         [t] -> rebalance t
