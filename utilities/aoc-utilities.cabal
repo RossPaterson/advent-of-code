@@ -22,7 +22,7 @@ library
     MinPriorityQueue
     Numbers
     Parser
-    Permutation
+    SmallPermutation
     RationalList
     SearchTree
     Utilities
