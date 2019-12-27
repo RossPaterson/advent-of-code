@@ -57,16 +57,17 @@ execute (JIO r offset) (State pc regs)
   | otherwise = State (pc+1) regs
  
 run :: Input -> Registers -> Registers
-run code regs0 = regs
+run code initial_regs = final_regs
   where
-    State _ regs = whileJust step (State 0 regs0)
-    step s@(State pc regs) = do
+    State _ final_regs = whileJust step (State 0 initial_regs)
+    step s@(State pc _regs) = do
         instr <- Map.lookup pc code
         return (execute instr s)
 
 solve1 :: Input -> Int
 solve1 code = run code zeroRegisters ! B
 
+test :: String
 test =
     "inc a\n\
     \jio a, +2\n\

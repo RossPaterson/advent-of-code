@@ -1,5 +1,6 @@
 module Main where
 
+import Utilities
 import Data.Char
 
 data Direction = Direction Int Int
@@ -42,6 +43,16 @@ addLine = foldl move
 solve1 :: Input -> String
 solve1 = map code . tail . scanl addLine start
 
+testInput :: String
+testInput =
+    "ULL\n\
+    \RRDDD\n\
+    \LURDL\n\
+    \UUUUD\n"
+
+tests1 :: [(String, String)]
+tests1 = [(testInput, "1985")]
+
 -- Part Two
 
 data Position2 = Position2 Int Int
@@ -69,11 +80,14 @@ addLine2 = foldl move2
 solve2 :: Input -> String
 solve2 = map code2 . tail . scanl addLine2 start2
 
-example = "ULL\nRRDDD\nLURDL\nUUUUD\n"
+tests2 :: [(String, String)]
+tests2 = [(testInput, "5DB3")]
 
 main :: IO ()
 main = do
     s <- readFile "input/02.txt"
     let input = parse s
+    putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     putStrLn (solve1 input)
+    putStr (unlines (failures "solve2" (solve2 . parse) tests2))
     putStrLn (solve2 input)

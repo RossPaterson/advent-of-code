@@ -31,10 +31,9 @@ module Utilities (
     ) where
 
 import Data.List
-import Data.Map (Map, (!))
+import Data.Map ((!))
 import qualified Data.Map as Map
 import Data.Ord
-import Data.Set (Set)
 import qualified Data.Set as Set
 
 -- | All the values of a bounded enumerated type

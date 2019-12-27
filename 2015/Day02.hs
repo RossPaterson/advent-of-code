@@ -1,7 +1,6 @@
 module Main where
 
 import Parser
-import Control.Applicative
 
 data Box = Box Int Int Int
 type Input = [Box]
@@ -17,6 +16,7 @@ wrapping (Box l w h) = 2*l*w + 2*w*h + 2*h*l + minimum [l*w, w*h, h*l]
 solve1 :: Input -> Int
 solve1 = sum . map wrapping
 
+test :: String
 test = "2x3x4\n1x1x10\n"
 
 -- Part Two --

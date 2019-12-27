@@ -5,7 +5,7 @@ import Graph
 import Parser
 import Control.Applicative
 import Data.List
-import Data.Map (Map, (!))
+import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Ord
 
@@ -60,7 +60,7 @@ data State = State { goal :: Position, hole :: Position }
 initState :: Input -> State
 initState df = State { goal = Pos max_x 0, hole = first_hole }
   where
-    max_x = maximum [x | Pos x y <- Map.keys df]
+    max_x = maximum [x | Pos x _ <- Map.keys df]
     first_hole = head [p | (p, Usage _ 0) <- Map.assocs df]
 
 -- ways we can move the hole (may also move the goal into the old hole)
@@ -85,13 +85,14 @@ finished s = goal s == Pos 0 0
 open :: Input -> Position -> Bool
 open df pos = case Map.lookup pos df of
     Nothing -> False
-    Just (Usage s u) -> u < 100
+    Just (Usage _ u) -> u < 100
 
 solve2 :: Input -> Int
 solve2 df =
     length $ takeWhile (not . any finished) $ bfs (moves df) $ [initState df]
 
-test =
+testInput :: String
+testInput =
     "root@ebhq-gridcenter# df -h\n\
     \Filesystem            Size  Used  Avail  Use%\n\
     \/dev/grid/node-x0-y0   10T    8T     2T   80%\n\
@@ -104,9 +105,13 @@ test =
     \/dev/grid/node-x2-y1    9T    8T     1T   88%\n\
     \/dev/grid/node-x2-y2    9T    6T     3T   66%\n"
 
+tests2 :: [(String, Int)]
+tests2 = [(testInput, 7)]
+
 main :: IO ()
 main = do
     s <- readFile "input/22.txt"
     let input = parse s
     print (solve1 input)
+    putStr (unlines (failures "solve2" (solve2 . parse) tests2))
     print (solve2 input)

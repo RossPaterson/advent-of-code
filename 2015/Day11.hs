@@ -27,6 +27,7 @@ straight :: String -> Bool
 straight (c1:c2:c3:_) = ord c2 == ord c1 + 1 && ord c3 == ord c2 + 1
 straight _ = False
 
+input :: String
 input = "cqjxjnds"
 
 solve1 :: String -> String

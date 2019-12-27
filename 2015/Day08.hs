@@ -27,8 +27,8 @@ solve1 lits = sum [length lit - length (unescape lit) | lit <- lits]
 
 -- Part Two --
 
-escape :: String -> String
-escape s = '"' : concatMap escapeChar s ++ "\""
+escapeChars :: String -> String
+escapeChars s = '"' : concatMap escapeChar s ++ "\""
   where
     escapeChar c
       | isSpecial c = ['\\', c]
@@ -38,7 +38,7 @@ escape s = '"' : concatMap escapeChar s ++ "\""
     isSpecial c = c == '\\' || c == '"'
 
 solve2 :: [String] -> Int
-solve2 lits = sum [length (escape lit) - length lit | lit <- lits]
+solve2 lits = sum [length (escapeChars lit) - length lit | lit <- lits]
 
 main :: IO ()
 main = do

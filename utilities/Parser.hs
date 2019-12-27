@@ -20,6 +20,7 @@ module Parser (
     ) where
 
 import Control.Applicative
+import Data.Functor
 import Data.Char
 import Data.List
 
@@ -60,8 +61,8 @@ satisfy p = Parser satisfyP
     satisfyP _ = []
 
 -- | Literal match of a given character.
-char :: Char -> Parser Char
-char c = satisfy (== c)
+char :: Char -> Parser ()
+char c = satisfy (== c) $> ()
 
 -- | Matches a space character.
 space :: Parser Char
@@ -88,11 +89,11 @@ int :: Num a => Parser a
 int = negate <$ char '-' <*> nat <|> nat
 
 -- | Literal match of the given string.
-string :: String -> Parser String
+string :: String -> Parser ()
 string str = Parser matchStr
   where
     matchStr t
-      | str `isPrefixOf` t = [(str, drop (length str) t)]
+      | str `isPrefixOf` t = [((), drop (length str) t)]
       | otherwise = []
 
 -- | Parses the values of an enumerated type by name.

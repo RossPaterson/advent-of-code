@@ -1,5 +1,6 @@
 module Main where
 
+import Utilities
 import Parser
 import Control.Applicative
 import Data.Set hiding (filter, foldl, map)
@@ -35,10 +36,10 @@ data Move = Move Turn Int
 type Input = [Move]
 
 parse :: String -> Input
-parse = runParser moves
+parse = runParser move_cmds
   where
-    moves = move `sepBy1` (char ',' <* many space) <* many space
-    move = Move <$> (char 'L' *> pure L <|> char 'R' *> pure R) <*> nat
+    move_cmds = move_cmd `sepBy1` (char ',' <* many space) <* many space
+    move_cmd = Move <$> (char 'L' *> pure L <|> char 'R' *> pure R) <*> nat
 
 start :: State
 start = State { orientation = north, position = origin }
@@ -55,6 +56,13 @@ moves = position . foldl move start
 solve1 :: Input -> Int
 solve1 = measure . moves
 
+tests1 :: [(String, Int)]
+tests1 = [
+    ("R2, L3", 5),
+    ("R2, R2, R2", 2),
+    ("R5, L5, R5, R3", 12)]
+
+
 -- Part Two
 
 type History = [Direction]
@@ -68,7 +76,7 @@ start2 :: State2
 start2 = State2 { orientation2 = north, position2 = origin, history = [origin] }
 
 move2 :: State2 -> Move -> State2
-move2 (State2 dir pos h) (Move t s) = State2 dir' pos' (walk s dir' pos)
+move2 (State2 dir pos _) (Move t s) = State2 dir' pos' (walk s dir' pos)
   where
     dir' = turn t dir
     pos' = add (scale s dir') pos
@@ -85,14 +93,14 @@ firstRepeated xs = head [x | (seen, x) <- zip (initSets xs) xs, member x seen]
 solve2 :: Input -> Int
 solve2 = measure . firstRepeated . visits
 
-test1 = solve1 (parse "R2, L3")
-test2 = solve1 (parse "R2, R2, R2")
-test3 = solve1 (parse "R5, L5, R5, R3")
-test4 = solve2 (parse "R8, R4, R4, R8")
+tests2 :: [(String, Int)]
+tests2 = [("R8, R4, R4, R8", 4)]
 
 main :: IO ()
 main = do
     s <- readFile "input/01.txt"
     let input = parse s
+    putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)
+    putStr (unlines (failures "solve2" (solve2 . parse) tests2))
     print (solve2 input)

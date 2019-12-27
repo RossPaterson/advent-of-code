@@ -10,6 +10,7 @@ data Item = Item {
     }
   deriving Show
 
+weapon_items :: [Item]
 weapon_items = [
     Item "Dagger"        8     4       0,
     Item "Shortsword"   10     5       0,
@@ -17,6 +18,7 @@ weapon_items = [
     Item "Longsword"    40     7       0,
     Item "Greataxe"     74     8       0]
 
+armor_items :: [Item]
 armor_items = [
     Item "Leather"      13     0       1,
     Item "Chainmail"    31     0       2,
@@ -24,6 +26,7 @@ armor_items = [
     Item "Bandedmail"   75     0       4,
     Item "Platemail"   102     0       5]
 
+ring_items :: [Item]
 ring_items = [
     Item "Damage +1"    25     1       0,
     Item "Damage +2"    50     2       0,

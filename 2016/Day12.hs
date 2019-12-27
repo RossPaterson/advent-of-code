@@ -24,11 +24,11 @@ parse :: String -> Input
 parse = Map.fromList . zip [0..] . map (runParser instruction) . lines
   where
     instruction =
-        Copy <$ string "cpy " <*> value <* char ' ' <*> reg <|>
+        Copy <$ string "cpy " <*> val <* char ' ' <*> reg <|>
         Incr <$ string "inc " <*> reg <|>
         Decr <$ string "dec " <*> reg <|>
-        JNZ <$ string "jnz " <*> value <* char ' ' <*> int
-    value = Value <$> int <|> Reg <$> reg
+        JNZ <$ string "jnz " <*> val <* char ' ' <*> int
+    val = Value <$> int <|> Reg <$> reg
     reg = A <$ char 'a' <|> B <$ char 'b' <|> C <$ char 'c' <|> D <$ char 'd'
 
 type Registers = Map Reg Integer
@@ -37,7 +37,7 @@ data State = State CodeAddr Registers
 
 value :: Value -> Registers -> Integer
 value (Value n) _ = n
-value (Reg r) regs = regs!r
+value (Reg r) rs = rs!r
 
 zeroRegisters :: Registers
 zeroRegisters = Map.fromList [(r, 0) | r <- allValues]
@@ -60,14 +60,24 @@ run :: Input -> State -> Registers
 run code s0 = regs
   where
     State _ regs = whileJust step s0
-    step s@(State pc regs) = do
+    step s@(State pc _) = do
         instr <- Map.lookup pc code
         return (execute instr s)
 
 solve1 :: Input -> Integer
 solve1 code = run code initState ! A
 
-test = "cpy 41 a\ninc a\ninc a\ndec a\njnz a 2\ndec a\n"
+testInput :: String
+testInput =
+    "cpy 41 a\n\
+    \inc a\n\
+    \inc a\n\
+    \dec a\n\
+    \jnz a 2\n\
+    \dec a\n"
+
+tests1 :: [(String, Integer)]
+tests1 = [(testInput, 42)]
 
 -- Part Two --
 
@@ -81,5 +91,6 @@ main :: IO ()
 main = do
     s <- readFile "input/12.txt"
     let input = parse s
+    putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)
     print (solve2 input)

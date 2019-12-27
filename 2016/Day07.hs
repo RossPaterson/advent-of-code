@@ -1,5 +1,6 @@
 module Main where
 
+import Utilities
 import Parser
 import Control.Applicative
 import Data.List
@@ -20,7 +21,7 @@ supernet :: Address -> [String]
 supernet (Address w hws) = w : map snd hws
 
 hypernet :: Address -> [String]
-hypernet (Address w hws) = map fst hws
+hypernet (Address _ hws) = map fst hws
 
 supportsTLS :: Address -> Bool
 supportsTLS addr =
@@ -33,10 +34,15 @@ isABBA :: String -> Bool
 isABBA (c1:c2:c3:c4:_) = c1 == c4 && c2 == c3 && c1 /= c2
 isABBA _ = False
 
-test = ["abba[mnop]qrst", "abcd[bddb]xyyx", "aaaa[qwer]tyui", "ioxxoj[asdfgh]zxcvbn"]
-
 solve1 :: Input -> Int
 solve1 = length . filter supportsTLS
+
+tests1 :: [(String, Bool)]
+tests1 = [
+    ("abba[mnop]qrst", True),
+    ("abcd[bddb]xyyx", False),
+    ("aaaa[qwer]tyui", False),
+    ("ioxxoj[asdfgh]zxcvbn", True)]
 
 -- Part Two --
 
@@ -55,11 +61,18 @@ getBAB _ = Nothing
 solve2 :: Input -> Int
 solve2 = length . filter supportsSSL
 
-test2 = ["aba[bab]xyz", "xyx[xyx]xyx", "aaa[kek]eke", "zazbz[bzb]cdb"]
+tests2 :: [(String, Bool)]
+tests2 = [
+    ("aba[bab]xyz", True),
+    ("xyx[xyx]xyx", False),
+    ("aaa[kek]eke", True),
+    ("zazbz[bzb]cdb", True)]
 
 main :: IO ()
 main = do
     s <- readFile "input/07.txt"
     let input = parse s
+    putStr (unlines (failures "supportsTLS" (supportsTLS . head . parse) tests1))
     print (solve1 input)
+    putStr (unlines (failures "supportsSSL" (supportsSSL . head . parse) tests2))
     print (solve2 input)
