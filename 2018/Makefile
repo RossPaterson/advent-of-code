@@ -11,3 +11,4 @@ clean:
 
 Day%: Day%.hs $(LIBDIR)/*.hs
 	/usr/bin/ghc -Wall --make -O -i$(LIBDIR) Day$*.hs
+	@touch $@

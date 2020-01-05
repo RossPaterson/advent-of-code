@@ -3,7 +3,7 @@ module Main where
 
 import Utilities
 import Graph
-import Geometry
+import Cartesian
 import Intcode
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -23,14 +23,14 @@ data Move = N | S | W | E
 fromMove :: Move -> Value
 fromMove d = toValue d + 1
 
-startPoint :: Point2
-startPoint = zero2
+startPoint :: Position
+startPoint = zero
 
-move :: Point2 -> Move -> Point2
-move (Point2 x y) N = Point2 x (y+1)
-move (Point2 x y) S = Point2 x (y-1)
-move (Point2 x y) W = Point2 (x-1) y
-move (Point2 x y) E = Point2 (x+1) y
+move :: Position -> Move -> Position
+move (Position x y) N = Position x (y-1)
+move (Position x y) S = Position x (y+1)
+move (Position x y) W = Position (x-1) y
+move (Position x y) E = Position (x+1) y
 
 data Response = Blocked | Moved | Found
     deriving (Enum, Show)
@@ -46,8 +46,8 @@ showCell Wall = '#'
 showCell Space = '.'
 
 data Maze = Maze {
-    target :: Maybe Point2,
-    maze_map :: Map Point2 Cell
+    target :: Maybe Position,
+    maze_map :: Map Position Cell
     }
 
 initMaze :: Maze
@@ -58,7 +58,8 @@ initMaze = Maze {
 
 showMaze :: Maze -> String
 showMaze maze = showGrid ' ' $
-    target_map `Map.union` Map.singleton startPoint '0' `Map.union`
+    target_map `Map.union`
+    Map.singleton startPoint '0' `Map.union`
     fmap showCell (maze_map maze)
   where
     target_map = case target maze of
@@ -70,12 +71,12 @@ mapMaze :: Memory -> Maze
 mapMaze mem = searchMaze startPoint (automaton mem) initMaze
 
 -- search from p with a droid positioned at p
-searchMaze :: Point2 -> Automaton -> Maze -> Maze
+searchMaze :: Position -> Automaton -> Maze -> Maze
 searchMaze p droid m =
     foldl (moveTo droid) m [(d, move p d) | d <- allValues]
 
 -- consider droid moves to adjacent points
-moveTo :: Automaton -> Maze -> (Move, Point2) -> Maze
+moveTo :: Automaton -> Maze -> (Move, Position) -> Maze
 moveTo droid maze (d, p)
   | Map.member p m = maze
   | otherwise = case r of
@@ -97,7 +98,7 @@ moveDroid (ReadValue k) d = case k (fromMove d) of
 moveDroid _ _ = error "Droid not accepting input"
 
 -- destinations reachable in one step from p
-neighbours :: Map Point2 Cell -> Point2 -> [Point2]
+neighbours :: Map Position Cell -> Position -> [Position]
 neighbours m p =
     [p' | d <- allValues, let p' = move p d, Map.lookup p' m == Just Space]
 

@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Cartesian
 import Intcode
 import Data.Maybe
 import Data.Map (Map)
@@ -19,15 +20,16 @@ data Move = N | S | W | E
     deriving (Bounded, Enum, Eq, Ord, Show)
 
 fromMove :: Move -> Value
-fromMove m = toValue m + 1
+fromMove d = toValue d + 1
 
-type Point = (Int, Int)
+startPoint :: Position
+startPoint = zero
 
-move :: Point -> Move -> Point
-move (x, y) N = (x, y+1)
-move (x, y) S = (x, y-1)
-move (x, y) W = (x-1, y)
-move (x, y) E = (x+1, y)
+move :: Position -> Move -> Position
+move (Position x y) N = Position x (y-1)
+move (Position x y) S = Position x (y+1)
+move (Position x y) W = Position (x-1) y
+move (Position x y) E = Position (x+1) y
 
 data Response = Blocked | Moved | Found
     deriving (Enum, Show)
@@ -43,32 +45,28 @@ showCell Wall = '#'
 showCell Space = '.'
 
 data Droid = Droid {
-    position :: Point,
-    target :: Maybe Point,
-    maze_map :: Map Point Cell
+    position :: Position,
+    target :: Maybe Position,
+    maze_map :: Map Position Cell
     }
 
 initDroid :: Droid
 initDroid = Droid {
-    position = (0, 0),
+    position = zero,
     target = Nothing,
-    maze_map = Map.singleton (0, 0) Space
+    maze_map = Map.singleton startPoint Space
     }
 
 showDroid :: Droid -> String
-showDroid d =
-    unlines [[showPos (x,y) | x <- [minX..maxX]] | y <- [minY..maxY]]
+showDroid d = showGrid ' ' $
+    target_map `Map.union`
+    Map.singleton (position d) 'D' `Map.union`
+    Map.singleton startPoint '0' `Map.union`
+    fmap showCell (maze_map d)
   where
-    maze = maze_map d
-    showPos p
-      | target d == Just p = '*'
-      | p == position d = 'D'
-      | p == (0,0) = '0'
-      | otherwise = maybe ' ' showCell (Map.lookup p maze)
-    minX = minimum (map fst (Map.keys maze))
-    maxX = maximum (map fst (Map.keys maze))
-    minY = minimum (map snd (Map.keys maze))
-    maxY = maximum (map snd (Map.keys maze))
+    target_map = case target d of
+        Just p -> Map.singleton p '*'
+        Nothing -> Map.empty
 
 -- Minimal paths from a given start node.
 -- Each node reachable from start appears in exactly one list, paired with
@@ -87,12 +85,12 @@ minimalPaths g start = allPaths Map.empty (Map.singleton start [])
             `Map.difference` done'
 
 -- minimal path between to points in the maze
-pathBetween :: Map Point Cell  -> Point -> Point -> [Move]
+pathBetween :: Map Position Cell  -> Position -> Position -> [Move]
 pathBetween m src dest =
     head [path | (p, path) <- concat (minimalPaths (steps m) src), p == dest]
 
 -- moves and destinations the droid can reach in one step from p
-steps :: Map Point Cell -> Point -> [(Move, Point)]
+steps :: Map Position Cell -> Position -> [(Move, Position)]
 steps m p =
     [(d, p') | d <- allValues, let p' = move p d, Map.lookup p' m /= Just Wall]
 
@@ -140,7 +138,7 @@ drive [] = error "No more droids"
 minimal :: Droid -> [Move]
 minimal d = case target d of
     Nothing -> error "No target"
-    Just t -> pathBetween maze (0,0) t
+    Just t -> pathBetween maze zero t
   where
     maze = maze_map d
 

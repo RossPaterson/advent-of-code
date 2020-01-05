@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Cartesian
 import Graph
 import Data.List
 import Data.Maybe
@@ -11,30 +12,27 @@ import qualified Data.Set as Set
 
 type Input = Maze
 
-data Pos = Pos Int Int
-  deriving (Show, Eq, Ord)
 type NodeName = Char
-data Maze = Maze { openPos :: Set Pos, nodeLoc :: Map NodeName Pos }
+data Maze = Maze { openPos :: Set Position, nodeLoc :: Map NodeName Position }
   deriving Show
 
-mkMaze :: [String] -> Maze
-mkMaze ls = Maze {
-    openPos = Set.fromList [Pos x y |
-        (y, l) <- zip [0..] ls, (x, c) <- zip [0..] l, c /= '#'],
-    nodeLoc = Map.fromList [(c, Pos x y) |
-        (y, l) <- zip [0..] ls, (x, c) <- zip [0..] l, c /= '#' && c /= '.']
+parse :: String -> Input
+parse s = Maze {
+    openPos = Set.fromList [p | (p, c) <- pcs, c /= '#'],
+    nodeLoc = Map.fromList [(c, p) | (p, c) <- pcs, c /= '#' && c /= '.']
     }
+  where
+    pcs = readGrid s
 
-neighbours :: Maze -> Pos -> [Pos]
-neighbours m (Pos x y) =
-    [p | p <- [Pos (x-1) y, Pos (x+1) y, Pos x (y-1), Pos x (y+1)],
+-- Part One --
+
+neighbours :: Maze -> Position -> [Position]
+neighbours m (Position x y) =
+    [p | p <- [Position (x-1) y, Position (x+1) y, Position x (y-1), Position x (y+1)],
         Set.member p (openPos m) ]
 
 nodes :: Maze -> [NodeName]
 nodes m = Map.keys (nodeLoc m)
-
-parse :: String -> Input
-parse = mkMaze . lines
 
 -- distances between nodes within the maze
 type Graph = Map (NodeName, NodeName) Int

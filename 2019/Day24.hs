@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import Geometry
+import Cartesian
 import qualified RationalList as RL
 import Data.Bits
 import qualified Data.Map as Map
@@ -16,13 +16,13 @@ type Input = Grid
 newtype Grid = Grid Int
     deriving (Eq, Ord, Show)
 
-pointIndex :: Point2 -> Int
-pointIndex (Point2 x y) = x + 5*y
+pointIndex :: Position -> Int
+pointIndex (Position x y) = x + 5*y
 
-member :: Grid -> Point2 -> Bool
+member :: Grid -> Position -> Bool
 member (Grid g) p = testBit g (pointIndex p)
 
-grid :: [Point2] -> Grid
+grid :: [Position] -> Grid
 grid ps = Grid (foldr (.|.) zeroBits [bit (pointIndex p) | p <- ps])
 
 parse :: String -> Input
@@ -35,18 +35,18 @@ display g = showGrid '.' $
 rating :: Grid -> Int
 rating (Grid g) = g
 
-neighbours :: Point2 -> [Point2]
-neighbours (Point2 x y) =
-    [Point2 (x+1) y, Point2 x (y+1), Point2 (x-1) y, Point2 x (y-1)]
+neighbours :: Position -> [Position]
+neighbours (Position x y) =
+    [Position (x+1) y, Position x (y+1), Position (x-1) y, Position x (y-1)]
 
 -- neighbours within the grid
-localNeighbours :: Point2 -> [Point2]
+localNeighbours :: Position -> [Position]
 localNeighbours p =
-    [Point2 x y | Point2 x y <- neighbours p,
+    [Position x y | Position x y <- neighbours p,
         0 <= x && x < 5 && 0 <= y && y < 5]
 
-allPoints :: [Point2]
-allPoints = [Point2 x y | y <- [0..4], x <- [0..4]]
+allPoints :: [Position]
+allPoints = [Position x y | y <- [0..4], x <- [0..4]]
 
 -- Part One
 
@@ -54,7 +54,7 @@ basicRule :: Bool -> Int -> Bool
 basicRule True count = count == 1
 basicRule False count = count == 1 || count == 2
 
-rule :: Grid -> Point2 -> Bool
+rule :: Grid -> Position -> Bool
 rule g p = basicRule (member g p) count
   where
     count = length $ filter (member g) $ localNeighbours p
@@ -84,18 +84,18 @@ localStep2 above this below =
     grid [p | p <- allPoints, p /= centre,
         basicRule (member this p) (ncount p)]
   where
-    centre = Point2 2 2
+    centre = Position 2 2
     ncount p = length $
         filter (member above) (outerNeighbours p) ++
         filter (member this) (filter (/= centre) $ localNeighbours p) ++
         filter (member below) (innerNeighbours p)
 
 -- neighbours in the outer grid
-outerNeighbours :: Point2 -> [Point2]
-outerNeighbours (Point2 x y) = sides ++ topBottom
+outerNeighbours :: Position -> [Position]
+outerNeighbours (Position x y) = sides ++ topBottom
   where
-    sides = [Point2 x' 2 | x' <- outside x]
-    topBottom = [Point2 2 y' | y' <- outside y]
+    sides = [Position x' 2 | x' <- outside x]
+    topBottom = [Position 2 y' | y' <- outside y]
 
 outside :: Int -> [Int]
 outside n
@@ -104,10 +104,10 @@ outside n
   | otherwise = []
 
 -- neighbours in the inner grid
-innerNeighbours :: Point2 -> [Point2]
-innerNeighbours (Point2 x y)
-  | y == 2 = [Point2 x' y' | x' <- inside x, y' <- [0..4]]
-  | x == 2 = [Point2 x' y' | y' <- inside y, x' <- [0..4]]
+innerNeighbours :: Position -> [Position]
+innerNeighbours (Position x y)
+  | y == 2 = [Position x' y' | x' <- inside x, y' <- [0..4]]
+  | x == 2 = [Position x' y' | y' <- inside y, x' <- [0..4]]
   | otherwise = []
 
 inside :: Int -> [Int]

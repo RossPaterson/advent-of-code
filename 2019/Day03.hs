@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import Geometry
+import Cartesian
 import Parser
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -27,27 +27,27 @@ parse s = (w1, w2)
 -- Part One
 
 -- the points visited by a wire, in order
-wirePoints :: Wire -> [Point2]
-wirePoints = tail . scanl plus2 zero2 . concatMap segmentDeltas
+wirePoints :: Wire -> [Position]
+wirePoints = tail . scanl (.+.) zero . concatMap segmentDeltas
 
 -- unit moves in a segment
-segmentDeltas :: Segment -> [Point2]
+segmentDeltas :: Segment -> [Position]
 segmentDeltas (Segment d n) = replicate n (direction d)
 
-direction :: Direction -> Point2
-direction U = Point2 0 (-1)
-direction D = Point2 0 1
-direction L = Point2 (-1) 0
-direction R = Point2 1 0
+direction :: Direction -> Position
+direction U = Position 0 (-1)
+direction D = Position 0 1
+direction L = Position (-1) 0
+direction R = Position 1 0
 
 -- points visited by both wires
-intersections :: Wire -> Wire -> [Point2]
+intersections :: Wire -> Wire -> [Position]
 intersections w1 w2 = Set.elems $
     Set.intersection (Set.fromList (wirePoints w1))
         (Set.fromList (wirePoints w2))
 
 solve1 :: Input -> Int
-solve1 = minimum . map manhattan2 . uncurry intersections
+solve1 = minimum . map norm . uncurry intersections
 
 testInput1 :: String
 testInput1 = "\
@@ -73,11 +73,11 @@ tests1 = [(testInput1, 6), (testInput2, 159), (testInput3, 135)]
 -- Part Two
 
 -- for each point visited by the wire, time of the first visit
-firstVisits :: Wire -> Map Point2 Int
+firstVisits :: Wire -> Map Position Int
 firstVisits w = Map.fromListWith (const id) (zip (wirePoints w) [1..])
 
 -- for each point visited by both wires, the sum of the times of first visits
-timedVisits :: Wire -> Wire -> Map Point2 Int
+timedVisits :: Wire -> Wire -> Map Position Int
 timedVisits w1 w2 = Map.intersectionWith (+) (firstVisits w1) (firstVisits w2)
 
 solve2 :: Input -> Int

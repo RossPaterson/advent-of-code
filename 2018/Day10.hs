@@ -1,8 +1,9 @@
 module Main where
 
+import Cartesian
 import Parser
 import Control.Applicative
-import qualified Data.Set as Set
+import qualified Data.Map as Map
 
 -- Input processing
 
@@ -10,16 +11,15 @@ type Input = System
 
 -- simple particle system
 type System = [Particle]
-data Particle = Particle { pos :: Vector, vel :: Vector }
+data Particle = Particle { pos :: Position, vel :: Position }
   deriving Show
-type Vector = (Int, Int)
 
 parse :: String -> Input
 parse = map (runParser particle) . lines
   where
     particle = Particle <$ string "position=" <*> point <*
         string " velocity=" <*> point
-    point = (,) <$ char '<' <*> coord <* char ',' <*> coord <* char '>'
+    point = Position <$ char '<' <*> coord <* char ',' <*> coord <* char '>'
     coord = many space *> int
 
 -- Parts One and Two
@@ -33,7 +33,7 @@ solve = concat . map (uncurry display) . candidates
 -- States that might be compact enough to contain a message.
 -- We expect the points to converge into a compact group and then expand
 -- again as each of them keeps moving linearly.
-candidates :: System -> [(Int, [Vector])]
+candidates :: System -> [(Int, [Position])]
 candidates s =
     takeWhile grouped $
     dropWhile (not . grouped)
@@ -42,46 +42,42 @@ candidates s =
     grouped = compact . snd
 
 -- position of particle at time t
-positionAt :: Int -> Particle -> Vector
-positionAt t (Particle (px, py) (vx, vy)) = (px+vx*t, py+vy*t)
+positionAt :: Int -> Particle -> Position
+positionAt t (Particle (Position px py) (Position vx vy)) =
+    Position (px+vx*t) (py+vy*t)
 
 -- is the bounding rectangle small enough to be a message?
-compact :: [Vector] -> Bool
+compact :: [Position] -> Bool
 compact ps = width rect < 80 && height rect <= 12
   where
     rect = boundingRect ps
 
 -- show a numbered state
-display :: Int -> [Vector] -> String
-display n ps = show n ++ ":\n" ++ displayPoints ps ++ "\n"
+display :: Int -> [Position] -> String
+display n ps = displayPoints ps ++ show n ++ "\n"
 
 -- display the filled part of a state as a bitmap
-displayPoints :: [Vector] -> String
-displayPoints ps =
-    unlines [[if Set.member (x, y) pset then '#' else '.' |
-        x <- [xmin..xmax]] | y <- [ymin..ymax]]
-  where
-    Rect (xmin, ymin) (xmax, ymax) = boundingRect ps
-    pset = Set.fromList ps
+displayPoints :: [Position] -> String
+displayPoints ps = showGrid '.' $ Map.fromList [(p, '#') | p <- ps]
 
 -- rectangles, described by a bottom left and top right corner
-data Rect = Rect Vector Vector
+data Rect = Rect Position Position
   deriving Show
 
 width :: Rect -> Int
-width (Rect (xmin, _ymin) (xmax, _ymax)) = xmax - xmin + 1
+width (Rect (Position xmin _ymin) (Position xmax _ymax)) = xmax - xmin + 1
 
 height :: Rect -> Int
-height (Rect (_xmin, ymin) (_xmax, ymax)) = ymax - ymin + 1
+height (Rect (Position _xmin ymin) (Position _xmax ymax)) = ymax - ymin + 1
 
 -- smallest rectangle containing all the points
-boundingRect :: [Vector] -> Rect
-boundingRect ps = Rect (xmin, ymin) (xmax, ymax)
+boundingRect :: [Position] -> Rect
+boundingRect ps = Rect (Position xmin ymin) (Position xmax ymax)
   where
-    xmin = minimum (map fst ps)
-    xmax = maximum (map fst ps)
-    ymin = minimum (map snd ps)
-    ymax = maximum (map snd ps)
+    xmin = minimum [x | Position x _ <- ps]
+    xmax = maximum [x | Position x _ <- ps]
+    ymin = minimum [y | Position _ y <- ps]
+    ymax = maximum [y | Position _ y <- ps]
 
 testInput :: String
 testInput =

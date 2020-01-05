@@ -2,7 +2,7 @@ module Main where
 
 import Utilities
 import Parser
-import Numbers
+import Number
 import Control.Applicative
 import Data.List
 import Data.Ord

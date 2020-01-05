@@ -1,5 +1,6 @@
 module Main where
 
+import Cartesian
 import Graph
 import Knothash
 import Utilities
@@ -7,7 +8,6 @@ import Data.Bits
 import Data.Set (Set)
 import qualified Data.Set as Set
 
-type Position = (Int, Int)
 type Grid = Set Position
 
 type Input = Grid
@@ -16,7 +16,7 @@ parse :: String -> Input
 parse = mkGrid
 
 mkGrid :: String -> Grid
-mkGrid key = Set.fromList [(r, pos*8 + b) |
+mkGrid key = Set.fromList [Position r (pos*8 + b) |
     r <- [0..127],
     (pos, h) <- zip [0..] (knothash (key ++ "-" ++ show r)),
     b <- [0..7],
@@ -24,7 +24,7 @@ mkGrid key = Set.fromList [(r, pos*8 + b) |
 
 showGrid :: Grid -> String
 showGrid g =
-    unlines [[if Set.member (r, c) g then '#' else '.' | c <- [0..127]] |
+    unlines [[if Set.member (Position r c) g then '#' else '.' | c <- [0..127]] |
         r <- [0..127]]
 
 solve1 :: Input -> Int
@@ -42,9 +42,11 @@ tests1 = [(testInput, 8108)]
 -- Part Two
 
 neighbours :: Grid -> Position -> [Position]
-neighbours g (pos@(x,y))
+neighbours g (pos@(Position x y))
   | Set.member pos g =
-    [pos' | pos' <- [(x-1,y), (x,y-1), (x+1,y), (x,y+1)], Set.member pos' g]
+    [pos' |
+        pos' <- [Position (x-1) y, Position x (y-1), Position (x+1) y, Position x (y+1)],
+        Set.member pos' g]
   | otherwise = []
 
 regions :: Grid -> [Set Position]
