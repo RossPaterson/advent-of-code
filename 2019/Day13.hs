@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import Geometry
+import Cartesian
 import Intcode
 import Data.Maybe
 import Data.Map (Map)
@@ -26,7 +26,7 @@ showTile Block = '@'
 showTile Paddle = '-'
 showTile Ball = 'o'
 
-type Screen = Map Point2 Tile
+type Screen = Map Position Tile
 
 showScreen :: Screen -> String
 showScreen = showGrid '.' . fmap showTile
@@ -37,7 +37,7 @@ initScreen = Map.empty
 paint :: [Int] -> Screen
 paint = foldl paintOne initScreen . takes 3
   where
-    paintOne s [x, y, tile] = Map.insert (Point2 x y) (toEnum tile) s
+    paintOne s [x, y, tile] = Map.insert (Position x y) (toEnum tile) s
     paintOne _ _ = error "unbalanced instructions"
 
 -- Intcode program as a function on lists of Ints
@@ -54,8 +54,8 @@ solve1 = length . filter (== Block) . Map.elems . paint . flip intFunction []
 data Game = Game {
     machine :: Automaton,
     screen :: Screen,
-    paddlePos :: Maybe Point2,
-    ballPos :: Maybe Point2,
+    paddlePos :: Maybe Position,
+    ballPos :: Maybe Position,
     score :: Int
     }
 
@@ -74,7 +74,7 @@ initGame mem = Game {
 deposit :: Memory -> Memory
 deposit = setMemory 0 2
 
-updateGame :: Point2 -> Tile -> Game -> Game
+updateGame :: Position -> Tile -> Game -> Game
 updateGame p Paddle g =
     g { screen = Map.insert p Paddle (screen g), paddlePos = Just p }
 updateGame p Ball g =
@@ -85,8 +85,8 @@ updateGame p l g = g { screen = Map.insert p l (screen g) }
 -- chosen to move the paddle toward the ball
 joystick :: Game -> Int
 joystick g = fromMaybe 0 $ do
-    Point2 px _ <- paddlePos g
-    Point2 bx _ <- ballPos g
+    Position px _ <- paddlePos g
+    Position bx _ <- ballPos g
     return (signum (bx - px))
 
 step :: Game -> Maybe Game
@@ -97,7 +97,7 @@ step g = case machine g of
       | otherwise -> Just (updateGame p (fromValue v) g')
       where
         g' = g { machine = a }
-        p = Point2 (fromValue x) (fromValue y)
+        p = Position (fromValue x) (fromValue y)
     Finish _ -> Nothing
     _ -> error "unbalanced instructions"
 

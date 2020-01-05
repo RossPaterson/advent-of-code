@@ -2,7 +2,7 @@ module Main where
 
 import Utilities
 import Graph
-import Geometry
+import Cartesian
 import Data.Char
 import Data.Maybe
 import Data.Map (Map, (!))
@@ -15,14 +15,14 @@ import qualified Data.Set as Set
 type Input = Maze
 
 data Maze = Maze {
-    passages :: Set Point2,
+    passages :: Set Position,
     portals :: [Portal],
-    start :: Point2,
-    finish :: Point2
+    start :: Position,
+    finish :: Position
     }
     deriving Show
 
-data Portal = Portal { name :: String, inner :: Point2, outer :: Point2 }
+data Portal = Portal { name :: String, inner :: Position, outer :: Position }
     deriving (Eq, Ord, Show)
 
 parse :: String -> Input
@@ -36,37 +36,37 @@ parse s = Maze {
     doors = Map.fromListWith (++) [([c1, c2], [p']) |
         (p1, c1) <- Map.toList letters,
         d <- dirs,
-        let p2 = plus2 p1 d,
+        let p2 = p1 .+. d,
         c2 <- maybeToList (Map.lookup p2 letters),
-        p' <- [minus2 p1 d, plus2 p2 d],
+        p' <- [p1 .-. d, p2 .+. d],
         Set.member p' open]
     letters = Map.fromList [(p, c) | (p, c) <- grid, isUpper c]
     open = Set.fromList [p | (p, c) <- grid, c == '.']
     grid = [(p, c) | (p, c) <- readGrid s, c == '.' || isUpper c]
-    dirs = [Point2 1 0, Point2 0 1]
+    dirs = [Position 1 0, Position 0 1]
     portal n p1 p2
       | outside p2 = Portal n p1 p2
       | otherwise = Portal n p2 p1
-    outside (Point2 x y) = x == minX || x == maxX || y == minY || y == maxY
-    minX = minimum [x | Point2 x _ <- Set.toList open]
-    maxX = maximum [x | Point2 x _ <- Set.toList open]
-    minY = minimum [y | Point2 _ y <- Set.toList open]
-    maxY = maximum [y | Point2 _ y <- Set.toList open]
+    outside (Position x y) = x == minX || x == maxX || y == minY || y == maxY
+    minX = minimum [x | Position x _ <- Set.toList open]
+    maxX = maximum [x | Position x _ <- Set.toList open]
+    minY = minimum [y | Position _ y <- Set.toList open]
+    maxY = maximum [y | Position _ y <- Set.toList open]
 
 -- Part One
 
 -- adjacent points regardless of walls
-neighbours :: Point2 -> [Point2]
-neighbours (Point2 x y) =
-    [Point2 (x+1) y, Point2 x (y+1), Point2 (x-1) y, Point2 x (y-1)]
+neighbours :: Position -> [Position]
+neighbours (Position x y) =
+    [Position (x+1) y, Position x (y+1), Position (x-1) y, Position x (y-1)]
 
 -- cached steps from each point
-stepMap :: Maze -> Map Point2 [Point2]
+stepMap :: Maze -> Map Position [Position]
 stepMap maze = Map.fromSet (stepsFrom maze) (passages maze)
 
 -- steps from a point, either moving in a passage or passing through
 -- a portal in either direction
-stepsFrom :: Maze -> Point2 -> [Point2]
+stepsFrom :: Maze -> Position -> [Position]
 stepsFrom maze p =
     [p' | p' <- neighbours p, Set.member p' (passages maze)] ++
     [p2 | Portal _ p1 p2 <- portals maze, p1 == p] ++
@@ -148,13 +148,13 @@ tests1 = [(testInput1, 23), (testInput2, 58)]
 -- Part Two
 
 -- cached steps from each point
-stepMap2 :: Maze -> Map Point2 [(Point2, Int)]
+stepMap2 :: Maze -> Map Position [(Position, Int)]
 stepMap2 maze = Map.fromSet (stepsFrom2 maze) (passages maze)
 
 -- all points and level changes immediately reachable from a point,
 -- either moving in a passage on the same level (0) or going up (-1)
 -- or down (1) through a portal
-stepsFrom2 :: Maze -> Point2 -> [(Point2, Int)]
+stepsFrom2 :: Maze -> Position -> [(Position, Int)]
 stepsFrom2 maze p =
     [(p', 0) | p' <- neighbours p, Set.member p' (passages maze)] ++
     [(p2, 1) | Portal _ p1 p2 <- portals maze, p1 == p] ++

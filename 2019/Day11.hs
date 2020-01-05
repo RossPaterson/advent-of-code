@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import Geometry
+import Cartesian
 import Intcode
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -31,11 +31,11 @@ turn 1 L = U
 turn 1 d = succ d
 turn n _ = error $ "bad turn instruction " ++ show n
 
-move :: Direction -> Point2 -> Point2
-move U (Point2 x y) = Point2 x (y-1)
-move R (Point2 x y) = Point2 (x+1) y
-move D (Point2 x y) = Point2 x (y+1)
-move L (Point2 x y) = Point2 (x-1) y
+move :: Direction -> Position -> Position
+move U (Position x y) = Position x (y-1)
+move R (Position x y) = Position (x+1) y
+move D (Position x y) = Position x (y+1)
+move L (Position x y) = Position (x-1) y
 
 data Paint = Black | White
     deriving (Enum, Show)
@@ -48,15 +48,15 @@ showPaint Black = '.'
 
 data Robot = Robot {
     direction :: Direction,
-    position :: Point2,
-    paint :: Map Point2 Paint
+    position :: Position,
+    paint :: Map Position Paint
     }
     deriving Show
 
 initRobot :: Robot
 initRobot = Robot {
     direction = U,
-    position = zero2,
+    position = zero,
     paint = Map.empty
     }
 
@@ -65,7 +65,7 @@ showRobot r = showGrid ' ' $
     Map.singleton (position r) (showDirection (direction r)) `Map.union`
     fmap showPaint (paint r)
 
-getPaint :: Robot -> Point2 -> Paint
+getPaint :: Robot -> Position -> Paint
 getPaint r p = Map.findWithDefault Black p (paint r)
 
 currPaint :: Robot -> Paint

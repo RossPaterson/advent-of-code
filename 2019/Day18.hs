@@ -1,6 +1,6 @@
 module Main where
 
-import Geometry
+import Cartesian
 import Graph
 import Utilities
 import Data.Bits
@@ -14,18 +14,18 @@ import qualified Data.Set as Set
 
 -- Input processing
 
-type Input = (Maze, Point2)
+type Input = (Maze, Position)
 
-neighbours :: Point2 -> [Point2]
-neighbours (Point2 x y) =
-    [Point2 (x+1) y, Point2 x (y+1), Point2 (x-1) y, Point2 x (y-1)]
+neighbours :: Position -> [Position]
+neighbours (Position x y) =
+    [Position (x+1) y, Position x (y+1), Position (x-1) y, Position x (y-1)]
 
 type Door = Int
 
 data Maze = Maze {
-    passages :: Set Point2,
-    keys :: Map Point2 Door,
-    doors :: Map Point2 Door
+    passages :: Set Position,
+    keys :: Map Position Door,
+    doors :: Map Position Door
     }
     deriving Show
 
@@ -57,18 +57,18 @@ addKey :: Door -> Keyring -> Keyring
 addKey d (Keyring ds) = Keyring (setBit ds d)
 
 data State = State {
-    position :: !Point2,
+    position :: !Position,
     collected :: !Keyring
     }
     deriving (Eq, Ord, Show)
 
-initState :: Point2 -> State
+initState :: Position -> State
 initState p = State p noKeys
 
 showState :: Maze -> State -> String
 showState m (State p coll) = showStateAux m [p] coll
 
-showStateAux :: Maze -> [Point2] -> Keyring -> String
+showStateAux :: Maze -> [Position] -> Keyring -> String
 showStateAux m ps coll = showGrid '#' $
     Map.fromList [(p, '@') | p <- ps] `Map.union`
     fmap key (Map.filter live (keys m)) `Map.union`
@@ -97,7 +97,7 @@ getKey m (State pos coll) =
     [(n, State p (addKey d coll)) | (n, p, d) <- keyDistances m coll pos]
 
 -- shortest distance and position of each key reachable from p
-keyDistances :: Maze -> Keyring -> Point2 -> [(Int, Point2, Door)]
+keyDistances :: Maze -> Keyring -> Position -> [(Int, Position, Door)]
 keyDistances m ds pos =
     [(n, p, d) |
         (n, ps) <- zip [0..] (bfs (steps m ds) [pos]),
@@ -106,11 +106,11 @@ keyDistances m ds pos =
         not (hasKey ds d)]
 
 -- neighbouring points that are not walls or locked doors
-steps :: Maze -> Keyring -> Point2 -> [Point2]
+steps :: Maze -> Keyring -> Position -> [Position]
 steps m coll pos = [p | p <- neighbours pos, isOpen m coll p]
 
 -- a cell is open if it is not a wall or a locked door
-isOpen :: Maze -> Keyring -> Point2 -> Bool
+isOpen :: Maze -> Keyring -> Position -> Bool
 isOpen m ds p =
     Set.member p (passages m) && maybe True (hasKey ds) (Map.lookup p (doors m))
 
@@ -166,7 +166,7 @@ tests1 = [
 
 -- now there are multiple searchers
 data State2 = State2 {
-    positions :: ![Point2],
+    positions :: ![Position],
     collected2 :: !Keyring
     }
     deriving (Eq, Ord, Show)
@@ -181,10 +181,10 @@ splitMaze (m, State p coll) = (m', State2 (corners p) coll)
     m' = m { passages = Set.difference (passages m) new_walls }
     new_walls = Set.fromList (p : neighbours p)
 
-corners :: Point2 -> [Point2]
-corners (Point2 x y) =
-    [Point2 (x-1) (y-1), Point2 (x-1) (y+1),
-     Point2 (x+1) (y-1), Point2 (x+1) (y+1)]
+corners :: Position -> [Position]
+corners (Position x y) =
+    [Position (x-1) (y-1), Position (x-1) (y+1),
+     Position (x+1) (y-1), Position (x+1) (y+1)]
 
 solve2 :: Input -> Int
 solve2 (m0, p) =

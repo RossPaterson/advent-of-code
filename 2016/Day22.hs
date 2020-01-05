@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Cartesian
 import Graph
 import Parser
 import Control.Applicative
@@ -8,9 +9,6 @@ import Data.List
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Ord
-
-data Position = Pos Int Int
-  deriving (Show, Eq, Ord)
 
 data Usage = Usage { size :: Int, used :: Int }
   deriving (Show, Eq, Ord)
@@ -24,9 +22,11 @@ parse :: String -> Input
 parse = Map.fromList . map (runParser df_line) . drop 2 . lines
   where
     df_line = (,) <$> node <*> usage
-    node = Pos <$ string "/dev/grid/node-x" <*> nat <* string "-y" <*> nat
+    node = Position <$ string "/dev/grid/node-x" <*> nat <* string "-y" <*> nat
     usage = Usage <$> num 'T' <*> num 'T' <* num 'T' <* num '%'
     num c = some space *> nat <* char c
+
+-- Part One --
 
 viable_pairs :: Map Position Usage -> [(Position, Position)]
 viable_pairs df =
@@ -58,9 +58,9 @@ data State = State { goal :: Position, hole :: Position }
   deriving (Show, Eq, Ord)
 
 initState :: Input -> State
-initState df = State { goal = Pos max_x 0, hole = first_hole }
+initState df = State { goal = Position max_x 0, hole = first_hole }
   where
-    max_x = maximum [x | Pos x _ <- Map.keys df]
+    max_x = maximum [x | Position x _ <- Map.keys df]
     first_hole = head [p | (p, Usage _ 0) <- Map.assocs df]
 
 -- ways we can move the hole (may also move the goal into the old hole)
@@ -73,13 +73,14 @@ moves df (State g h) =
         not (near h g) || near n g]
 
 near :: Position -> Position -> Bool
-near (Pos x1 y1) (Pos x2 y2) = abs (x1-x2) <= 1 && abs (y1-y2) <= 1
+near (Position x1 y1) (Position x2 y2) = abs (x1-x2) <= 1 && abs (y1-y2) <= 1
 
 neighbours :: Position -> [Position]
-neighbours (Pos x y) = [Pos (x-1) y, Pos (x+1) y, Pos x (y-1), Pos x (y+1)]
+neighbours (Position x y) =
+    [Position (x-1) y, Position (x+1) y, Position x (y-1), Position x (y+1)]
 
 finished :: State -> Bool
-finished s = goal s == Pos 0 0
+finished s = goal s == zero
 
 -- a position we could move the hole to
 open :: Input -> Position -> Bool

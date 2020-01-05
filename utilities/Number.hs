@@ -1,5 +1,5 @@
 -- | Elementary number theory
-module Numbers where
+module Number where
 
 -- | Factorization of the argument:
 --
@@ -22,7 +22,7 @@ primeFactors = factorize primes
 
 -- | Is @n@ prime?
 isPrime :: Int -> Bool
-isPrime n = null [p | p <- takeWhile small primes, n `mod` p == 0]
+isPrime n = and [n `mod` p /= 0 | p <- takeWhile small primes]
   where
     small p = p*p <= n
 

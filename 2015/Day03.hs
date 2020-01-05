@@ -1,25 +1,21 @@
 module Main where
 
+import Cartesian
 import Utilities
 import Data.Char
 import qualified Data.Set as Set
-
-type Pos = (Int, Int)
-
-origin :: Pos
-origin = (0, 0)
 
 parse :: String -> String
 parse = filter (not . isSpace)
 
 solve1 :: String -> Int
-solve1 = Set.size . Set.fromList . scanl move origin
+solve1 = Set.size . Set.fromList . scanl move zero
 
-move :: Pos -> Char -> Pos
-move (x, y) '^' = (x, y-1)
-move (x, y) 'v' = (x, y+1)
-move (x, y) '<' = (x-1, y)
-move (x, y) '>' = (x+1, y)
+move :: Position -> Char -> Position
+move (Position x y) '^' = Position x (y-1)
+move (Position x y) 'v' = Position x (y+1)
+move (Position x y) '<' = Position (x-1) y
+move (Position x y) '>' = Position (x+1) y
 move _ _ = error "bad move"
 
 tests1 :: [(String, Int)]
@@ -42,8 +38,8 @@ solve2 :: String -> Int
 solve2 s = Set.size (Set.fromList santa `Set.union` Set.fromList robo)
   where
     cs = filter (not . isSpace) s
-    santa = scanl move origin (evens cs)
-    robo = scanl move origin (odds cs)
+    santa = scanl move zero (evens cs)
+    robo = scanl move zero (odds cs)
 
 tests2 :: [(String, Int)]
 tests2 = [

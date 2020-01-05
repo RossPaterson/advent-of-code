@@ -193,7 +193,7 @@ On the
 it seems many people got the first part more quickly using a depth-first
 search, but then had to implement a breadth-first search for the
 second part.  While exploring the maze, I only thought of a sequential
-approach, bit other people used multiple instances of the Intcode
+approach, but other people used multiple instances of the Intcode
 machine, restarting it from scratch for each branch or cloning it at
 each branch point.
 
@@ -237,7 +237,7 @@ It seems that in all of the supplied inputs the maze is a tree.
 
 ## [Day 19: Tractor Beam](https://adventofcode.com/2019/day/19) \*\*
 
-This was a novel idea.  The first part was straight forward.  The second
+This was a novel idea.  The first part was straightforward.  The second
 requires us to map out the beam and perform a calculation on that map.
 In the examples, the horizontal width of the beam is monotonic nondecreasing,
 but that doesn't hold for the input.  The main challenge is then not getting

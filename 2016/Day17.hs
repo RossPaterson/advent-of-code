@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Cartesian
 import Control.Monad
 import Data.Functor
 import Data.Maybe
@@ -18,27 +19,24 @@ open passcode path = [d | (d, c) <- zip allValues hash, c >= 'b']
   where
     hash = md5s (Str (passcode ++ showPath path))
 
-data Position = Pos Int Int
-  deriving (Show)
-
 x_max, y_max :: Int
 x_max = 3
 y_max = 3
 
 move :: Direction -> Position -> Maybe Position
-move U (Pos x y) = guard (y > 0) $> Pos x (y-1)
-move D (Pos x y) = guard (y < y_max) $> Pos x (y+1)
-move L (Pos x y) = guard (x > 0) $> Pos (x-1) y
-move R (Pos x y) = guard (x < x_max) $> Pos (x+1) y
+move U (Position x y) = guard (y > 0) $> Position x (y-1)
+move D (Position x y) = guard (y < y_max) $> Position x (y+1)
+move L (Position x y) = guard (x > 0) $> Position (x-1) y
+move R (Position x y) = guard (x < x_max) $> Position (x+1) y
 
 data State = State { position :: Position, history :: Path }
   deriving (Show)
 
 start :: State
-start = State (Pos 0 0) []
+start = State zero []
 
 finished :: State -> Bool
-finished (State (Pos x y) _) = x == x_max && y == y_max
+finished (State (Position x y) _) = x == x_max && y == y_max
 
 moves :: String -> State -> [State]
 moves passcode (State pos path) =

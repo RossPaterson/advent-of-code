@@ -1,6 +1,7 @@
 module Main where
 
 import Utilities
+import Cartesian
 import Data.Foldable
 import Data.List
 import Data.Maybe
@@ -11,9 +12,6 @@ import qualified Data.Map as Map
 -- Input processing
 
 type Input = (Track, Carts)
-
--- x and y coordinates, with (0, 0) as top left
-type Position = (Int, Int)
 
 type Track = Map Position Piece
 data Piece = Horiz | Vert | Intersection | CurveDown | CurveUp
@@ -34,12 +32,11 @@ data TurnDir = TurnLeft | Straight | TurnRight
 
 parse :: String -> Input
 parse s =
-    (Map.fromList [(p, piece c) | (p, c) <- pcs],
+    (Map.fromList [(p, piece c) | (p, c) <- pcs, c /= ' '],
      Map.fromList [(p, CartState dir TurnLeft) |
         (p, c) <- pcs, dir <- maybeToList (direction c)])
   where
-    pcs = [((x, y), c) |
-        (y, line) <- zip [0..] (lines s), (x, c) <- zip [0..] line, c /= ' ']
+    pcs = readGrid s
 
 piece :: Char -> Piece
 piece '-' = Horiz
@@ -82,9 +79,9 @@ moveOne t cs (p, dir)
 
 -- order in which to move the carts
 moveOrder :: Carts -> [Cart]
-moveOrder = sortBy (comparing (swap . fst)) . Map.toList
+moveOrder = sortBy (comparing key) . Map.toList
   where
-    swap (x, y) = (y, x)
+    key (Position x y, _) = (y, x)
 
 moveCart :: Track -> Cart -> Cart
 moveCart t (p, o) = (move dir p, o')
@@ -92,10 +89,10 @@ moveCart t (p, o) = (move dir p, o')
     o'@(CartState dir _) = turns (t!p) o
 
 move :: Direction -> Position -> Position
-move U (x, y) = (x, y-1)
-move D (x, y) = (x, y+1)
-move L (x, y) = (x-1, y)
-move R (x, y) = (x+1, y)
+move U (Position x y) = Position x (y-1)
+move D (Position x y) = Position x (y+1)
+move L (Position x y) = Position (x-1) y
+move R (Position x y) = Position (x+1) y
 
 turns :: Piece -> CartState -> CartState
 turns Intersection (CartState dir td) = CartState (turn td dir) (succWrap td)
@@ -140,7 +137,7 @@ testInput =
     \  \\------/   \n"
 
 tests1 :: [(String, Position)]
-tests1 = [(testStraight, (0,3)), (testInput, (7,3))]
+tests1 = [(testStraight, Position 0 3), (testInput, Position 7 3)]
 
 -- Part Two
 
@@ -176,7 +173,7 @@ testTwoLoops = "\
 \  \\<->/\n"
 
 tests2 :: [(String, Position)]
-tests2 = [(testTwoLoops, (6,4))]
+tests2 = [(testTwoLoops, Position 6 4)]
 
 main :: IO ()
 main = do

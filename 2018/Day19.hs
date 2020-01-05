@@ -1,7 +1,7 @@
 module Main where
 
 import AssemblyCode
-import Numbers
+import Number
 import Utilities
 import Data.Maybe
 import Data.Map ((!))

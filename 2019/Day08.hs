@@ -37,8 +37,8 @@ topVisible :: [Char] -> Char
 topVisible = head . dropWhile (== '2') -- '2' is transparent
 
 display :: Char -> Char
-display '1' = '@'
-display _ = ' '
+display '1' = '#'
+display _ = '.'
 
 solve2 :: Input -> Layer Char
 solve2 = map (map display) . combine

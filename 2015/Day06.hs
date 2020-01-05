@@ -1,14 +1,13 @@
 module Main where
 
+import Cartesian
 import Parser
 import Control.Applicative
 
-data Coord = Coord Int Int
-  deriving (Show, Eq, Ord)
 data Instruction
-    = TurnOn Coord Coord
-    | Toggle Coord Coord
-    | TurnOff Coord Coord
+    = TurnOn Position Position
+    | Toggle Position Position
+    | TurnOff Position Position
   deriving Show
 type Input = [Instruction]
 
@@ -19,7 +18,7 @@ parse = map (runParser instruction) . lines
         TurnOn <$ string "turn on " <*> coord <* string " through " <*> coord <|>
         Toggle <$ string "toggle " <*> coord <* string " through " <*> coord <|>
         TurnOff <$ string "turn off " <*> coord <* string " through " <*> coord
-    coord = Coord <$> nat <* char ',' <*> nat
+    coord = Position <$> nat <* char ',' <*> nat
 
 type Grid a = [[a]]
 
@@ -34,8 +33,8 @@ switch lights (Toggle topleft botright) =
 switch lights (TurnOff topleft botright) =
     updateRange topleft botright (const False) lights
 
-updateRange :: Coord -> Coord -> (a -> a) -> Grid a -> Grid a
-updateRange (Coord x1 y1) (Coord x2 y2) f lights =
+updateRange :: Position -> Position -> (a -> a) -> Grid a -> Grid a
+updateRange (Position x1 y1) (Position x2 y2) f lights =
     top ++ map alter mid ++ bot
   where
     (top, mid_bot) = splitAt y1 lights

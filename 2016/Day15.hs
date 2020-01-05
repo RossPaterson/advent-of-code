@@ -1,6 +1,6 @@
 module Main where
 
-import Numbers
+import Number
 import Parser
 import Control.Applicative
 import Data.List

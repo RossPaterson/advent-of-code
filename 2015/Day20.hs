@@ -1,6 +1,6 @@
 module Main where
 
-import Numbers
+import Number
 
 input :: Int
 input = 29000000

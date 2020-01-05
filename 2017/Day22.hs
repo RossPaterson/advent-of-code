@@ -2,11 +2,10 @@
 module Main where
 
 import Utilities
+import Cartesian
 import Prelude hiding (Either(Left, Right))
 import Data.Map (Map)
 import qualified Data.Map as Map
-
-type Position = (Int, Int)
 
 data NodeState = Clean | Weakened | Infected | Flagged
     deriving (Eq, Show)
@@ -37,10 +36,10 @@ turnRight Down = Left
 turnRight Left = Up
 
 move :: Direction -> Position -> Position
-move Up (x, y) = (x, y-1)
-move Down (x, y) = (x, y+1)
-move Left (x, y) = (x-1, y)
-move Right (x, y) = (x+1, y)
+move Up (Position x y) = Position x (y-1)
+move Down (Position x y) = Position x (y+1)
+move Left (Position x y) = Position (x-1) y
+move Right (Position x y) = Position (x+1) y
 
 data State = State {
     position :: !Position,
@@ -59,10 +58,8 @@ parse s = State {
     infections = 0 }
   where
     ls = lines s
-    grid = Map.fromList [((x, y), Infected) |
-        (y, line) <- zip [0..] ls,
-        (x, c) <- zip [0..] line, c == '#']
-    centre = (middle (length (head ls)), middle (length ls))
+    grid = Map.fromList [(p, Infected) | (p, c) <- readGrid s, c == '#']
+    centre = Position (middle (length (head ls))) (middle (length ls))
     middle n = (n-1) `div` 2
 
 burst1 :: State -> State

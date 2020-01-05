@@ -1,5 +1,6 @@
 module Main where
 
+import Cartesian
 import Parser
 import Utilities
 import Data.List
@@ -9,18 +10,12 @@ import qualified Data.Set as Set
 
 -- Input processing
 
-type Input = [Coordinate]
-
-type Coordinate = (Int, Int)
-
--- Manhattan distance between two coordinates
-distance :: Coordinate -> Coordinate -> Int
-distance (x1, y1) (x2, y2) = abs (x1-x2) + abs (y1-y2)
+type Input = [Position]
 
 parse :: String -> Input
 parse = map (runParser coord) . lines
   where
-    coord = (,) <$> nat <* string ", " <*> nat
+    coord = Position <$> nat <* string ", " <*> nat
 
 -- Part One
 
@@ -31,29 +26,29 @@ solve1 = maximum . map snd . areas
 data Rect = Rect { xmin :: Int, xmax :: Int, ymin :: Int, ymax :: Int }
 
 -- smallest rectangle containing all the coordinates
-boundingRect :: [Coordinate] -> Rect
-boundingRect cs = Rect {
-    xmin = minimum (map fst cs),
-    xmax = maximum (map fst cs),
-    ymin = minimum (map snd cs),
-    ymax = maximum (map snd cs)
+boundingRect :: [Position] -> Rect
+boundingRect ps = Rect {
+    xmin = minimum [x | Position x _ <- ps],
+    xmax = maximum [x | Position x _ <- ps],
+    ymin = minimum [y | Position _ y <- ps],
+    ymax = maximum [y | Position _ y <- ps]
     }
 
 -- all the coordinates in a rectangle
-allCoords :: Rect -> [Coordinate]
-allCoords r = [(x, y) | x <- [xmin r..xmax r], y <- [ymin r..ymax r]]
+allCoords :: Rect -> [Position]
+allCoords r = [Position x y | x <- [xmin r..xmax r], y <- [ymin r..ymax r]]
 
 -- coordinates around the outside of a rectangle
-boundary :: Rect -> [Coordinate]
+boundary :: Rect -> [Position]
 boundary r =
-    [(xmin r-1, y) | y <- [ymin r-1..ymax r+1]] ++
-    [(xmax r+1, y) | y <- [ymin r-1..ymax r+1]] ++
-    [(x, ymin r-1) | x <- [xmin r..xmax r]] ++
-    [(x, ymax r+1) | x <- [xmin r..xmax r]]
+    [Position (xmin r-1) y | y <- [ymin r-1..ymax r+1]] ++
+    [Position (xmax r+1) y | y <- [ymin r-1..ymax r+1]] ++
+    [Position x (ymin r-1) | x <- [xmin r..xmax r]] ++
+    [Position x (ymax r+1) | x <- [xmin r..xmax r]]
 
 -- coordinates with finite areas and their sizes
 -- (relies on the fact that all finite areas are within the rectangle)
-areas :: [Coordinate] -> [(Coordinate, Int)]
+areas :: [Position] -> [(Position, Int)]
 areas cs =
     frequency $ filter (not . flip Set.member unbounded) $ closestAll points cs
   where
@@ -62,11 +57,11 @@ areas cs =
     unbounded = Set.fromList $ closestAll (boundary rect) cs
 
 -- unique closest coordinate to each coordinate in ps
-closestAll :: [Coordinate] -> [Coordinate] -> [Coordinate]
+closestAll :: [Position] -> [Position] -> [Position]
 closestAll ps cs = [c | p <- ps, c <- maybeToList (closest p cs)]
 
 -- the unique closest coordinate to p
-closest :: Coordinate -> [Coordinate] -> Maybe Coordinate
+closest :: Position -> [Position] -> Maybe Position
 closest p cs =
     unique $ map fst $ head $ groupBy (same snd) $ sortBy (comparing snd) $
     [(c, distance p c) | c <- cs]
@@ -92,7 +87,7 @@ solve2 :: Input -> Int
 solve2 = numWithin 10000
 
 -- number of coordinates within n of all of cs
-numWithin :: Int -> [Coordinate] -> Int
+numWithin :: Int -> [Position] -> Int
 numWithin n cs = length $ filter (< n) $ map (totalDistance cs) points
   where
     rect = boundingRect cs
@@ -110,7 +105,7 @@ expand n r = Rect {
     }
 
 -- total distance to all of cs
-totalDistance :: [Coordinate] -> Coordinate -> Int
+totalDistance :: [Position] -> Position -> Int
 totalDistance cs p = sum [distance p c | c <- cs]
 
 tests2 :: [((Int, String), Int)]
