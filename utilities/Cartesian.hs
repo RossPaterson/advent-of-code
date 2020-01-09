@@ -55,7 +55,9 @@ readGrid s =
 
 -- | String representation of smallest grid containing the points in the map
 showGrid :: Char -> Map Position Char -> String
-showGrid def m =
+showGrid def m
+  | Map.null m = ""
+  | otherwise =
     unlines [[Map.findWithDefault def (Position x y) m |
         x <- [minX..maxX]] | y <- [minY..maxY]]
   where
