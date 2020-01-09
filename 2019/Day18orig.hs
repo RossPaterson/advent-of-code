@@ -7,7 +7,7 @@ import Data.Bits
 import Data.Char
 import Data.List
 import Data.Maybe
-import Data.Map (Map, (!))
+import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
@@ -45,26 +45,6 @@ parse s = (maze, pos)
 
 -- Part One
 
--- For each startpoint, door or key in the original layout, the number
--- of steps to other doors or keys that are reachable without passing
--- through any door.
-bigSteps :: Maze -> [Position] -> Map Position [(Int, Position)]
-bigSteps m starts =
-    Map.fromList [(p, reachable p) | p <- starts ++ Set.toList waypoints]
-  where
-    waypoints = Set.union (Map.keysSet (keys m)) (Map.keysSet (doors m))
-    reachable p = [(depth, dest) |
-        -- first step is special because next won't go past doors
-        (depth, dests) <- (1, ns):zip [2..] (tail (bfs next (p:ns))),
-        dest <- dests,
-        Set.member dest waypoints]
-      where
-        ns = open p
-    open p = [n | n <- neighbours p, Set.member n (passages m)]
-    next p -- like open, except won't go anywhere from a door
-      | Map.member p (doors m) = []
-      | otherwise = open p
-
 -- a bit set of keys
 newtype Keyring = Keyring Int
     deriving (Eq, Ord, Show)
@@ -79,16 +59,16 @@ addKey :: Door -> Keyring -> Keyring
 addKey d (Keyring ds) = Keyring (setBit ds d)
 
 data State = State {
-    collected :: !Keyring,
-    position :: !Position
+    position :: !Position,
+    collected :: !Keyring
     }
     deriving (Eq, Ord, Show)
 
 initState :: Position -> State
-initState p = State noKeys p
+initState p = State p noKeys
 
 showState :: Maze -> State -> String
-showState m s = showStateAux m [position s] (collected s)
+showState m (State p coll) = showStateAux m [p] coll
 
 showStateAux :: Maze -> [Position] -> Keyring -> String
 showStateAux m ps coll = showGrid '#' $
@@ -104,27 +84,37 @@ showStateAux m ps coll = showGrid '#' $
 solve1 :: Input -> Int
 solve1 (m, p) =
     fst $ head $ dropWhile (not . finished . snd) $
-        shortestPaths (nextState m graph) $ initState p
+        shortestPaths (getKey m) $ initState p
   where
-    graph = bigSteps m [p]
     ks = allKeys m
-    finished s = collected s == ks
-
--- Move to either an open door or a new key
-nextState :: Maze -> Map Position [(Int, Position)] -> State -> [(Int, State)]
-nextState m steps (State coll pos) =
-    [(dist, State coll' p) |
-        (dist, p) <- steps!pos,
-        let mb_new_key = Map.lookup p new_keys,
-        isJust mb_new_key || Map.member p open_doors,
-        let coll' = maybe coll (flip addKey coll) mb_new_key]
-  where
-    new_keys = Map.filter (not . hasKey coll) (keys m)
-    open_doors = Map.filter (hasKey coll) (doors m)
+    finished (State _ coll) = coll == ks
 
 -- all the keys in the maze
 allKeys :: Maze -> Keyring
 allKeys m = foldr addKey noKeys (Map.elems (keys m))
+
+-- move from the current state to a new key
+getKey :: Maze -> State -> [(Int, State)]
+getKey m (State pos coll) =
+    [(n, State p (addKey d coll)) | (n, p, d) <- keyDistances m coll pos]
+
+-- shortest distance and position of each key reachable from p
+keyDistances :: Maze -> Keyring -> Position -> [(Int, Position, Door)]
+keyDistances m ds pos =
+    [(n, p, d) |
+        (n, ps) <- zip [0..] (bfs (steps m ds) [pos]),
+        p <- ps,
+        d <- maybeToList (Map.lookup p (keys m)),
+        not (hasKey ds d)]
+
+-- neighbouring points that are not walls or locked doors
+steps :: Maze -> Keyring -> Position -> [Position]
+steps m coll pos = [p | p <- neighbours pos, isOpen m coll p]
+
+-- a cell is open if it is not a wall or a locked door
+isOpen :: Maze -> Keyring -> Position -> Bool
+isOpen m ds p =
+    Set.member p (passages m) && maybe True (hasKey ds) (Map.lookup p (doors m))
 
 testInput1 :: String
 testInput1 =
@@ -178,17 +168,17 @@ tests1 = [
 
 -- now there are multiple searchers
 data State2 = State2 {
-    collected2 :: !Keyring,
-    positions :: ![Position]
+    positions :: ![Position],
+    collected2 :: !Keyring
     }
     deriving (Eq, Ord, Show)
 
 showState2 :: Maze -> State2 -> String
-showState2 m s = showStateAux m (positions s) (collected2 s)
+showState2 m (State2 ps coll) = showStateAux m ps coll
 
 -- transformation of the maze into four quadrants for part 2
 splitMaze :: (Maze, State) -> (Maze, State2)
-splitMaze (m, State coll p) = (m', State2 coll (corners p))
+splitMaze (m, State p coll) = (m', State2 (corners p) coll)
   where
     m' = m { passages = Set.difference (passages m) new_walls }
     new_walls = Set.fromList (p : neighbours p)
@@ -200,26 +190,18 @@ corners (Position x y) =
 
 solve2 :: Input -> Int
 solve2 (m0, p) =
-    fst $ head $ dropWhile (not . finished . snd) $ shortestPaths (nextState2 m graph) s0
+    fst $ head $ dropWhile (not . finished . snd) $ shortestPaths (getKey2 m) s
   where
-    (m, s0) = splitMaze (m0, initState p)
-    graph = bigSteps m (positions s0)
+    (m, s) = splitMaze (m0, initState p)
     ks = allKeys m
-    finished s = collected2 s == ks
+    finished (State2 _ coll) = coll == ks
 
--- Move to either an open door or a new key
-nextState2 :: Maze -> Map Position [(Int, Position)] -> State2 -> [(Int, State2)]
-nextState2 m steps (State2 coll ps) =
-    [(dist, State2 coll' ps') |
-        (front, pos:back) <- zip (inits ps) (tails ps),
-        (dist, p) <- steps!pos,
-        let mb_new_key = Map.lookup p new_keys,
-        isJust mb_new_key || Map.member p open_doors,
-        let coll' = maybe coll (flip addKey coll) mb_new_key,
-        let ps' = front++(p:back)]
-  where
-    new_keys = Map.filter (not . hasKey coll) (keys m)
-    open_doors = Map.filter (hasKey coll) (doors m)
+-- move one of the bots to a new key
+getKey2 :: Maze -> State2 -> [(Int, State2)]
+getKey2 m (State2 ps coll) =
+    [(n, State2 (front++(p':back)) (addKey d coll)) |
+        (front, p:back) <- zip (inits ps) (tails ps),
+        (n, p', d) <- keyDistances m coll p]
 
 testInput6 :: String
 testInput6 =
