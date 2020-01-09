@@ -20,8 +20,9 @@ library
     Graph
     MaxPriorityQueue
     MinPriorityQueue
-    Numbers
+    Number
     Parser
+    PrioritySearchQueue
     RationalList
     SearchTree
     SmallPermutation

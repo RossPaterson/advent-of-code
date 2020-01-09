@@ -7,10 +7,9 @@ module Graph (
     ) where
 
 import Data.List
-import Data.Map (Map, (!))
-import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
+import qualified PrioritySearchQueue as PSQ
 
 -- | Breadth-first search.
 -- @'bfs' f xs!!k@ contains all the unique values reachable from @xs@
@@ -27,46 +26,16 @@ bfs f = takeWhile (not . null) . map fst . iterate step . new_level Set.empty
       where
         (ys, seen') = new_level (Set.insert x seen) xs
 
-data PSQ p a = PSQ (Map a p) (Map p (Set a))
-    deriving Show
-
-singletonPSQ :: (Ord p, Ord a) => p -> a -> PSQ p a
-singletonPSQ p v = PSQ (Map.singleton v p) (Map.singleton p (Set.singleton v))
-
-addPSQ :: (Ord p, Ord a) => p -> a -> PSQ p a -> PSQ p a
-addPSQ p v pq@(PSQ priority queue) =
-    case Map.lookup v priority of
-        Nothing -> PSQ (Map.insert v p priority) queue'
-        Just p'
-          | p' <= p -> pq
-          | otherwise ->
-            PSQ (Map.insert v p priority) (removeEntry p' v queue')
-  where
-    queue' = Map.insertWith Set.union p (Set.singleton v) queue
-
-removeEntry :: (Ord p, Ord a) => p -> a -> Map p (Set a) -> Map p (Set a)
-removeEntry p v m
-    | Set.null entries = Map.delete p m
-    | otherwise = Map.insert p entries m
-  where
-    entries = Set.delete v (m!p)
-
-extractPSQ :: (Ord p, Ord a) => PSQ p a -> Maybe (p, a, PSQ p a)
-extractPSQ (PSQ priority queue) = do
-    ((p, vs), _) <- Map.minViewWithKey queue
-    (v, _) <- Set.minView vs
-    Just (p, v, PSQ (Map.delete v priority) (removeEntry p v queue))
-
 -- | reachable nodes and shortest distances
 shortestPaths :: Ord a => (a -> [(Int, a)]) -> a -> [(Int, a)]
-shortestPaths children start = dijkstra Set.empty (singletonPSQ 0 start)
+shortestPaths adjacent start = dijkstra Set.empty (PSQ.singleton start 0)
   where
-    dijkstra done psq = case extractPSQ psq of
+    dijkstra done psq = case PSQ.extract psq of
         Nothing -> []
-        Just (p, v, psq') ->
-            let done' = Set.insert v done in
-            (p, v):dijkstra done' (foldr adjust psq' [(p+d, c) | (d, c) <- children v, not (Set.member c done')])
-    adjust (p, v) psq = addPSQ p v psq
+        Just (n, p, psq') ->
+            let done' = Set.insert n done in
+            (p, n):dijkstra done' (foldr adjust psq' [(p+d, n') | (d, n') <- adjacent n, not (Set.member n' done')])
+    adjust (p, n) psq = PSQ.insert n p psq
 
 -- | Connected component containing this node
 component :: Ord a => (a -> [a]) -> a -> Set a
