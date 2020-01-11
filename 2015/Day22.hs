@@ -2,7 +2,8 @@ module Main where
 
 import Utilities
 import Graph
-import Data.List
+import Data.Map (Map)
+import qualified Data.Map as Map
 
 type Mana = Int
 type HitPoints = Int
@@ -12,7 +13,7 @@ data State = State {
     player_hit_points :: HitPoints,
     player_armor :: HitPoints,
     mana_points :: Mana,
-    active_spells :: [(Spell, Int)]
+    active_spells :: Map Spell Int
     }
     deriving (Eq, Ord)
 data Spell = MagicMissile | Drain | Shield | Poison | Recharge
@@ -44,7 +45,7 @@ startState player_hp mana boss_hp boss_dmg = State {
     player_hit_points = player_hp,
     player_armor = 0,
     mana_points = mana,
-    active_spells = []
+    active_spells = Map.empty
     }
 
 cost :: Spell -> Mana
@@ -74,7 +75,8 @@ allSpells :: [Spell]
 allSpells = allValues
 
 available_spells :: State -> [Spell]
-available_spells s = allSpells \\ map fst (active_spells s)
+available_spells s =
+    [spell | spell <- allSpells, not (Map.member spell (active_spells s))]
 
 -- states immediately before casting a spell
 step :: HitPoints -> State -> [(Int, State)]
@@ -88,7 +90,8 @@ castSpell :: State -> [(Spell, State)]
 castSpell s =
     [(spell, s {
             mana_points = mana_points s - cost spell,
-            active_spells = (spell, lifetime spell):active_spells s }) |
+            active_spells = Map.insert spell (lifetime spell) (active_spells s)
+        }) |
         spell <- available_spells s,
         cost spell <= mana_points s]
 
@@ -100,13 +103,14 @@ turns level =
 -- apply recurrent spells
 applySpells :: State -> State
 applySpells s
-  | player_hit_points s > 0 = foldr (effect . fst) s' spells
+  | player_hit_points s > 0 =
+        foldr (effect . fst) s' (Map.assocs (active_spells s))
   | otherwise = s'
   where
     s' = s {
         player_armor = 0,
-        active_spells = [(spell, n-1) | (spell, n) <- spells, n > 1] }
-    spells = active_spells s
+        active_spells = fmap (subtract 1) (Map.filter (> 1) (active_spells s))
+        }
 
 bossAttack :: Effect
 bossAttack s
