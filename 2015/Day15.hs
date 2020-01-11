@@ -41,6 +41,7 @@ score is = product [max 0 (total f is) | f <- properties]
 quantity :: Int
 quantity = 100
 
+-- all the ways of dividing n between the elements of a list
 selections :: Int -> [a] -> [[(a, Int)]]
 selections n [] = [[] | n == 0]
 selections n (x:xs) = [(x, m):ys | m <- [1..n], ys <- selections (n-m) xs]
