@@ -24,6 +24,5 @@ library
     Parser
     PrioritySearchQueue
     RationalList
-    SearchTree
     SmallPermutation
     Utilities
