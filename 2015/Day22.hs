@@ -1,6 +1,7 @@
 module Main where
 
-import SearchTree
+import Utilities
+import Graph
 import Data.List
 
 type Mana = Int
@@ -11,9 +12,11 @@ data State = State {
     player_hit_points :: HitPoints,
     player_armor :: HitPoints,
     mana_points :: Mana,
-    active_spells :: [(Spell, Int)],
-    available_spells :: [Spell]
+    active_spells :: [(Spell, Int)]
     }
+    deriving (Eq, Ord)
+data Spell = MagicMissile | Drain | Shield | Poison | Recharge
+    deriving (Bounded, Enum, Eq, Ord, Show)
 
 -- modifiers
 
@@ -41,26 +44,37 @@ startState player_hp mana boss_hp boss_dmg = State {
     player_hit_points = player_hp,
     player_armor = 0,
     mana_points = mana,
-    active_spells = [],
-    available_spells = allSpells
+    active_spells = []
     }
+
+cost :: Spell -> Mana
+cost MagicMissile = 53
+cost Drain = 73
+cost Shield = 113
+cost Poison = 173
+cost Recharge = 229
+
+lifetime :: Spell -> Int
+lifetime MagicMissile = 1
+lifetime Drain = 1
+lifetime Shield = 6
+lifetime Poison = 6
+lifetime Recharge = 5
+
+effect :: Spell -> State -> State
+effect MagicMissile = mod_boss_hit_points (subtract 4)
+effect Drain = mod_boss_hit_points (subtract 2) . mod_player_hit_points (+2)
+effect Shield = mod_player_armor (+7)
+effect Poison = mod_boss_hit_points (subtract 3)
+effect Recharge = mod_mana_points (+101)
 
 type Effect = State -> State
 
-data Spell = Spell {
-    name :: String,
-    cost :: Mana,
-    lifetime :: Int,
-    effect :: Effect }
-
 allSpells :: [Spell]
-allSpells = [
-    Spell "Magic Missile" 53 1 (mod_boss_hit_points (subtract 4)),
-    Spell "Drain" 73 1
-        (mod_boss_hit_points (subtract 2) . mod_player_hit_points (+2)),
-    Spell "Shield" 113 6 (mod_player_armor (+7)),
-    Spell "Poison" 173 6 (mod_boss_hit_points (subtract 3)),
-    Spell "Recharge" 229 5 (mod_mana_points (+101)) ]
+allSpells = allValues
+
+available_spells :: State -> [Spell]
+available_spells s = allSpells \\ map fst (active_spells s)
 
 -- states immediately before casting a spell
 step :: HitPoints -> State -> [(Int, State)]
@@ -69,18 +83,14 @@ step level s =
         boss_hit_points s > 0 && player_hit_points s > 0,
         (spell, s') <- castSpell s ]
 
+-- spells that can be cast from the current state
 castSpell :: State -> [(Spell, State)]
-castSpell s = [(spell, s') |
-    (spell, rest) <- pick (available_spells s),
-    cost spell <= mana_points s,
-    -- move recurrent spell to active list
-    let s' = s {
+castSpell s =
+    [(spell, s {
             mana_points = mana_points s - cost spell,
-            active_spells = (spell, lifetime spell):active_spells s,
-            available_spells = rest } ]
-
-pick :: [a] -> [(a, [a])]
-pick xs = [(x, front++back) | (front, x:back) <- zip (inits xs) (tails xs)]
+            active_spells = (spell, lifetime spell):active_spells s }) |
+        spell <- available_spells s,
+        cost spell <= mana_points s]
 
 turns :: HitPoints -> State -> State
 turns level =
@@ -90,15 +100,13 @@ turns level =
 -- apply recurrent spells
 applySpells :: State -> State
 applySpells s
-  | player_hit_points s > 0 = foldr id s' (map (effect . fst) spells)
+  | player_hit_points s > 0 = foldr (effect . fst) s' spells
   | otherwise = s'
   where
     s' = s {
         player_armor = 0,
-        active_spells = [(spell, n-1) | (spell, n) <- live_spells],
-        available_spells = map fst expired ++ available_spells s }
+        active_spells = [(spell, n-1) | (spell, n) <- spells, n > 1] }
     spells = active_spells s
-    (live_spells, expired) = partition ((> 1) . snd) spells
 
 bossAttack :: Effect
 bossAttack s
@@ -118,7 +126,7 @@ testState2 = startState 10 250 14 8
 
 solve :: Int -> State -> Int
 solve level =
-    dfs success . unfoldTree (step level) .
+    fst . head . filter (success . snd) . shortestPaths (step level) .
     mod_player_hit_points (subtract level)
 
 solve1 :: Int
