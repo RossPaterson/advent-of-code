@@ -30,6 +30,10 @@ isPrime n = and [n `mod` p /= 0 | p <- takeWhile small primes]
 primes :: [Int]
 primes = 2:filter isPrime [3,5..]
 
+-- | The number of factors of @n@
+numberOfFactors :: Int -> Int
+numberOfFactors n = product [k+1 | (_, k) <- primeFactors n]
+
 -- | The sum of all the factors of @n@
 sumOfFactors :: Int -> Int
 sumOfFactors n = product [(p^(k+1) - 1) `div` (p-1) | (p, k) <- primeFactors n]
