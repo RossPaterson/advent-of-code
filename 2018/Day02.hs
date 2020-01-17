@@ -40,8 +40,7 @@ nearRepetitions xss =
 -- Each pair (p, ys) is a position p and a list ys obtained by removing the
 -- element of xs at position p.
 removals :: [a] -> [(Int, [a])]
-removals xs =
-    [(length front, front++back) | (front, _:back) <- zip (inits xs) (tails xs)]
+removals xs = [(length front, front++back) | (front, _:back) <- splits xs]
 
 -- Another way of finding the shared part of a list that is repeated
 -- except for the value at one position.

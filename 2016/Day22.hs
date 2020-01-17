@@ -24,6 +24,7 @@ parse = Map.fromList . map (runParser df_line) . drop 2 . lines
     df_line = (,) <$> node <*> usage
     node = Position <$ string "/dev/grid/node-x" <*> nat <* string "-y" <*> nat
     usage = Usage <$> num 'T' <*> num 'T' <* num 'T' <* num '%'
+    num :: Char -> Parser Int
     num c = some space *> nat <* char c
 
 -- Part One --

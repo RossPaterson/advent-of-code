@@ -328,7 +328,7 @@ tests2 =
 fullTest :: (Cavern, Units) -> String
 fullTest (cavern, units) =
     unlines ["After " ++ show n ++ " rounds:\n" ++ showState cavern s |
-        (n, s) <- zip [0..] (iterateWhileRight (fullRound (const 3) cavern) units)]
+        (n, s) <- zip [(0::Int)..] (iterateWhileRight (fullRound (const 3) cavern) units)]
 
 test :: (Cavern, Units) -> String
 test (cavern, units) = showResult cavern (battle (const 3) cavern units)

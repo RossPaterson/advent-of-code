@@ -3,7 +3,7 @@ module Main where
 
 import Parser
 import Utilities
-import Prelude hiding (Left, Right)
+import Prelude hiding (Either(Left, Right))
 import Control.Applicative
 import Data.Char
 import Data.Map (Map, (!))

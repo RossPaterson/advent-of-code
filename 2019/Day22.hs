@@ -99,7 +99,7 @@ inverse (Linear n a b) = Linear n inv_a ((- inv_a*b) `mod` n)
 
 solve2 :: Input -> Int
 solve2 ts =
-    apply (inverse (stimes 101741582076661 (transforms 119315717514047 ts))) 2020
+    apply (inverse (stimes (101741582076661::Integer) (transforms 119315717514047 ts))) 2020
 
 main :: IO ()
 main = do

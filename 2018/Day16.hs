@@ -96,8 +96,9 @@ reduce (done, ambiguous) = (done', ambiguous')
             map swap (singletons (invert ambiguous)))
     done' = Map.union done (Map.fromList unique)
     ambiguous' =
-        compose [fmap (Set.delete opcode) | (_, opcode) <- unique] $
-        foldr Map.delete ambiguous [i | (i, _) <- unique]
+        fmap (`Set.difference` Set.fromList (map snd unique))
+            (ambiguous `Map.withoutKeys` Set.fromList (map fst unique))
+
 
 -- mappings to a unique value
 singletons :: (Ord a, Ord b) => Map a (Set b) -> [(a, b)]

@@ -5,7 +5,8 @@ import Utilities
 import Control.Applicative
 import Data.List as List
 import Data.Maybe
-import Data.Map as Map hiding (map, foldl)
+import Data.Map (Map, (!))
+import qualified Data.Map as Map
 
 type Value = Int
 type Bot = Int
@@ -48,37 +49,44 @@ startState :: Input -> State
 startState instrs = foldl (flip id) initState [send v o | Input v o <- instrs]
 
 send :: Value -> Output -> State -> State
-send v (Bot i) (State bot out actions) = State (add i v bot) out actions
-send v (Output i) (State bot out actions) = State bot (add i v out) actions
+send v (Bot i) s = s { bot = add i v (bot s) }
+send v (Output i) s = s {out = add i v (out s) }
 
 add :: Int -> Value -> Bins -> Bins
 add i v m
-  | member i m = adjust (List.insert v) i m
+  | Map.member i m = Map.adjust (List.insert v) i m
   | otherwise = Map.insert i [v] m
 
 finalState :: Input -> State
 finalState instrs = whileJust (distribute instrs) (startState instrs)
 
 distribute :: Input -> State -> Maybe State
-distribute instrs (State bot out actions) =
-    listToMaybe [distr b ol oh (State bot out actions) |
-        (b, vs) <- assocs bot, length vs >= 2,
+distribute instrs s =
+    listToMaybe [distr b ol oh s |
+        (b, vs) <- Map.assocs (bot s), length vs >= 2,
         Distribute b' ol oh <- instrs, b' == b]
 
 distr :: Bot -> Output -> Output -> State -> State
-distr b ol oh (State bot out actions) =
-    send low ol (send high oh (State bot' out actions'))
+distr b ol oh s =
+    send low ol $ send high oh $ s {
+        bot = Map.adjust (init . tail) b (bot s),
+        history = Action b low ol high oh:history s }
   where
-    bot_vals = bot!b
+    bot_vals = bot s!b
     low = head bot_vals
     high = last bot_vals
-    bot' = adjust (init . tail) b bot
-    actions' = Action b low ol high oh:actions
 
 solve1 :: Input -> Int
 solve1 instrs = head [b | Action b 17 _ 61 _ <- history (finalState instrs)]
 
-test = "value 5 goes to bot 2\nbot 2 gives low to bot 1 and high to bot 0\nvalue 3 goes to bot 1\nbot 1 gives low to output 1 and high to bot 0\nbot 0 gives low to output 2 and high to output 0\nvalue 2 goes to bot 2\n"
+testInput :: String
+testInput =
+    "value 5 goes to bot 2\n\
+    \bot 2 gives low to bot 1 and high to bot 0\n\
+    \value 3 goes to bot 1\n\
+    \bot 1 gives low to output 1 and high to bot 0\n\
+    \bot 0 gives low to output 2 and high to output 0\n\
+    \value 2 goes to bot 2\n"
 
 -- Part Two --
 

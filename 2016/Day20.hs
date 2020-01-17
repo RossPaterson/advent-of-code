@@ -1,7 +1,6 @@
 module Main where
 
 import Parser
-import Control.Applicative
 import Data.List
 
 data Range = Range { low :: Integer, high :: Integer }
@@ -27,7 +26,8 @@ mergeAux lo hi (Range lo2 hi2:rs)
 solve1 :: Input -> Integer
 solve1 = (+1) . high . head . mergeRanges . sort
 
-test = "5-8\n0-2\n4-7\n"
+testInput :: String
+testInput = "5-8\n0-2\n4-7\n"
 
 -- Part Two --
 
@@ -35,7 +35,7 @@ sizeRange :: Range -> Integer
 sizeRange (Range lo hi) = hi - lo + 1
 
 solve2 :: Input -> Integer
-solve2 = (2^32 -) . sum . map sizeRange . mergeRanges . sort
+solve2 = (2^(32::Int) -) . sum . map sizeRange . mergeRanges . sort
 
 main :: IO ()
 main = do

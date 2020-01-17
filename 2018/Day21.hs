@@ -54,7 +54,7 @@ uniq xs =
 
 -- same as map Set.fromList (inits xs)
 init_sets :: Ord a => [a] -> [Set a]
-init_sets xs = scanl (flip Set.insert) Set.empty xs
+init_sets = scanl (flip Set.insert) Set.empty
 
 main :: IO ()
 main = do

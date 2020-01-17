@@ -4,7 +4,6 @@ import Utilities
 import Parser
 import Control.Applicative
 import Data.Char
-import Data.List
 import Data.Maybe
 
 type Element = String
@@ -29,7 +28,7 @@ parse s = Input
 replacements :: Input -> [Molecule]
 replacements (Input rules es) = fastNub $
     [front ++ repl ++ back |
-        (front, e:back) <- zip (inits es) (tails es),
+        (front, e:back) <- splits es,
         (r :=> repl) <- rules, r == e]
 
 solve1 :: Input -> Int

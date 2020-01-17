@@ -21,7 +21,8 @@ bridges = bridgesFrom 0
 bridgesFrom :: Int -> [Component] -> [[Component]]
 bridgesFrom n comps =
     []:[(x, y):path |
-        (e, rest) <- pick comps,
+        (front, e:back) <- splits comps,
+        let rest = front ++ back,
         (x, y) <- arrangements e,
         x == n,
         path <- bridgesFrom y rest]
