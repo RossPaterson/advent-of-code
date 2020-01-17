@@ -15,10 +15,10 @@ type Diagram = Map Position Char
 type Input = Diagram
 
 parse :: String -> Input
-parse s = compose [Map.insert (Position row col) c |
+parse s = Map.fromList [(Position row col, c) |
     (row, line) <- zip [0..] (lines s),
     (col, c) <- zip [0..] line,
-    c /= ' '] Map.empty
+    c /= ' ']
 
 data Direction = Up | Down | Left | Right
     deriving Show

@@ -18,35 +18,35 @@ parse = map (runParser line) . lines
 
 -- Part One
 
-direction :: Direction -> Point2
-direction L = Point2 (-1) 0
-direction R = Point2 1 0
-direction U = Point2 0 (-1)
-direction D = Point2 0 1
+direction :: Direction -> Position
+direction L = Position (-1) 0
+direction R = Position 1 0
+direction U = Position 0 (-1)
+direction D = Position 0 1
 
 -- square 3x3 keypad, centred on the origin
 -- 1 2 3
 -- 4 5 6
 -- 7 8 9
 
-inrange :: Point2 -> Bool
-inrange (Point2 x y) = abs x <= 1 && abs y <= 1
+inrange :: Position -> Bool
+inrange (Position x y) = abs x <= 1 && abs y <= 1
 
-code :: Point2 -> Char
-code (Point2 x y) = chr (ord '1' + x + y*3 + 4)
+code :: Position -> Char
+code (Position x y) = chr (ord '1' + x + y*3 + 4)
 
 -- start on the 5
-start :: Point2
+start :: Position
 start = zero
 
-move :: Point2 -> Direction -> Point2
+move :: Position -> Direction -> Position
 move p d
   | inrange p' = p'
   | otherwise = p
   where
     p' = p .+. direction d
 
-addLine :: Point2 -> Line -> Point2
+addLine :: Position -> Line -> Position
 addLine = foldl move
 
 solve1 :: Input -> String
@@ -71,26 +71,26 @@ tests1 = [(testInput, "1985")]
 --   A B C
 --     D
 
-inrange2 :: Point2 -> Bool
+inrange2 :: Position -> Bool
 inrange2 p = norm p <= 2
 
-code2 :: Point2 -> Char
-code2 (Point2 x y) = codes!!(y+2)!!(x+2)
+code2 :: Position -> Char
+code2 (Position x y) = codes!!(y+2)!!(x+2)
   where
     codes = ["..1..", ".234.", "56789", ".ABC.", "..D.."]
 
 -- start on the 5
-start2 :: Point2
-start2 = Point2 (-2) 0
+start2 :: Position
+start2 = Position (-2) 0
 
-move2 :: Point2 -> Direction -> Point2
+move2 :: Position -> Direction -> Position
 move2 p d
   | inrange2 p' = p'
   | otherwise = p
   where
     p' = p .+. direction d
 
-addLine2 :: Point2 -> Line -> Point2
+addLine2 :: Position -> Line -> Position
 addLine2 = foldl move2
 
 solve2 :: Input -> String

@@ -2,7 +2,6 @@ module Main where
 
 import Number
 import Parser
-import Control.Applicative
 import Data.List
 import Data.Ord
 
@@ -50,7 +49,10 @@ chineseRemainder = foldr1 match . sortBy (comparing cycle_size)
 solve1 :: Input -> Integer
 solve1 = remainder . chineseRemainder . map positionToMod
 
-test = "Disc #1 has 5 positions; at time=0, it is at position 4.\nDisc #2 has 2 positions; at time=0, it is at position 1.\n"
+testInput :: String
+testInput =
+    "Disc #1 has 5 positions; at time=0, it is at position 4.\n\
+    \Disc #2 has 2 positions; at time=0, it is at position 1.\n"
 
 -- Part Two --
 

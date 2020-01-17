@@ -29,7 +29,7 @@ twos x = splitPower 0 x
   where
     splitPower k n
       | k `seq` odd n = (n, k)
-      | even n = splitPower (k+1) (n `div` 2)
+      | otherwise = splitPower (k+1) (n `div` 2)
 
 solve :: Int -> String -> String
 solve size = bitsToString .

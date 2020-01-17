@@ -3,7 +3,6 @@ module Main where
 import Utilities
 import Graph
 import Data.List
-import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
@@ -51,7 +50,7 @@ genFloors (State _ gcs) = Set.fromList (map fst gcs)
 -- finished if all objects on top floor
 -- (uses the fact that pairs are ordered)
 finished :: State -> Bool
-finished (State _ (gc:gcs)) = gc == (topFloor, topFloor)
+finished (State _ (gc:_)) = gc == (topFloor, topFloor)
 finished (State _ []) = True
 
 mkState :: Input -> State

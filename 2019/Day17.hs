@@ -153,10 +153,6 @@ extendPlan (Plan ns fs) ts
         (f, ts') <- takeWhile (validFunction . fst) (tail (splits ts)),
         plan <- extendPlan (Plan (length fs:ns) (fs ++ [f])) ts']
 
--- all the ways of splitting a list, earliest first
-splits :: [a] -> [([a], [a])]
-splits xs = zip (inits xs) (tails xs)
-
 imagePlans :: String -> [Plan]
 imagePlans = plans . segments . scanImage
 

@@ -20,9 +20,8 @@ module Utilities (
     iterateWhileRight,
     convergeBy,
     times,
-    compose,
     -- * Searching
-    pick,
+    splits,
     choose,
     chooseBetween,
     bsearch,
@@ -100,9 +99,9 @@ times n f = compose (replicate n f)
 compose :: [a -> a] -> a -> a
 compose fs x = foldr id x fs
 
--- | Ways of picking one element from a list
-pick :: [a] -> [(a, [a])]
-pick xs = [(x, front ++ back) | (front, x:back) <- zip (inits xs) (tails xs)]
+-- | Ways of splitting a list, earliest first
+splits :: [a] -> [([a], [a])]
+splits xs = zip (inits xs) (tails xs)
 
 -- | Possible choices of n elements from a list
 choose :: Int -> [a] -> [([a], [a])]

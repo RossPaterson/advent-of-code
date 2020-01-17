@@ -5,7 +5,6 @@ import Graph
 import Utilities
 import Data.Bits
 import Data.Char
-import Data.List
 import Data.Maybe
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
@@ -211,7 +210,7 @@ solve2 (m0, p) =
 nextState2 :: Maze -> Map Position [(Int, Position)] -> State2 -> [(Int, State2)]
 nextState2 m steps (State2 coll ps) =
     [(dist, State2 coll' ps') |
-        (front, pos:back) <- zip (inits ps) (tails ps),
+        (front, pos:back) <- splits ps,
         (dist, p) <- steps!pos,
         let mb_new_key = Map.lookup p new_keys,
         isJust mb_new_key || Map.member p open_doors,

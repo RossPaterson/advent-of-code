@@ -84,7 +84,7 @@ runTest (size, rep, ms) = showDance size (stimesMonoid rep (dance size ms))
 -- Part Two
 
 solve2 :: Input -> String
-solve2 = showDance 16 . stimesMonoid 1000000000 . dance 16
+solve2 = showDance 16 . stimesMonoid (1000000000::Int) . dance 16
 
 tests2 :: [((Int, Int, [Move]), String)]
 tests2 = [((5, 2, parse testInput), "ceadb")]

@@ -34,7 +34,7 @@ repeats xs = [x | (x, prev_xs) <- zip xs (init_sets xs), Set.member x prev_xs]
 
 -- same as map Set.fromList (inits xs)
 init_sets :: Ord a => [a] -> [Set a]
-init_sets xs = scanl (flip Set.insert) Set.empty xs
+init_sets = scanl (flip Set.insert) Set.empty
 
 tests2 :: [(Input, Int)]
 tests2 = [

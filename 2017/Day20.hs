@@ -132,7 +132,7 @@ intSqrt n
   | n == 0 = [0]
   | otherwise = []
   where
-    k = floor (sqrt (fromIntegral n))
+    k = floor (sqrt (fromIntegral n::Double))
 
 solve2 :: Input -> Int
 solve2 ps = length ps - Set.size (collisions ps)
