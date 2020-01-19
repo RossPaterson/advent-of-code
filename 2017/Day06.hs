@@ -1,18 +1,18 @@
 module Main where
 
 import Utilities
-import qualified Data.Map as Map
-import Data.Map ((!))
+import qualified RationalList as RL
 
-type Input = [Int]
+type Input = Banks
+type Banks = [Int]
 
 parse :: String -> Input
 parse = map read . words
 
-redistribute :: Input -> Input
+redistribute :: Banks -> Banks
 redistribute xs = zipWith (+) (front ++ 0:back) (incr_front ++ incr_back)
   where
-    -- first first occurrence of largest element
+    -- first occurrence of largest element
     (front, v:back) = span (/= maximum xs) xs
     -- distribute its values evenly, starting at the following element
     n = length xs
@@ -20,32 +20,24 @@ redistribute xs = zipWith (+) (front ++ 0:back) (incr_front ++ incr_back)
     increments = replicate r (d+1) ++ replicate (n-r) d
     (incr_back, incr_front) = splitAt (n - length front - 1) increments
 
--- positions of the first and second occurrences of the first repeated element
-findRepetition :: Ord a => [a] -> (Int, Int)
-findRepetition = iter Map.empty 0
-  where
-    iter s n (x:xs)
-      | Map.member x s = (s!x, Map.size s)
-      | otherwise = iter (Map.insert x n s) (n+1) xs
-    iter _ _ [] = error "No repeated element"
-
 solve1 :: Input -> Int
-solve1 xs = p2
+solve1 xs = length (RL.prefix rl) + length (RL.repetend rl)
   where
-    (_, p2) = findRepetition (iterate redistribute xs)
+    rl = RL.iterate redistribute xs
+
+testInput :: String
+testInput = "0 2 7 0"
 
 tests1 :: [(String, Int)]
-tests1 = [("0 2 7 0", 5)]
+tests1 = [(testInput, 5)]
 
 -- Part Two
 
 solve2 :: Input -> Int
-solve2 xs = p2 - p1
-  where
-    (p1, p2) = findRepetition (iterate redistribute xs)
+solve2 = length . RL.repetend . RL.iterate redistribute
 
 tests2 :: [(String, Int)]
-tests2 = [("0 2 7 0", 4)]
+tests2 = [(testInput, 4)]
 
 main :: IO ()
 main = do
