@@ -7,6 +7,7 @@ type Input = [Int]
 parse :: String -> Input
 parse = map read . lines
 
+-- partitions of xs for which the first list sums to n
 selections :: Int -> [Int] -> [([Int], [Int])]
 selections n [] = [([], []) | n == 0]
 selections n (x:xs) =
