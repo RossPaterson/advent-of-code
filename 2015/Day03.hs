@@ -8,15 +8,18 @@ import qualified Data.Set as Set
 parse :: String -> String
 parse = filter (not . isSpace)
 
-solve1 :: String -> Int
-solve1 = Set.size . Set.fromList . scanl move zero
+move :: Char -> Position
+move '^' = Position 0 (-1)
+move 'v' = Position 0 1
+move '<' = Position (-1) 0
+move '>' = Position 1 0
+move _ = error "bad move"
 
-move :: Position -> Char -> Position
-move (Position x y) '^' = Position x (y-1)
-move (Position x y) 'v' = Position x (y+1)
-move (Position x y) '<' = Position (x-1) y
-move (Position x y) '>' = Position (x+1) y
-move _ _ = error "bad move"
+path :: String -> [Position]
+path = scanl (.+.) zero . map move
+
+solve1 :: String -> Int
+solve1 = Set.size . Set.fromList . path
 
 tests1 :: [(String, Int)]
 tests1 = [
@@ -38,8 +41,8 @@ solve2 :: String -> Int
 solve2 s = Set.size (Set.fromList santa `Set.union` Set.fromList robo)
   where
     cs = filter (not . isSpace) s
-    santa = scanl move zero (evens cs)
-    robo = scanl move zero (odds cs)
+    santa = path (evens cs)
+    robo = path (odds cs)
 
 tests2 :: [(String, Int)]
 tests2 = [
