@@ -31,11 +31,11 @@ turn 1 L = U
 turn 1 d = succ d
 turn n _ = error $ "bad turn instruction " ++ show n
 
-move :: Direction -> Position -> Position
-move U (Position x y) = Position x (y-1)
-move R (Position x y) = Position (x+1) y
-move D (Position x y) = Position x (y+1)
-move L (Position x y) = Position (x-1) y
+move :: Direction -> Position
+move U = Position 0 (-1)
+move R = Position 1 0
+move D = Position 0 1
+move L = Position (-1) 0
 
 data Paint = Black | White
     deriving (Enum, Show)
@@ -78,7 +78,7 @@ turnRobot :: Int -> Robot -> Robot
 turnRobot v r = r { direction = turn v (direction r) }
 
 moveRobot :: Robot -> Robot
-moveRobot r = r { position = move (direction r) (position r) }
+moveRobot r = r { position = position r .+. move (direction r) }
 
 -- running a robot with an Intcode controller
 

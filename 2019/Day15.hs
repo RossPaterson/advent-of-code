@@ -26,11 +26,11 @@ fromMove d = toValue d + 1
 startPoint :: Position
 startPoint = zero
 
-move :: Position -> Move -> Position
-move (Position x y) N = Position x (y-1)
-move (Position x y) S = Position x (y+1)
-move (Position x y) W = Position (x-1) y
-move (Position x y) E = Position (x+1) y
+move :: Move -> Position
+move N = Position 0 (-1)
+move S = Position 0 1
+move W = Position (-1) 0
+move E = Position 1 0
 
 data Response = Blocked | Moved | Found
     deriving (Enum, Show)
@@ -73,7 +73,7 @@ mapMaze mem = searchMaze startPoint (automaton mem) initMaze
 -- search from p with a droid positioned at p
 searchMaze :: Position -> Automaton -> Maze -> Maze
 searchMaze p droid m =
-    foldl (moveTo droid) m [(d, move p d) | d <- allValues]
+    foldl (moveTo droid) m [(d, p .+. move d) | d <- allValues]
 
 -- consider droid moves to adjacent points
 moveTo :: Automaton -> Maze -> (Move, Position) -> Maze
@@ -100,7 +100,7 @@ moveDroid _ _ = error "Droid not accepting input"
 -- destinations reachable in one step from p
 neighbours :: Map Position Cell -> Position -> [Position]
 neighbours m p =
-    [p' | d <- allValues, let p' = move p d, Map.lookup p' m == Just Space]
+    [p' | d <- allValues, let p' = p .+. move d, Map.lookup p' m == Just Space]
 
 solve1 :: Maze -> Int
 solve1 maze = case target maze of

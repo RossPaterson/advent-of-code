@@ -35,11 +35,11 @@ turnRight Right = Down
 turnRight Down = Left
 turnRight Left = Up
 
-move :: Direction -> Position -> Position
-move Up (Position x y) = Position x (y-1)
-move Down (Position x y) = Position x (y+1)
-move Left (Position x y) = Position (x-1) y
-move Right (Position x y) = Position (x+1) y
+move :: Direction -> Position
+move Up = Position 0 (-1)
+move Down = Position 0 1
+move Left = Position (-1) 0
+move Right = Position 1 0
 
 data State = State {
     position :: !Position,
@@ -68,7 +68,7 @@ burst1 (State pos dir g n) = State pos' dir' g' n'
     infected = Map.member pos g
     dir' = (if infected then turnRight else turnLeft) dir
     g' = set pos (if infected then Clean else Infected) g
-    pos' = move dir' pos
+    pos' = pos .+. move dir'
     n' = if infected then n else n+1
 
 solve1 :: Input -> Int
@@ -92,7 +92,7 @@ burst2 (State pos dir g n) = State pos' dir' g' n'
     dir' = turn state dir
     state' = newState state
     g' = set pos state' g
-    pos' = move dir' pos
+    pos' = pos .+. move dir'
     n' = if state' == Infected then n+1 else n
 
 turn :: NodeState -> Direction -> Direction
