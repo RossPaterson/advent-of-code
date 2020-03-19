@@ -4,7 +4,7 @@ import Cartesian
 import Parser
 import qualified MaxPriorityQueue as PQ
 import Utilities
-import Data.List
+import Data.Foldable
 import Data.Ord
 
 -- Input processing
@@ -63,7 +63,7 @@ testInput1 =
 -- code that intersects with the most regions and dividing it into
 -- eight subcubes for further consideration.
 solve2 :: [Region] -> Int
-solve2 ns = searchCubes (add (boundingCube ns) mempty)
+solve2 ns = searchCubes (newCube (boundingCube ns))
   where
     -- The priority ordering ensures that if the least is a cube of size 1,
     -- it is a point inside the most regions that is closest to the origin.
@@ -71,12 +71,12 @@ solve2 ns = searchCubes (add (boundingCube ns) mempty)
         Nothing -> error "empty queue"
         Just (Priority _ s (Down dist), c, pq')
           | s == 1 -> dist
-          | otherwise -> searchCubes (foldr add pq' (splitCube c))
+          | otherwise -> searchCubes (pq' <> foldMap newCube (splitCube c))
 
-    -- add a cube to the priority queue in appropriate order
-    add c pq = PQ.insert (priority ns c) c pq
+    -- priority queue containing a single cube
+    newCube c = PQ.singleton (priority ns c) c
 
--- cubic search area, with bottom corner and size (a power of 2)
+-- cubic search area, with minimal corner and size (a power of 2)
 data Cube = Cube Point3 Int
   deriving Show
 
