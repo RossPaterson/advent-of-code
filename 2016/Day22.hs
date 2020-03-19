@@ -77,8 +77,7 @@ near :: Position -> Position -> Bool
 near (Position x1 y1) (Position x2 y2) = abs (x1-x2) <= 1 && abs (y1-y2) <= 1
 
 neighbours :: Position -> [Position]
-neighbours (Position x y) =
-    [Position (x-1) y, Position (x+1) y, Position x (y-1), Position x (y+1)]
+neighbours p = map (p .+.) cardinalDirections
 
 finished :: State -> Bool
 finished s = goal s == zero

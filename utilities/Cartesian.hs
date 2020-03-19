@@ -3,7 +3,7 @@ module Cartesian (
     -- * Normed vector spaces
     NormedVectorSpace(..), distance,
     -- * Display coordinates
-    Position(..),
+    Position(..), cardinalDirections, corners,
     readGrid, showGrid,
     -- * Various dimensions
     Point2(..),
@@ -47,6 +47,15 @@ instance NormedVectorSpace Position where
     Position x1 y1 .-. Position x2 y2 = Position (x1-x2) (y1-y2)
     r *. Position x y = Position (r*x) (r*y)
     norm (Position x y) = abs x + abs y
+
+-- | Difference vectors for the cardinal directions
+cardinalDirections :: [Position]
+cardinalDirections =
+    [Position 0 (-1), Position 1 0, Position 1 1, Position (-1) 0]
+
+-- | Difference vectors for the corner directions
+corners :: [Position]
+corners = [Position 1 (-1), Position 1 1, Position (-1) 1, Position (-1) 1]
 
 -- | Read a 2-dimensional grid, with (0, 0) in the top left corner
 readGrid :: String -> [(Position, Char)]

@@ -16,8 +16,7 @@ import qualified Data.Set as Set
 type Input = (Maze, Position)
 
 neighbours :: Position -> [Position]
-neighbours (Position x y) =
-    [Position (x+1) y, Position x (y+1), Position (x-1) y, Position x (y-1)]
+neighbours pos = map (pos .+.) cardinalDirections
 
 type Door = Int
 
@@ -187,15 +186,11 @@ showState2 m s = showStateAux m (positions s) (collected2 s)
 
 -- transformation of the maze into four quadrants for part 2
 splitMaze :: (Maze, State) -> (Maze, State2)
-splitMaze (m, State coll p) = (m', State2 coll (corners p))
+splitMaze (m, State coll p) = (m', State2 coll new_ps)
   where
     m' = m { passages = Set.difference (passages m) new_walls }
     new_walls = Set.fromList (p : neighbours p)
-
-corners :: Position -> [Position]
-corners (Position x y) =
-    [Position (x-1) (y-1), Position (x-1) (y+1),
-     Position (x+1) (y-1), Position (x+1) (y+1)]
+    new_ps = map (p .+.) corners
 
 solve2 :: Input -> Int
 solve2 (m0, p) =

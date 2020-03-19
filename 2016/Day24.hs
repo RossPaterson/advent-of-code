@@ -27,9 +27,11 @@ parse s = Maze {
 -- Part One --
 
 neighbours :: Maze -> Position -> [Position]
-neighbours m (Position x y) =
-    [p | p <- [Position (x-1) y, Position (x+1) y, Position x (y-1), Position x (y+1)],
-        Set.member p (openPos m) ]
+neighbours m p =
+    [p' |
+        dp <- cardinalDirections,
+        let p' = p .+. dp,
+        Set.member p' (openPos m)]
 
 nodes :: Maze -> [NodeName]
 nodes m = Map.keys (nodeLoc m)
