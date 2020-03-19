@@ -84,15 +84,15 @@ moveOrder = sortBy (comparing key) . Map.toList
     key (Position x y, _) = (y, x)
 
 moveCart :: Track -> Cart -> Cart
-moveCart t (p, o) = (move dir p, o')
+moveCart t (p, o) = (p .+. move dir, o')
   where
     o'@(CartState dir _) = turns (t!p) o
 
-move :: Direction -> Position -> Position
-move U (Position x y) = Position x (y-1)
-move D (Position x y) = Position x (y+1)
-move L (Position x y) = Position (x-1) y
-move R (Position x y) = Position (x+1) y
+move :: Direction -> Position
+move U = Position 0 (-1)
+move D = Position 0 1
+move L = Position (-1) 0
+move R = Position 1 0
 
 turns :: Piece -> CartState -> CartState
 turns Intersection (CartState dir td) = CartState (turn td dir) (succWrap td)

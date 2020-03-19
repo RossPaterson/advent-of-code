@@ -22,11 +22,11 @@ type Scaffold = Set Position
 data Direction = Up | Dn | Lt | Rt
     deriving (Bounded, Enum, Show)
 
-move :: Direction -> Position -> Position
-move Up (Position x y) = Position x (y-1)
-move Dn (Position x y) = Position x (y+1)
-move Lt (Position x y) = Position (x-1) y
-move Rt (Position x y) = Position (x+1) y
+move :: Direction -> Position
+move Up = Position 0 (-1)
+move Dn = Position 0 1
+move Lt = Position (-1) 0
+move Rt = Position 1 0
 
 dirNames :: String
 dirNames = "^v<>"
@@ -53,7 +53,7 @@ intersections :: State -> [Position]
 intersections s = filter crossing (Set.toList m)
   where
     m = scaffold s
-    crossing p = Set.fromList [move d p | d <- allValues] `Set.isSubsetOf` m
+    crossing p = Set.fromList [p .+. move d | d <- allValues] `Set.isSubsetOf` m
 
 alignment :: Position -> Int
 alignment (Position x y) = x*y
@@ -108,12 +108,12 @@ segmentsFrom :: Set Position -> Position -> Direction -> [Segment]
 segmentsFrom s p d = case tds of
     [] -> []
     [(t, d')] ->
-        let ps = takeWhile (`Set.member` s) (iterate (move d') p) in
+        let ps = takeWhile (`Set.member` s) (iterate (.+. move d') p) in
         (t, length ps - 1):segmentsFrom s (last ps) d'
     _ -> error "More than one turn"
   where
     tds = [(t, d') |
-        t <- allValues, let d' = turn t d, move d' p `Set.member` s]
+        t <- allValues, let d' = turn t d, (p .+. move d') `Set.member` s]
 
 -- A two-level program for traversing the path
 data Plan = Plan {
