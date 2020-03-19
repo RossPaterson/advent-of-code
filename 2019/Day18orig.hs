@@ -178,15 +178,11 @@ showState2 m (State2 ps coll) = showStateAux m ps coll
 
 -- transformation of the maze into four quadrants for part 2
 splitMaze :: (Maze, State) -> (Maze, State2)
-splitMaze (m, State p coll) = (m', State2 (corners p) coll)
+splitMaze (m, State p coll) = (m', State2 new_ps coll)
   where
     m' = m { passages = Set.difference (passages m) new_walls }
     new_walls = Set.fromList (p : neighbours p)
-
-corners :: Position -> [Position]
-corners (Position x y) =
-    [Position (x-1) (y-1), Position (x-1) (y+1),
-     Position (x+1) (y-1), Position (x+1) (y+1)]
+    new_ps = map (p .+.) corners
 
 solve2 :: Input -> Int
 solve2 (m0, p) =

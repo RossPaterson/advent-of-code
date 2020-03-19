@@ -42,10 +42,11 @@ tests1 = [(testInput, 8108)]
 -- Part Two
 
 neighbours :: Grid -> Position -> [Position]
-neighbours g (pos@(Position x y))
+neighbours g pos
   | Set.member pos g =
     [pos' |
-        pos' <- [Position (x-1) y, Position x (y-1), Position (x+1) y, Position x (y+1)],
+        dir <- cardinalDirections,
+        let pos' = pos .+. dir,
         Set.member pos' g]
   | otherwise = []
 
