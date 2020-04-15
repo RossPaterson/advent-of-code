@@ -2,23 +2,18 @@ module Main where
 
 import Prelude hiding (Either(Left, Right))
 import Utilities
+import Cartesian
 import Control.Monad
 import Data.Char
 import Data.List
 import Data.Map (Map)
 import qualified Data.Map as Map
 
-data Position = Position Int Int -- row first, so start is first key
-    deriving (Eq, Ord, Show)
-
 type Diagram = Map Position Char
 type Input = Diagram
 
 parse :: String -> Input
-parse s = Map.fromList [(Position row col, c) |
-    (row, line) <- zip [0..] (lines s),
-    (col, c) <- zip [0..] line,
-    c /= ' ']
+parse s = Map.fromList [(p, c) | (p, c) <- readGrid s, c /= ' ']
 
 data Direction = Up | Down | Left | Right
     deriving Show
@@ -35,22 +30,25 @@ turnRight Right = Down
 turnRight Down = Left
 turnRight Left = Up
 
-move :: Direction -> Position -> Position
-move Up (Position r c) = Position (r-1) c
-move Down (Position r c) = Position (r+1) c
-move Left (Position r c) = Position r (c-1)
-move Right (Position r c) = Position r (c+1)
+direction :: Direction -> Position
+direction Up = Position 0 (-1)
+direction Down = Position 0 1
+direction Left = Position (-1) 0
+direction Right = Position 1 0
 
 type State = (Position, Direction)
 
--- start above the first wire, so it is included in the path
+-- start above the uppermost wire, so it is included in the path
 start :: Map Position a -> State
-start diagram = (move Up (head (Map.keys diagram)), Down)
+start diagram = (minimumBy cmpRow (Map.keys diagram) .+. direction Up, Down)
+  where
+    cmpRow (Position _ y1) (Position _ y2) = compare y1 y2
 
 step :: Map Position a -> State -> Maybe (a, State)
 step diagram (pos, dir) =
     -- move in the same direction if we can, otherwise try turning
-    msum [moveto (move d pos) d | d <- [dir, turnLeft dir, turnRight dir]]
+    msum [moveto (pos .+. direction d) d |
+        d <- [dir, turnLeft dir, turnRight dir]]
   where
     moveto pos' dir' = do
         cell <- Map.lookup pos' diagram
