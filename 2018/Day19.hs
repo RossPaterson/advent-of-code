@@ -64,7 +64,7 @@ the main computation.
 -}
 
 solve2 :: Input -> Int
-solve2 = sumOfFactors . target 1
+solve2 = fromInteger . sumOfDivisors . target 1
 
 -- The bound used in the first GTRR if R0 initially contains v.
 target :: Int -> Program -> Int
