@@ -8,14 +8,9 @@ module Number(
     numberOfDivisors,
     sumOfDivisors,
     sumOfDivisorPowers,
-    -- * Bézout's identity
+    -- * Linear Diophantine equations
     bezout,
-    -- * Quadratic residues
-    legendre,
-    sqrtMod
     ) where
-
-import Data.List
 
 -- | The infinite list of prime numbers
 primes :: [Int]
@@ -47,9 +42,13 @@ primeFactors = factorize primes
           | m `mod` p == 0 = primePower (k+1) (m `div` p)
           | otherwise = (p, k):factorize ps m
 
+-- A multiplicative function, specified by its action on @p^k@
+multiplicative :: Num a => (Int -> Int -> a) -> Int -> a
+multiplicative f n = product [f p k | (p, k) <- primeFactors n]
+
 -- | The number of divisors of @n@
 numberOfDivisors :: Int -> Int
-numberOfDivisors n = product [k+1 | (_, k) <- primeFactors n]
+numberOfDivisors = multiplicative (const (+1))
 
 -- | The sum of all the divisors of @n@
 sumOfDivisors :: Int -> Integer
@@ -58,10 +57,9 @@ sumOfDivisors = sumOfDivisorPowers 1
 -- | @'sumOfDivisorPowers' m n@ is the sum of @m@th powers all the
 -- divisors of @n@.
 sumOfDivisorPowers :: Int -> Int -> Integer
-sumOfDivisorPowers m n
-  | m <= 0 = toInteger (numberOfDivisors n)
-  | otherwise =
-    product [sumPowers (toInteger p^m) k | (p, k) <- primeFactors n]
+sumOfDivisorPowers m
+  | m <= 0 = toInteger . numberOfDivisors
+  | otherwise = multiplicative $ \ p k -> sumPowers (toInteger p^m) k
 
 -- @'sumPowers' x k = x^k + ... + x + 1@
 sumPowers :: Integer -> Int -> Integer
@@ -77,7 +75,7 @@ sumPowers x k = fromInteger ((x^(k+1) - 1) `div` (x-1))
 -- * @x@ is the multiplicative inverse of @a@ modulo @b@.
 --
 -- * @j*a*x + i*b*y@ is equivalent to @i@ modulo @a@ and to @j@ modulo @b@
---   (Chinese Remaider Theorem).
+--   (Chinese Remainder Theorem).
 bezout :: Integral a => a -> a -> (a, a)
 bezout a b = (signum a * approx 1 0 qs, signum b * approx 0 1 qs)
   where
@@ -90,34 +88,3 @@ bezout a b = (signum a * approx 1 0 qs, signum b * approx 0 1 qs)
 
     approx x _ [] = x
     approx x y (c:cs) = approx y (x - c*y) cs
-
--- | For an odd prime @p@, @'legendre' a p@ is @0@ if @a@ is a multiple
--- of @p@, @1@ if @a = x*x@ modulo @p@ for some @x@, and @-1@ otherwise.
-legendre :: Int -> Int -> Int
-legendre a p = (power_mod (p `div` 2) + 1) `mod` p - 1
-  where
-    base = a `mod` p
-    power_mod n
-      | n == 0 = 1
-      | odd n = (xx * base) `mod` p
-      | otherwise = xx
-      where
-        x = power_mod (n `div` 2)
-        xx = (x * x) `mod` p
-
--- | @'sqrtMod' a n@ is the list of numbers @x@ such that @a = x*x@ modulo @n@.
-sqrtMod :: Int -> Int -> [Int]
-sqrtMod a n
-  | n <= 0 = error "Non-positive modulus"
-  | n == 1 = [0]
-  | otherwise = sort (fst (foldr1 combine parts))
-  where
-    combine (ras, na) (rbs, nb) =
-        ([(rb*na*x + ra*nb*y) `mod` nab | ra <- ras, rb <- rbs], nab)
-      where
-        nab = na*nb
-        (x, y) = bezout na nb
-    parts = [(roots (a `mod` pk) pk, pk) | pk <- components]
-    roots x pk = [y | y <- [0..pk-1], y*y `mod` pk == x]
-    components = [p^k | (p, k) <- primeFactors n]
-    factors = primeFactors n
