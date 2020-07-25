@@ -5,7 +5,7 @@ import Cartesian
 import Control.Monad
 import Data.Functor
 import Data.Maybe
-import Data.Hash.MD5(md5s, Str(..)) -- from MissingH package
+import MD5
 
 data Direction = U | D | L | R
   deriving (Show, Bounded, Enum)
@@ -17,7 +17,7 @@ showPath = concatMap show
 open :: String -> Path -> [Direction]
 open passcode path = [d | (d, c) <- zip allValues hash, c >= 'b']
   where
-    hash = md5s (Str (passcode ++ showPath path))
+    hash = md5s (passcode ++ showPath path)
 
 x_max, y_max :: Int
 x_max = 3

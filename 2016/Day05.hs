@@ -1,13 +1,13 @@
 module Main where
 
+import MD5
 import Utilities
 import Data.Char
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Hash.MD5 -- from MissingH package
 
 hash :: String -> Int -> String
-hash s n = md5s (Str (s ++ show n))
+hash s n = md5s (s ++ show n)
 
 matches :: String -> [String]
 matches s = [drop 5 h | n <- [0..], let h = hash s n, take 5 h == "00000"]

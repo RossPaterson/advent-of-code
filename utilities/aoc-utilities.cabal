@@ -18,6 +18,7 @@ library
   exposed-modules:
     Cartesian
     Graph
+    MD5
     MaxPriorityQueue
     MinPriorityQueue
     Number
