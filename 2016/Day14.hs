@@ -1,15 +1,15 @@
 module Main where
 
+import MD5
 import Utilities
 import Data.List
 import Data.Maybe
-import Data.Hash.MD5 -- from MissingH package
 
 input_salt :: String
 input_salt = "ahsbgdzn"
 
 hash1 :: String -> String
-hash1 s = md5s (Str s)
+hash1 = md5s
 
 hashes :: String -> (String -> String) -> [(Int, String)]
 hashes salt hash = [(n, hash (salt ++ show n)) | n <- [0..]]
@@ -49,6 +49,6 @@ main :: IO ()
 main = do
     putStr (unlines (failures "solve1" solve1 tests1))
     print (solve1 input_salt)
-    -- These are just too slow
-    -- putStr (unlines (failures "solve2" solve2 tests2))
-    -- print (solve2 input_salt)
+    -- These are quite slow
+    putStr (unlines (failures "solve2" solve2 tests2))
+    print (solve2 input_salt)

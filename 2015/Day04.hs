@@ -1,11 +1,11 @@
 module Main where
 
+import MD5
 import Utilities
 import Data.List
-import Data.Hash.MD5 -- from MissingH package
 
 hash :: String -> Int -> String
-hash s n = md5s (Str (s ++ show n))
+hash s n = md5s (s ++ show n)
 
 solve1 :: String -> Int
 solve1 s = head [n | n <- [0..], let h = hash s n, "00000" `isPrefixOf` h]

@@ -1,1 +1,1 @@
-:set -i../utilities
+:set -i../utilities -lbsd
