@@ -51,11 +51,11 @@ instance NormedVectorSpace Position where
 -- | Difference vectors for the cardinal directions
 cardinalDirections :: [Position]
 cardinalDirections =
-    [Position 0 (-1), Position 1 0, Position 1 1, Position (-1) 0]
+    [Position 0 (-1), Position 1 0, Position 0 1, Position (-1) 0]
 
 -- | Difference vectors for the corner directions
 corners :: [Position]
-corners = [Position 1 (-1), Position 1 1, Position (-1) 1, Position (-1) 1]
+corners = [Position 1 (-1), Position 1 1, Position (-1) 1, Position (-1) (-1)]
 
 -- | Read a 2-dimensional grid, with (0, 0) in the top left corner
 readGrid :: String -> [(Position, Char)]
