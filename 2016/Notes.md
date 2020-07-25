@@ -4,6 +4,11 @@
 
 (image by Jo Wood)
 
+Days 5, 14 and 17 used MD5 hashing (used in Day 5 in 2015), exploiting
+the fact that it is a bit costly to compute and is difficult to invert.
+In 2017, a custom hashing function with the same properties is used
+instead.
+
 ## [Day 1: No Time for a Taxicab](https://adventofcode.com/2016/day/1)
 
 The first part is just following Cartesian directions.
@@ -53,8 +58,9 @@ The second part involves displaying a bitmap for manual reading.
 
 String expansion.
 
-The second part is incompletely specified; needs recursion.
-It is crucial that markers must be nested.
+The second part is incompletely specified: it is crucial that markers
+must be nested.  The solution requires recursion, but fortunately only
+lengths need be computed.
 
 ## [Day 10: Balance Bots](https://adventofcode.com/2016/day/10)
 
