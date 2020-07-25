@@ -57,6 +57,9 @@ direction '^' = Just U
 direction 'v' = Just D
 direction _ = Nothing
 
+showPosition :: Position -> String
+showPosition (Position x y) = show (x, y)
+
 -- Part One
 
 -- position of the first crash
@@ -180,6 +183,6 @@ main = do
     s <- readFile "input/13.txt"
     let input = parse s
     putStr (unlines (failures "solve1" (solve1 . parse) tests1))
-    print (solve1 input)
+    putStrLn (showPosition (solve1 input))
     putStr (unlines (failures "solve2" (solve2 . parse) tests2))
-    print (solve2 input)
+    putStrLn (showPosition (solve2 input))
