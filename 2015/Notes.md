@@ -6,9 +6,10 @@
 
 I did this set retrospectively, after first participating in 2016.
 
-Days 4, 5, 14 and 17 used MD5 hashing, exploiting the fact that
-it is a bit costly to compute and is difficult to invert.  In 2017,
-a custom hashing function with the same properties is used instead.
+Day 4 used MD5 hashing, exploiting the fact that it is a bit costly to
+compute and is difficult to invert.  MD5 hashing re-appeared in days 5,
+14 and 17 of 2016.  In 2017, a custom hashing function with the same
+properties is used instead.
 
 ## [Day 1: Not Quite Lisp](https://adventofcode.com/2015/day/1)
 
