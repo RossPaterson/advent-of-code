@@ -17,6 +17,7 @@ library
   default-language: Haskell2010
   exposed-modules:
     Cartesian
+    CompactSet
     Graph
     MD5
     MaxPriorityQueue

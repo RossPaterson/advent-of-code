@@ -18,7 +18,7 @@ parse = Map.fromList . map (runParser node) . lines
     node = (,) <$> nat <* string " <-> " <*> sepBy1 nat (string ", ")
 
 solve1 :: Input -> Int
-solve1 g = length (component (g!) 0)
+solve1 g = length (concat (bfs (g!) [0]))
 
 testInput :: String
 testInput =

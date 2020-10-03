@@ -32,8 +32,10 @@ production rs = Map.fromList [(res, (n, qs)) | Reaction qs (n, res) <- rs]
 
 -- everything but the last (ORE) in top-down order
 productionOrder :: Production -> [Chemical]
-productionOrder p =
-    init (tsort [(x, y) | (x, (_, nys)) <- Map.assocs p, (_, y) <- nys])
+productionOrder = init . tsortG . Map.map (map snd . snd)
+
+graphToRelation :: Map a [a] -> [(a, a)]
+graphToRelation g = [(x, y) | (x, ys) <- Map.assocs g, y <- ys]
 
 -- add immediate components needed to make the required amount of ch
 manufacture :: Production -> Map Chemical Int -> Chemical -> Map Chemical Int

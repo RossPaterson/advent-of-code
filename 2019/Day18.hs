@@ -1,9 +1,10 @@
 module Main where
 
 import Cartesian
+import qualified CompactSet as CompactSet
 import Graph
 import Utilities
-import Data.Bits
+import Control.Monad
 import Data.Char
 import Data.Maybe
 import Data.Map (Map, (!))
@@ -18,12 +19,13 @@ type Input = (Maze, Position)
 neighbours :: Position -> [Position]
 neighbours pos = map (pos .+.) cardinalDirections
 
-type Door = Int
+-- identifier of a door and corresponding key
+type DoorId = Int
 
 data Maze = Maze {
     passages :: Set Position,
-    keys :: Map Position Door,
-    doors :: Map Position Door
+    keys :: Map Position DoorId,
+    doors :: Map Position DoorId
     }
     deriving Show
 
@@ -43,50 +45,56 @@ parse s = (maze, pos)
 
 -- Part One
 
--- For each startpoint, door or key in the original layout, the number
--- of steps to other doors or keys that are reachable without passing
--- through any door.
-bigSteps :: Maze -> [Position] -> Map Position [(Int, Position)]
-bigSteps m starts =
-    Map.fromList [(p, reachable p) | p <- starts ++ Set.toList waypoints]
+-- a waypoint is a startpoint, door or key in the original layout
+data Waypoint = Start !Position | Door !DoorId | Key !DoorId
+    deriving (Eq, Ord, Show)
+
+-- weighted graph
+type Graph a = Map a [(Int, a)]
+
+-- graph of distances between waypoints without passing through any door.
+waypointGraph :: Maze -> [Position] -> Graph Waypoint
+waypointGraph m starts = fmap reachable waypointLocs
   where
-    waypoints = Set.union (Map.keysSet (keys m)) (Map.keysSet (doors m))
-    reachable p = [(depth, dest) |
+    waypointLocs = Map.fromList $
+        [(Start p, p) | p <- starts] ++
+        [(Door k, p) | (p, k) <- Map.assocs (doors m)] ++
+        [(Key k, p) | (p, k) <- Map.assocs (keys m)]
+    reachable p = [(depth, wp) |
         -- first step is special because next won't go past doors
         (depth, dests) <- (1, ns):zip [2..] (tail (bfs next (p:ns))),
         dest <- dests,
-        Set.member dest waypoints]
+        wp <- maybeToList (waypoint dest)]
       where
         ns = open p
+    waypoint p =
+        fmap Door (Map.lookup p (doors m)) `mplus`
+        fmap Key (Map.lookup p (keys m))
     open p = [n | n <- neighbours p, Set.member n (passages m)]
     next p -- like open, except won't go anywhere from a door
       | Map.member p (doors m) = []
       | otherwise = open p
 
--- a bit set of keys
-newtype Keyring = Keyring Int
-    deriving (Eq, Ord, Show)
-
-noKeys :: Keyring
-noKeys = Keyring 0
-
-hasKey :: Keyring -> Door -> Bool
-hasKey (Keyring ds) d = testBit ds d
-
-addKey :: Door -> Keyring -> Keyring
-addKey d (Keyring ds) = Keyring (setBit ds d)
+-- a set of keys
+type Keyring = CompactSet.Set DoorId
 
 data State = State {
     collected :: !Keyring,
-    position :: !Position
+    position :: !Waypoint
     }
     deriving (Eq, Ord, Show)
 
 initState :: Position -> State
-initState p = State noKeys p
+initState p = State mempty (Start p)
 
 showState :: Maze -> State -> String
-showState m s = showStateAux m [position s] (collected s)
+showState m s = showStateAux m [wpPosition m (position s)] (collected s)
+
+-- position of the waypoint in a maze
+wpPosition :: Maze -> Waypoint -> Position
+wpPosition _ (Start p) = p
+wpPosition m (Door d) = head [p | (p, k) <- Map.assocs (doors m), k == d]
+wpPosition m (Key d) = head [p | (p, k) <- Map.assocs (keys m), k == d]
 
 showStateAux :: Maze -> [Position] -> Keyring -> String
 showStateAux m ps coll = showGrid '#' $
@@ -97,32 +105,37 @@ showStateAux m ps coll = showGrid '#' $
   where
     key d = chr (d + ord 'a')
     door d = chr (d + ord 'A')
-    live d = not (hasKey coll d)
+    live d = not (CompactSet.member d coll)
 
 solve1 :: Input -> Int
 solve1 (m, p) =
     fst $ head $ dropWhile (not . finished . snd) $
-        shortestPaths (nextState m graph) $ initState p
+        shortestPaths (nextState graph) $ initState p
   where
-    graph = bigSteps m [p]
+    graph = waypointGraph m [p]
     ks = allKeys m
     finished s = collected s == ks
 
--- Move to either an open door or a new key
-nextState :: Maze -> Map Position [(Int, Position)] -> State -> [(Int, State)]
-nextState m steps (State coll pos) =
-    [(dist, State coll' p) |
-        (dist, p) <- steps!pos,
-        let mb_new_key = Map.lookup p new_keys,
-        isJust mb_new_key || Map.member p open_doors,
-        let coll' = maybe coll (flip addKey coll) mb_new_key]
-  where
-    new_keys = Map.filter (not . hasKey coll) (keys m)
-    open_doors = Map.filter (hasKey coll) (doors m)
+-- Move to either an open door or an uncollected key
+nextState :: Graph Waypoint -> State -> [(Int, State)]
+nextState graph (State coll p) =
+    [(dist, State (updateKeyring p' coll) p') |
+        (dist, p') <- graph!p, isTarget coll p']
+
+-- update keyring on arriving at the waypoint
+updateKeyring :: Waypoint -> Keyring -> Keyring
+updateKeyring (Key k) ks = CompactSet.insert k ks
+updateKeyring _ ks = ks
+
+-- waypoint is an open door or uncollected key
+isTarget :: Keyring -> Waypoint -> Bool
+isTarget ks (Key k) = not (CompactSet.member k ks) -- uncollected key
+isTarget ks (Door k) = CompactSet.member k ks -- open door
+isTarget _ _ = False
 
 -- all the keys in the maze
 allKeys :: Maze -> Keyring
-allKeys m = foldr addKey noKeys (Map.elems (keys m))
+allKeys m = CompactSet.fromList (Map.elems (keys m))
 
 testInput1 :: String
 testInput1 =
@@ -177,16 +190,20 @@ tests1 = [
 -- now there are multiple searchers
 data State2 = State2 {
     collected2 :: !Keyring,
-    positions :: ![Position]
+    positions :: ![Waypoint]
     }
     deriving (Eq, Ord, Show)
 
+initState2 :: [Position] -> State2
+initState2 ps = State2 mempty (map Start ps)
+
 showState2 :: Maze -> State2 -> String
-showState2 m s = showStateAux m (positions s) (collected2 s)
+showState2 m s =
+    showStateAux m (map (wpPosition m) (positions s)) (collected2 s)
 
 -- transformation of the maze into four quadrants for part 2
-splitMaze :: (Maze, State) -> (Maze, State2)
-splitMaze (m, State coll p) = (m', State2 coll new_ps)
+splitMaze :: (Maze, Position) -> (Maze, [Position])
+splitMaze (m, p) = (m', new_ps)
   where
     m' = m { passages = Set.difference (passages m) new_walls }
     new_walls = Set.fromList (p : neighbours p)
@@ -194,26 +211,24 @@ splitMaze (m, State coll p) = (m', State2 coll new_ps)
 
 solve2 :: Input -> Int
 solve2 (m0, p) =
-    fst $ head $ dropWhile (not . finished . snd) $ shortestPaths (nextState2 m graph) s0
+    fst $ head $ dropWhile (not . finished . snd) $
+        shortestPaths (nextState2 graph) s0
   where
-    (m, s0) = splitMaze (m0, initState p)
-    graph = bigSteps m (positions s0)
+    (m, ps) = splitMaze (m0, p)
+    s0 = initState2 ps
+    graph = waypointGraph m ps
     ks = allKeys m
     finished s = collected2 s == ks
 
--- Move to either an open door or a new key
-nextState2 :: Maze -> Map Position [(Int, Position)] -> State2 -> [(Int, State2)]
-nextState2 m steps (State2 coll ps) =
+-- Move one of the robots to either an open door or an uncollected key
+nextState2 :: Graph Waypoint -> State2 -> [(Int, State2)]
+nextState2 graph (State2 coll ps) =
     [(dist, State2 coll' ps') |
-        (front, pos:back) <- splits ps,
-        (dist, p) <- steps!pos,
-        let mb_new_key = Map.lookup p new_keys,
-        isJust mb_new_key || Map.member p open_doors,
-        let coll' = maybe coll (flip addKey coll) mb_new_key,
-        let ps' = front++(p:back)]
-  where
-    new_keys = Map.filter (not . hasKey coll) (keys m)
-    open_doors = Map.filter (hasKey coll) (doors m)
+        (front, p:back) <- splits ps,
+        (dist, p') <- graph!p,
+        isTarget coll p',
+        let coll' = updateKeyring p' coll,
+        let ps' = front++(p':back)]
 
 testInput6 :: String
 testInput6 =

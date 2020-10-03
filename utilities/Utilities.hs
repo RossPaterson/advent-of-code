@@ -13,6 +13,7 @@ module Utilities (
     leastBy,
     same,
     tsort,
+    tsortG,
     -- * Iteration
     whileJust,
     iterateWhileJust,
@@ -30,7 +31,7 @@ module Utilities (
     ) where
 
 import Data.List
-import Data.Map ((!))
+import Data.Map (Map, (!))
 import qualified Data.Map as Map
 import Data.Ord
 import qualified Data.Set as Set
@@ -137,14 +138,21 @@ fastNub = Set.toList . Set.fromList
 
 -- | Topological sort
 tsort :: Ord a => [(a, a)] -> [a]
-tsort xys = map fst $ sortBy (comparing (Down . snd)) $ Map.assocs depth_map
+tsort = tsortG . relationToGraph
+
+-- | Topological sort
+tsortG :: Ord a => Map a [a] -> [a]
+tsortG g = map fst $ sortBy (comparing (Down . snd)) $ Map.assocs depth_map
   where
-    depth_map = fmap depth $ Map.unionsWith Set.union $
-        [Map.singleton x (Set.singleton y) | (x, y) <- xys] ++
-        [Map.singleton y Set.empty | (_, y) <- xys]
-    depth ys
-      | Set.null ys = 0::Int
-      | otherwise = maximum [depth_map!y | y <- Set.toList ys] + 1
+    depth_map = fmap depth (Map.union g empties)
+    empties = Map.unions [Map.singleton x [] | xs <- Map.elems g, x <- xs]
+    depth [] = 0::Int
+    depth ys = maximum [depth_map!y | y <- ys] + 1
+
+relationToGraph :: Ord a => [(a, a)] -> Map a [a]
+relationToGraph xys =
+    Map.map Set.toList $ Map.unionsWith Set.union $
+        [Map.singleton x (Set.singleton y) | (x, y) <- xys]
 
 -- | For a non-constant upward-closed predicate @p@, @'bsearch' p@
 -- returns the least @n@ satisfying @p@.
