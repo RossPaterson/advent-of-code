@@ -47,10 +47,19 @@ addMotions (Motion ax vx px) (Motion ay vy py) (Motion az vz pz) =
 
 -- make dominant component positive and apply its sign to the rest
 asymptoticCoord :: Motion Int -> Motion Int
-asymptoticCoord (Motion a v p)
-  | a /= 0 = Motion (abs a) (v * signum a) (p * signum a)
-  | v /= 0 = Motion 0 (abs v) (p * signum v)
-  | otherwise = Motion 0 0 (abs p)
+asymptoticCoord m = scaleMotion (asymptoticSign m) m
+
+-- The sign of the dominant component,
+-- which will be the sign of the position for large n
+-- (-1 for negative, 0, or 1 for positive).
+asymptoticSign :: Motion Int -> Int
+asymptoticSign (Motion a v p)
+  | a /= 0 = signum a
+  | v /= 0 = signum v
+  | otherwise = signum p
+
+scaleMotion :: Int -> Motion Int -> Motion Int
+scaleMotion s (Motion a v p) = Motion (s*a) (s*v) (s*p)
 
 -- index of asymptotically closest particle
 solve1 :: Input -> Int
