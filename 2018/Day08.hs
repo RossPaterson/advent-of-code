@@ -13,7 +13,7 @@ parse :: String -> Input
 parse = fst . takeTree . map read . words
 
 -- Scan one tree from the list
--- First two numbers are number of subtress and number of data values
+-- First two numbers are number of subtrees and number of data values
 takeTree :: [Int] -> (Tree, [Int])
 takeTree (nc:nd:xs) = (Tree children vs, rest)
   where
