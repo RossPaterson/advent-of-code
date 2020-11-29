@@ -79,6 +79,35 @@ solve1 program = length $ filter (isMul . (program!)) $ init $
 
 -- Part Two
 
+{-
+The outer structure of the program is:
+ 0: set b <v0>
+    ...
+ 4: mul b <v4>
+ 5: sub b <v5>
+ 6: set c b
+ 7: sub c <v7>
+    ... if b has factors, increment h ...
+26: set g b
+27: sub g c
+28: jnz g +2
+29: jump to address 32 (exit)
+30: sub b <v30>
+31: jump to address 8
+
+That is:
+    b = <v0>*<v4> - <v5>
+    c = b - <v7>
+    while (1) {
+        if (b has factors)
+            h++
+        if (b == c)
+            exit
+        b = b - <v30>
+
+All the subtracted values are negative, so they are additions.
+-}
+
 -- n has non-trivial factors
 composite :: Int -> Bool
 composite n = not (isPrime n)

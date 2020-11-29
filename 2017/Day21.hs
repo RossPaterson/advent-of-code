@@ -3,12 +3,14 @@ module Main where
 import Parser
 import Utilities
 import Control.Applicative
-import Data.Bits
 import Data.List
 
+-- an nxn array of Booleans
 data Grid = Grid Int [[Bool]]
     deriving (Eq, Show)
-data Rule = Rule CompactGrid Grid Grid
+
+-- grid re-writing rule
+data Rule = Rule Grid Grid
     deriving Show
 
 type Input = [Rule]
@@ -19,7 +21,7 @@ parse = map (runParser rule) . lines
 rule :: Parser Rule
 rule = mkRule <$> grid <* string " => " <*> grid
   where
-    mkRule lhs rhs = Rule (normalize lhs) lhs rhs
+    mkRule lhs rhs = Rule lhs rhs
 
 grid :: Parser Grid
 grid = mkGrid <$> sepBy1 row (char '/')
@@ -34,41 +36,8 @@ showGrid (Grid _ bss) = unlines (map (map showCell) bss)
     showCell True = '#'
     showCell False = '.'
 
--- Reduced form of a grid
-
-data CompactGrid = Grid2 Int | Grid3 Int
-    deriving (Eq, Ord, Show)
-
-toCompact :: Grid -> CompactGrid
-toCompact (Grid n bss) = (if n == 2 then Grid2 else Grid3) $
-    foldr addRow 0 (map (foldr addBit 0) bss)
-  where
-    addRow x y = x .|. shift y n
-    addBit True x = shift x 1 .|. bit 0
-    addBit False x = shift x 1
-
-fromCompact :: CompactGrid -> Grid
-fromCompact (Grid2 x) = Grid 2 (getRows 2 x)
-fromCompact (Grid3 x) = Grid 3 (getRows 3 x)
-
-getRows :: Int -> Int -> [[Bool]]
-getRows n x = [[testBit x (r*n + c) | c <- [0..n-1]] | r <- [0..n-1]]
-
--- Represent a left-hand side with a canonical compact from
-
-normalize :: Grid -> CompactGrid
-normalize = minimum . map toCompact . arrangements
-
-arrangements :: Grid -> [Grid]
-arrangements g = [f (times n rotate90 g) | f <- [id, flipGrid], n <- [0..3]]
-
-flipGrid :: Grid -> Grid
-flipGrid (Grid n bss) = Grid n (reverse bss)
-
-rotate90 :: Grid -> Grid
-rotate90 (Grid n bss) = Grid n (map reverse (transpose bss))
-
 -- Splitting and reassembling the grid
+-- The side of the square grid follows OEIS A000792 (https://oeis.org/A000792)
 
 splitGrid :: Grid -> [[Grid]]
 splitGrid (Grid n bss)
@@ -92,10 +61,29 @@ step :: [Rule] -> Grid -> Grid
 step rs = reassemble . map (map (rewrite rs)) . splitGrid
 
 -- Rewrite a subgrid
+-- The grid may be rotated and/or flipped to match the lhs, but the
+-- rhs it is replaced with is unaffected.
+-- Pre-computing a canonical rearrangement of the lhs would give a speedup
+-- by a factor of a bit under 2.
 rewrite :: [Rule] -> Grid -> Grid
-rewrite rs g = head [rhs | Rule nlhs _ rhs <- rs, nlhs == ng]
+rewrite rs g = head [rhs | Rule lhs rhs <- rs, elem lhs gs]
   where
-    ng = normalize g
+    gs = arrangements g
+
+-- ways of rotating or flipping the grid
+arrangements :: Grid -> [Grid]
+arrangements g =
+    [arrangement |
+        rotation <- take 4 (iterate rotate90 g),
+        arrangement <- [rotation, flipGrid rotation]]
+
+-- flip a grid around a vertical axis
+flipGrid :: Grid -> Grid
+flipGrid (Grid n bss) = Grid n (reverse bss)
+
+-- rotate a grid 90 degrees clockwise
+rotate90 :: Grid -> Grid
+rotate90 (Grid n bss) = Grid n (map reverse (transpose bss))
 
 -- Number of pixels that are on
 onCount :: Grid -> Int

@@ -31,6 +31,7 @@ bridgesFrom n comps =
       | x == y = [(x, y)]
       | otherwise = [(x, y), (y, x)]
 
+-- strongest bridge
 solve1 :: Input -> Int
 solve1 = maximum . map strength . bridges
 
@@ -49,6 +50,7 @@ tests1 = [(testInput, 31)]
 
 -- Part Two
 
+-- lexicographical ordering compares length, then strength
 measure :: [Component] -> (Int, Int)
 measure bridge = (length bridge, strength bridge)
 
