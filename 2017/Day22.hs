@@ -44,8 +44,7 @@ move Right = Position 1 0
 data State = State {
     position :: !Position,
     direction :: !Direction,
-    states :: !Grid,
-    infections :: !Int }
+    states :: !Grid }
     deriving Show
 
 type Input = State
@@ -54,25 +53,47 @@ parse :: String -> Input
 parse s = State {
     position = centre,
     direction = Up,
-    states = grid,
-    infections = 0 }
+    states = grid }
   where
     ls = lines s
     grid = Map.fromList [(p, Infected) | (p, c) <- readGrid s, c == '#']
     centre = Position (middle (length (head ls))) (middle (length ls))
     middle n = (n-1) `div` 2
 
-burst1 :: State -> State
-burst1 (State pos dir g n) = State pos' dir' g' n'
+-- one step of the machine
+burst :: (NodeState -> NodeState) ->
+    (NodeState -> Direction -> Direction) -> State -> State
+burst newState turn (State pos dir g) = State pos' dir' g'
   where
-    infected = Map.member pos g
-    dir' = (if infected then turnRight else turnLeft) dir
-    g' = set pos (if infected then Clean else Infected) g
+    node = get pos g
+    node' = newState node
+    dir' = turn node dir
+    g' = set pos node' g
     pos' = pos .+. move dir'
-    n' = if infected then n else n+1
+
+newState1 :: NodeState -> NodeState
+newState1 Infected = Clean
+newState1 Clean = Infected
+newState1 _ = error "unexpected node state"
+
+turn1 :: NodeState -> Direction -> Direction
+turn1 Infected = turnRight
+turn1 Clean = turnLeft
+turn1 _ = error "unexpected node state"
+
+burst1 :: State -> State
+burst1 = burst newState1 turn1
+
+-- number of new infections in a sequence of states
+infections :: [State] -> Int
+infections ss =
+    length [s' | (s, s') <- zip ss (tail ss),
+        let pos = position s,
+        get pos (states s) /= Infected,
+        get pos (states s') == Infected]
 
 solve1 :: Input -> Int
-solve1 = infections . times 10000 burst1
+solve1 = infections . take 10001 . iterate burst1
 
 testInput :: String
 testInput =
@@ -86,29 +107,22 @@ tests1 = [((10000, testInput), 5587)]
 -- Part Two
 
 burst2 :: State -> State
-burst2 (State pos dir g n) = State pos' dir' g' n'
-  where
-    state = get pos g
-    dir' = turn state dir
-    state' = newState state
-    g' = set pos state' g
-    pos' = pos .+. move dir'
-    n' = if state' == Infected then n+1 else n
+burst2 = burst newState2 turn2
 
-turn :: NodeState -> Direction -> Direction
-turn Clean = turnLeft
-turn Weakened = id
-turn Infected = turnRight
-turn Flagged = turnLeft . turnLeft
+newState2 :: NodeState -> NodeState
+newState2 Clean = Weakened
+newState2 Weakened = Infected
+newState2 Infected = Flagged
+newState2 Flagged = Clean
 
-newState :: NodeState -> NodeState
-newState Clean = Weakened
-newState Weakened = Infected
-newState Infected = Flagged
-newState Flagged = Clean
+turn2 :: NodeState -> Direction -> Direction
+turn2 Clean = turnLeft
+turn2 Weakened = id
+turn2 Infected = turnRight
+turn2 Flagged = turnLeft . turnLeft
 
 solve2 :: Input -> Int
-solve2 = infections . times 10000000 burst2
+solve2 = infections . take 10000001 . iterate burst2
 
 tests2 :: [((Int, String), Int)]
 tests2 = [((100, testInput), 26), ((10000000, testInput), 2511944)]
@@ -123,4 +137,4 @@ main = do
     print (solve2 input)
 
 runParsed :: (State -> State) -> (Int, String) -> Int
-runParsed f (n, s) = infections (times n f (parse s))
+runParsed f (n, s) = infections (take (n+1) (iterate f (parse s)))

@@ -10,7 +10,17 @@ import qualified Data.Set as Set
 data Vector = Vector { xc :: !Int, yc :: !Int, zc :: !Int }
     deriving (Eq, Ord, Show)
 
--- acceleration will dominate, then velocity, then position
+-- Because we're asked about asymptotic behaviour, we need to solve this
+-- particle system analytically.  Each coordinate evolves independently.
+-- Its values at step n will be
+--
+--     a_n = a_0
+--     v_n = a_0*n + v_0
+--     p_n = a_0*(n*(n+1) `div` 2) + v_0*n + p_0
+--
+-- Asymptotically, position will be dominated by initial acceleration,
+-- then initial velocity, then initial position, so we put them in that
+-- order for the Ord instance.
 data Motion a = Motion { acceleration :: a, velocity :: a, position :: a }
     deriving (Eq, Ord, Show)
 
@@ -47,7 +57,7 @@ addMotions (Motion ax vx px) (Motion ay vy py) (Motion az vz pz) =
 
 -- make dominant component positive and apply its sign to the rest
 asymptoticCoord :: Motion Int -> Motion Int
-asymptoticCoord m = scaleMotion (asymptoticSign m) m
+asymptoticCoord m = fmap (asymptoticSign m *) m
 
 -- The sign of the dominant component,
 -- which will be the sign of the position for large n
@@ -57,9 +67,6 @@ asymptoticSign (Motion a v p)
   | a /= 0 = signum a
   | v /= 0 = signum v
   | otherwise = signum p
-
-scaleMotion :: Int -> Motion Int -> Motion Int
-scaleMotion s (Motion a v p) = Motion (s*a) (s*v) (s*p)
 
 -- index of asymptotically closest particle
 solve1 :: Input -> Int
@@ -75,8 +82,10 @@ tests1 = [(testInput1, 0)]
 
 -- Part Two
 
--- Collect indices of colliding particles.  If a particle is involved in
--- a collision, later potential collisions with that particle are ignored.
+-- Collect indices of particles destroyed in collisions.  If a particle
+-- is destroyed in a collision, later potential collisions with that
+-- particle are ignored.  Thus we must consider potential collisions in
+-- increasing time order.
 collisions :: System -> Set Int
 collisions ps =
     foldl addCollisions Set.empty $
@@ -87,8 +96,10 @@ collisions ps =
         (n1, p1):rest <- tails (zip [0..] ps), (n2, p2) <- rest,
         t <- collisionTimes p1 p2]
 
--- Add potential collisions at a simulation step to the set of collisions,
--- unless either of the particles involved has already been destroyed.
+-- Given a set of already destroyed particles and a list of pairs of
+-- potentially colliding particles at a point in time, determine which
+-- are actual collisions (neither particle has been destroyed) and add
+-- the colliding particles to the destroyed set.
 addCollisions :: Set Int -> [(Int, Int)] -> Set Int
 addCollisions s xys =
     Set.union s $ Set.fromList $ concat
@@ -112,6 +123,7 @@ merge (x:xs) (y:ys) = case compare x y of
 
 -- Integral times when two motions cross.
 -- value at time n = a*(n*(n+1) `div` 2) + v*n + p
+-- Doubling that yields a quadratic formula with integer coefficients.
 componentCollisions :: Motion Int -> Motion Int -> [Int]
 componentCollisions (Motion a1 v1 p1) (Motion a2 v2 p2) =
     filter (>= 0) (quadSolutions da (da+2*dv) (2*dp))
