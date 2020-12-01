@@ -88,7 +88,8 @@ whileRight f x = either id (whileRight f) (f x)
 iterateWhileRight :: (a -> Either b a) -> a -> [a]
 iterateWhileRight f x = x : either (const []) (iterateWhileRight f) (f x)
 
--- | @'convergeBy' p xs@ returns the first related to the previous one by @p@.
+-- | @'convergeBy' p xs@ returns the first element of @xs@ related to
+-- the previous one by @p@.
 convergeBy :: (a -> a -> Bool) -> [a] -> a
 convergeBy p xs = head [x2 | (x1, x2) <- zip xs (tail xs), p x1 x2]
 
@@ -104,7 +105,8 @@ compose fs x = foldr id x fs
 splits :: [a] -> [([a], [a])]
 splits xs = zip (inits xs) (tails xs)
 
--- | Possible choices of n elements from a list
+-- | Possible choices of n elements from a list.  Elements of each list
+-- have the same relative ordering as in the input list.
 choose :: Int -> [a] -> [([a], [a])]
 choose 0 xs = [([], xs)]
 choose _ [] = []
@@ -154,11 +156,11 @@ relationToGraph xys =
     Map.map Set.toList $ Map.unionsWith Set.union $
         [Map.singleton x (Set.singleton y) | (x, y) <- xys]
 
--- | For a non-constant upward-closed predicate @p@, @'bsearch' p@
--- returns the least @n@ satisfying @p@.
+-- | For a non-constant upward-closed predicate @p@, @'bsearch' p@ returns
+-- the least @n@ satisfying @p@, using /O(log n)/ evaluations of @p@.
 --
--- If no such @n@ exists, either because no integer satisfies @p@ or
--- all do, @'bsearch' p@ does not terminate.
+-- If @p@ is constant, no such @n@ exists and @'bsearch' p@ does not
+-- terminate.
 bsearch :: (Integer -> Bool) -> Integer
 bsearch p
   | p 0 = negate (searchFrom (not . p . negate) 0) + 1
