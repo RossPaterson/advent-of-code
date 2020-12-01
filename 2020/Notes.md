@@ -1,0 +1,15 @@
+# Notes on each day's solutions
+
+![Completion times 2020](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2020.png)
+
+(image by [Jo Wood](https://github.com/jwoLondon))
+
+## [Day 1: Report Repair](https://adventofcode.com/2020/day/1)
+
+Another simple one to start with.  The leaderboard times are misleading
+because the servers were down for three and a half minutes.
+
+Both parts were trivial with the right utility function from previous
+years.  Some incorrect approaches would have failed on inputs including
+1010, three numbers _n_, _n_, 2020-2*_n_ or two numbers _n_, 2020-2*_n_,
+but my input had none of these.
