@@ -7,18 +7,14 @@ import qualified Data.Set as Set
 
 -- Input processing
 
-data Forest = Forest {
-    width :: Int,
-    height :: Int,
-    trees :: Set Position
-    }
+data Forest = Forest { width :: Int, height :: Int, trees :: Set Position }
     deriving Show
 type Input = Forest
 
 parse :: String -> Input
 parse s = Forest {
-    width = length $ head $ lines s,
-    height = length $ lines s,
+    width = length (head (lines s)),
+    height = length (lines s),
     trees = Set.fromList [p | (p, c) <- readGrid s, c == '#']
     }
 
