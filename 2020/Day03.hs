@@ -26,8 +26,9 @@ inpath :: Int -> Int -> Forest -> Int
 inpath r d forest = Set.size (Set.intersection wrappedPath (trees forest))
   where
     wrappedPath =
-       Set.fromList [Position (r*n `mod` w) (d*n) |
-           n <- takeWhile (\ n -> n*d < h) [1..]]
+       Set.fromList $
+           takeWhile (\ (Position _ row) -> row < h) $
+           [Position (r*n `mod` w) (d*n) | n <- [1..]]
     w = width forest
     h = height forest
 
