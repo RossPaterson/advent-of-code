@@ -22,7 +22,7 @@ parse s = Forest {
 
 -- number of elements of ts (repeated to the right indefinitely) on a path
 -- going right r and down d at each step
-inpath :: Int -> Int -> Input -> Int
+inpath :: Int -> Int -> Forest -> Int
 inpath r d forest = Set.size (Set.intersection wrappedPath (trees forest))
   where
     wrappedPath =
