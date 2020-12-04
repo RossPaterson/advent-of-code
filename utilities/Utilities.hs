@@ -5,6 +5,7 @@ module Utilities (
     succWrap,
     predWrap,
     -- * Lists
+    paragraphs,
     takes,
     pairWith,
     fastNub,
@@ -51,6 +52,16 @@ predWrap :: (Eq a, Bounded a, Enum a) => a -> a
 predWrap v
   | v == minBound = maxBound
   | otherwise = pred v
+
+-- | Break a string into chunks separated by blank lines (two consecutive
+-- newlines).  Each chunk in the result ends with a newline.
+paragraphs :: String -> [String]
+paragraphs "" = []
+paragraphs "\n" = []
+paragraphs ('\n':'\n':cs) = "\n":paragraphs cs
+paragraphs (c:cs) = case paragraphs cs of
+    [] -> [[c, '\n']]
+    p:ps -> (c:p):ps
 
 -- | @'takes' n xs@ partitions @xs@ into groups of size @n@, with the
 -- possible exception of the last one, which is non-empty.
