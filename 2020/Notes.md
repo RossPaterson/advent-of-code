@@ -26,3 +26,13 @@ I added one rather than subtracting on the first attempt.
 This was a fun little puzzle, described in terms of a repeating landscape,
 but neatly solvable using arithmetic on coordinates.  Solutions using
 `repeat` and indexing are shorter, and still feasible for the input size.
+
+## [Day 4: Passport Processing](https://adventofcode.com/2020/day/4)
+
+The second part involves checking some very detailed conditions.
+Regular expressions would be very useful here, but its not too difficult
+without them.  Some parts involve number ranges where both numbers
+had the same number of digits, so string comparison would work, after
+checking the length of the string (and it appears that the supplied
+inputs included no cases where the lengths were wrong, such as "16cm").
+I compared numbers, which seems easier to get right.
