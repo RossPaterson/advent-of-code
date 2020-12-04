@@ -23,7 +23,7 @@ data Input = Input { startState :: State, stopAfter :: Int, tm :: Machine }
 parse :: String -> Input
 parse s = Input start steps machine
   where
-    (s_intro:s_states) = map unlines $ paragraphs $ lines s
+    (s_intro:s_states) = paragraphs s
     (start, steps) = runParser intro s_intro
     intro = (,) <$
         string "Begin in state " <*> state <* string ".\n" <*
@@ -40,13 +40,6 @@ parse s = Input start steps machine
     state = satisfy isUpper
     direction = Left <$ string "left" <|> Right <$ string "right"
     value = False <$ char '0' <|> True <$ char '1'
-
-paragraphs :: [[a]] -> [[[a]]]
-paragraphs ls = para:case rest of
-    [] -> []
-    _:ls' -> paragraphs ls'
-  where
-    (para, rest) = span (not . null) ls
 
 -- infinite tape padded with False
 data Tape =
