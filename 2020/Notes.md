@@ -36,3 +36,8 @@ had the same number of digits, so string comparison would work, after
 checking the length of the string (and it appears that the supplied
 inputs included no cases where the lengths were wrong, such as "16cm").
 I compared numbers, which seems easier to get right.
+
+## [Day 5: Binary Boarding](https://adventofcode.com/2020/day/5)
+
+A neat little puzzle after yesterday's nitpicking.  The first part is
+binary representations and the second can be done cleanly with sets.
