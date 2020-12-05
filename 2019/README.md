@@ -4,7 +4,7 @@
 
 (image by [Jo Wood](https://github.com/jwoLondon))
 
-The most enjoyable puzzles so far have been days 3, 6, 7, 10 and 22.
+The most enjoyable puzzles were days 3, 6, 7, 10 and 22.  Day 25 was cute.
 
 Some common AoC themes:
 
