@@ -41,3 +41,8 @@ I compared numbers, which seems easier to get right.
 
 A neat little puzzle after yesterday's nitpicking.  The first part is
 binary representations and the second can be done cleanly with sets.
+
+## [Day 6: Custom Customs](https://adventofcode.com/2020/day/6)
+
+Both parts can be done cleanly and very concisely using bulk operations
+on sets.
