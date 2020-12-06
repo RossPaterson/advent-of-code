@@ -19,7 +19,7 @@ but my input had none of these.
 This was another easy list manipulation, after a little input processing.
 I might have been tempted to write a more complex test for the second part,
 if I hadn't already written an occurrence counter for the first part.
-I added one rather than subtracting on the first attempt.
+I messed up my first attempt by adding one rather than subtracting.
 
 ## [Day 3: Toboggan Trajectory](https://adventofcode.com/2020/day/3)
 
