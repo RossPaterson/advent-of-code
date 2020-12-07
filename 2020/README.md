@@ -46,3 +46,11 @@ binary representations and the second can be done cleanly with sets.
 
 Both parts can be done cleanly and very concisely using bulk operations
 on sets.
+
+## [Day 7: Handy Haversacks](https://adventofcode.com/2020/day/7)
+
+There was a bit of fussy parsing, but then some bulk operations on
+containers.  The first part was more involved, inverting the relation
+and thean using breadth-first search.  For the second part, I memoized
+the function because it is easy to do in a lazy language, but it turns
+out that with this input it's not necessary.
