@@ -30,11 +30,7 @@ solve2 = head . repeats . scanl (+) 0 . cycle
 
 -- repeated elements of the list
 repeats :: Ord a => [a] -> [a]
-repeats xs = [x | (x, prev_xs) <- zip xs (init_sets xs), Set.member x prev_xs]
-
--- same as map Set.fromList (inits xs)
-init_sets :: Ord a => [a] -> [Set a]
-init_sets = scanl (flip Set.insert) Set.empty
+repeats xs = [x | (x, prev_xs) <- zip xs (initSets xs), Set.member x prev_xs]
 
 tests2 :: [(Input, Int)]
 tests2 = [

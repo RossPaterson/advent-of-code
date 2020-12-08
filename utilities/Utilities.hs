@@ -11,6 +11,7 @@ module Utilities (
     fastNub,
     frequency,
     mostCommon,
+    initSets,
     leastBy,
     same,
     tsort,
@@ -35,6 +36,7 @@ import Data.List
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
 import Data.Ord
+import Data.Set (Set)
 import qualified Data.Set as Set
 
 -- | All the values of a bounded enumerated type
@@ -80,6 +82,11 @@ frequency xs = [(head g, length g) | g <- group (sort xs)]
 -- | Unique elements of the input list, in decreasing order of frequency
 mostCommon :: Ord a => [a] -> [a]
 mostCommon xs = map snd (sort [(-n, w) | (w, n) <- frequency xs])
+
+-- | Faster equivalent of @map Set.fromList (inits xs)@.
+-- Zipping this with the original list gives a way to find repetitions.
+initSets :: Ord a => [a] -> [Set a]
+initSets = scanl (flip Set.insert) Set.empty
 
 -- | Repeatedly apply the function until it doesn't produce a new value
 whileJust :: (a -> Maybe a) -> a -> a
