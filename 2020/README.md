@@ -54,3 +54,9 @@ containers.  The first part was more involved, inverting the relation
 and thean using breadth-first search.  For the second part, I memoized
 the function because it is easy to do in a lazy language, but it turns
 out that with this input it's not necessary.
+
+## [Day 8: Handheld Halting](https://adventofcode.com/2020/day/8)
+
+This is presumably the start of this year's virtual machine.  The first
+part is a routine simulation, while the second is a novel piece of reverse
+engineering.  Exhaustive search is sufficient.
