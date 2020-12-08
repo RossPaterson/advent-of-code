@@ -50,11 +50,7 @@ solve2 = last . uniq . values
 -- elements of a list before the first repetition
 uniq :: Ord a => [a] -> [a]
 uniq xs =
-    map fst $ takeWhile (not . uncurry Set.member) $ zip xs (init_sets xs)
-
--- same as map Set.fromList (inits xs)
-init_sets :: Ord a => [a] -> [Set a]
-init_sets = scanl (flip Set.insert) Set.empty
+    map fst $ takeWhile (not . uncurry Set.member) $ zip xs (initSets xs)
 
 main :: IO ()
 main = do

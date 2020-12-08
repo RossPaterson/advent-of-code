@@ -69,12 +69,9 @@ move2 (State2 dir pos _) (Move t s) = State2 dir' pos' (walk s dir' pos)
 visits :: [Move] -> History
 visits = concat . map history . scanl move2 start2
 
-init_sets :: Ord a => [a] -> [Set a]
-init_sets = scanl (flip Set.insert) Set.empty
-
 firstRepeated :: Ord a => [a] -> a
 firstRepeated xs =
-    head [x | (seen, x) <- zip (init_sets xs) xs, Set.member x seen]
+    head [x | (seen, x) <- zip (initSets xs) xs, Set.member x seen]
 
 solve2 :: Input -> Int
 solve2 = norm . firstRepeated . visits
