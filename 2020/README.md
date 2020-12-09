@@ -60,3 +60,12 @@ out that with this input it's not necessary.
 This is presumably the start of this year's virtual machine.  The first
 part is a routine simulation, while the second is a novel piece of reverse
 engineering.  Exhaustive search is sufficient.
+
+## [Day 9: Encoding Error](https://adventofcode.com/2020/day/9)
+
+The two parts are different list manipulations, and can be solved neatly
+using a number of list library functions.  There is a corner case in the
+first part (similar to day 1), but it is not tested by the supplied input.
+
+My initial solution to the first part was ridiculously over-engineered,
+but not noticably faster than more straight-forward solutions.
