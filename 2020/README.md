@@ -51,7 +51,7 @@ on sets.
 
 There was a bit of fussy parsing, but then some bulk operations on
 containers.  The first part was more involved, inverting the relation
-and thean using breadth-first search.  For the second part, I memoized
+and then using breadth-first search.  For the second part, I memoized
 the function because it is easy to do in a lazy language, but it turns
 out that with this input it's not necessary.
 
@@ -68,4 +68,18 @@ using a number of list library functions.  There is a corner case in the
 first part (similar to day 1), but it is not tested by the supplied input.
 
 My initial solution to the first part was ridiculously over-engineered,
-but not noticably faster than more straight-forward solutions.
+but not noticeably faster than more straight-forward solutions.
+This and the preceding two puzzles punish premature optimization.
+
+## [Day 10: Adapter Array](https://adventofcode.com/2020/day/10)
+
+The first part is straightforward once you get past the awkward
+description, but the second is the most difficult so far.  As the text
+suggests, exhaustive search is prohibitively expensive.
+
+The sample inputs and the actual input all satisfy a crucial simplifying
+condition that is not present in the text, though the first part is a
+subtle hint.  Given that, we can decompose the problem, reducing it to
+finding an integer sequence.  I worked out the first few values and then
+found the sequence in [OEIS](https://oeis.org/), but it turns out that
+the actual input only requires the first few values.
