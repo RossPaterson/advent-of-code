@@ -73,7 +73,7 @@ This and the preceding two puzzles punish premature optimization.
 
 ## [Day 10: Adapter Array](https://adventofcode.com/2020/day/10)
 
-The first part is straightforward once you get past the awkward
+The first part is straightforward once you get past the nonsensical
 description, but the second is the most difficult so far.  As the text
 suggests, exhaustive search is prohibitively expensive.
 
@@ -83,3 +83,7 @@ subtle hint.  Given that, we can decompose the problem, reducing it to
 finding an integer sequence.  I worked out the first few values and then
 found the sequence in [OEIS](https://oeis.org/), but it turns out that
 the actual input only requires the first few values.
+
+It seems most people on the [solutions thread](https://www.reddit.com/r/adventofcode/comments/ka8z8x/2020_day_10_solutions/)
+used a dynamic programming approach over the whole list, which does not
+rely on the above restriction in the input.
