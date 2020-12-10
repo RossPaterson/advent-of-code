@@ -111,6 +111,16 @@ tribonacci n = t
 solve2 :: Input -> Int
 solve2 = product . map tribonacci . adjacent_ones . diffs
 
+-- dynamic programming version: also works with gaps of 2
+-- Pair each value with the number of valid sublists of the list from
+-- that point on that include the value.
+solve2DP :: Input -> Int
+solve2DP vs = fst $ head $ foldr add_one [(1, maximum vs+3)] $ 0:sort vs
+  where
+    add_one x nvs = (nx, x):nvs
+      where
+        nx = sum $ map fst $ takeWhile (\ (_, x') -> x' <= x+3) nvs
+
 tests2 :: [(String, Int)]
 tests2 = [(testInput1, 8), (testInput2, 19208)]
 
@@ -121,4 +131,5 @@ main = do
     putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)
     putStr (unlines (failures "solve2" (solve2 . parse) tests2))
+    putStr (unlines (failures "solve2DP" (solve2DP . parse) tests2))
     print (solve2 input)
