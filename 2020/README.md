@@ -87,3 +87,10 @@ the actual input only requires the first few values.
 It seems most people on the [solutions thread](https://www.reddit.com/r/adventofcode/comments/ka8z8x/2020_day_10_solutions/)
 used a dynamic programming approach over the whole list, which does not
 rely on the above restriction in the input.
+
+## [Day 11: Seating System](https://adventofcode.com/2020/day/11)
+
+This is yet another variation on a cellular automaton.  Approaches similar
+to those used on previous such puzzles get most of the way, but there are
+a couple of novel twists.  It comes out quite neatly using bulk operations
+on `Set`s and `Map`s, with most code shared between the two parts.
