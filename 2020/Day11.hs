@@ -75,9 +75,9 @@ tests1 = [(testInput, 37)]
 seatsVisible :: Set Position -> Map Position (Set Position)
 seatsVisible seats = Map.fromSet visible seats
   where
-    visible p = Set.fromList [p' | d <- directions,
-        p' <- take 1 $ filter (flip Set.member seats) $ map (p .+.) $ ray d]
-    ray d = [n *. d | n <- [1..maxdist]]
+    visible p = Set.fromList [p' | ray <- lines_of_sight,
+        p' <- take 1 $ filter (flip Set.member seats) $ map (p .+.) ray]
+    lines_of_sight = [[n *. d | n <- [1..maxdist]] | d <- directions]
     maxdist = maximum [max x y | Position x y <- Set.elems seats]
 
 -- seating rule for part two
