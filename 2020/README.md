@@ -94,3 +94,9 @@ This is yet another variation on a cellular automaton.  Approaches similar
 to those used on previous such puzzles get most of the way, but there are
 a couple of novel twists.  It comes out quite neatly using bulk operations
 on `Set`s and `Map`s, with most code shared between the two parts.
+
+## [Day 12: Rain Risk](https://adventofcode.com/2020/day/12)
+
+Both parts are following a sequence of instructions to move around
+2-dimensional space, with the second only slightly more elaborate,
+but easy enough after working out rotation.
