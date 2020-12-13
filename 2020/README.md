@@ -100,3 +100,11 @@ on `Set`s and `Map`s, with most code shared between the two parts.
 Both parts are following a sequence of instructions to move around
 2-dimensional space, with the second only slightly more elaborate,
 but easy enough after working out rotation.
+
+## [Day 13: Shuttle Search](https://adventofcode.com/2020/day/13)
+
+This is all modular arithmetic, with the twist that the remainders are
+negated.  The second part is easily recognizable as the
+[Chinese Remainder Problem](https://en.wikipedia.org/wiki/Chinese_remainder_theorem),
+previously seen on day 15 of 2016.  Plenty of test cases are supplied,
+so we can avoid wasted submissions.
