@@ -2,8 +2,7 @@ module Main where
 
 import Number
 import Parser
-import Data.List
-import Data.Ord
+import Utilities
 
 data Disc = Disc {
     disc_number :: Int,
@@ -29,37 +28,27 @@ data Mod = Mod { remainder :: Integer, cycle_size :: Integer }
 
 -- position t d == 0 <=> t == t0 - n - pos0 (mod npos)
 
--- Mod i n denotes position i in n-cycle.  0 <= i < n
-mkMod :: Int -> Int -> Mod
-mkMod i n = Mod (toInteger (i `mod` n)) (toInteger n)
+-- (i, n) denotes position i in n-cycle.  0 <= i < n
+positionToMod :: Disc -> (Int, Int)
+positionToMod (Disc n npos t0 pos0) = ((t0 - n - pos0) `mod` npos, npos)
 
-positionToMod :: Disc -> Mod
-positionToMod (Disc n npos t0 pos0) = mkMod (t0 - n - pos0) npos
-
--- the sort means the largest cycle is trivial
-chineseRemainder :: [Mod] -> Mod
-chineseRemainder = foldr1 match . sortBy (comparing cycle_size)
-  where
-    -- Mod k (p*n) such that k == i (mod p) and k == j (mod n)
-    -- assumes gcd p n == 1
-    match (Mod i p) (Mod j n) = Mod ((i*y*n + j*x*p) `mod` (p*n)) (p*n)
-      where
-        (x, y) = bezout p n -- x*p + y*n = 1
-
-solve1 :: Input -> Integer
-solve1 = remainder . chineseRemainder . map positionToMod
+solve1 :: Input -> Int
+solve1 = chineseRemainder . map positionToMod
 
 testInput :: String
 testInput =
     "Disc #1 has 5 positions; at time=0, it is at position 4.\n\
     \Disc #2 has 2 positions; at time=0, it is at position 1.\n"
 
+tests1 :: [(String, Int)]
+tests1 = [(testInput, 5)]
+
 -- Part Two --
 
 addDisc :: Int -> Int -> [Disc] -> [Disc]
 addDisc npos pos0 discs = discs ++ [Disc (length discs + 1) npos 0 pos0]
 
-solve2 :: Input -> Integer
+solve2 :: Input -> Int
 solve2 = solve1 . addDisc 11 0
 
 main :: IO ()
@@ -67,4 +56,5 @@ main = do
     s <- readFile "input/15.txt"
     let input = parse s
     print (solve1 input)
+    putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve2 input)
