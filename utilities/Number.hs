@@ -11,6 +11,7 @@ module Number(
     totient,
     -- * Extended GCD
     bezout, denominators,
+    chineseRemainder,
     -- * Modular powers
     modularPower,
     modularRoots,
@@ -21,6 +22,7 @@ module Number(
 
 import Data.List
 import Data.Maybe
+import Data.Ord
 
 -- | The infinite list of prime numbers
 -- (OEIS Sequence <http://oeis.org/A000040 A000040>)
@@ -111,6 +113,21 @@ denominators a b
   | otherwise = q:denominators b r
   where
     (q, r) = divMod a b
+
+-- | Given a list of pairs @(r, m)@ of remainders and moduli, where the
+-- moduli are pairwise coprime, return the smallest @n@ such that
+-- @n `mod` m == r@ for all of these pairs.  (Chinese Remainder Theorem)
+chineseRemainder :: [(Int, Int)] -> Int
+chineseRemainder =
+    fromInteger . fst . foldr1 match . map promote . sortBy (comparing snd)
+  where
+    promote (r, m) = (toInteger r, toInteger m)
+    -- (k, m*n) such that k == i (mod m) and k == j (mod n)
+    -- assumes gcd m n == 1
+    match (i, m) (j, n) = ((i*y*n + j*x*m) `mod` mn, mn)
+      where
+        (x, y) = bezout m n -- x*m + y*n = 1
+        mn = m*n
 
 -- | @'modularPower' n a k = a^k `mod` n@
 modularPower :: Integral a => a -> a -> Int -> a
