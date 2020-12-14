@@ -1,9 +1,9 @@
 module Main where
 
 import AssemblyCode
+import Utilities
 import Data.Map ((!))
 import qualified Data.Map as Map
-import Data.Set (Set)
 import qualified Data.Set as Set
 
 -- Input processing
