@@ -1,11 +1,11 @@
--- | Cartesian coordinates
+-- | Simple geometric algebra
 module Geometry (
-    -- * Normed vector spaces
-    NormedVectorSpace(..), distance,
+    -- * Normed modules over integers
+    NormedModule(..), distance,
     -- * Display coordinates
     Position(..), cardinalDirections, corners,
     readGrid, showGrid,
-    -- * Various dimensions
+    -- * Cartesian spaces of various dimensions
     Point2(..),
     Point3(..),
     Point4(..),
@@ -18,30 +18,31 @@ import qualified Data.Map as Map
 infixr 7  *.
 infixl 6  .+., .-.
 
--- | Normed vector space
-class NormedVectorSpace v where
+-- | Module over the integers with a norm function
+class NormedModule v where
     -- | The origin
     zero :: v
-    -- | Component-wise addition
+    -- | Addition, an associative operation with identity 'zero'
     (.+.) :: v -> v -> v
-    -- | Component-wise subtraction
+    -- | Subtraction, the inverse of addition
     (.-.) :: v -> v -> v
-    -- | Scalar multiplication
+    -- | Scalar multiplication, distributing over 'zero' and addition
     (*.) :: Int -> v -> v
-    -- | Manhattan metric
+    -- | A nonnegative-valued function satisfying the triangle inequality
     norm :: v -> Int
 
     v1 .-. v2 = v1 .+. (-1) *. v2
 
--- | Distance by Manhattan metric
-distance :: NormedVectorSpace v => v -> v -> Int
+-- | A metric
+distance :: NormedModule v => v -> v -> Int
 distance v1 v2 = norm (v1 .-. v2)
 
--- | Point in 2-D display space: x increases to right, y downwards
+-- | Point in 2-D display space: x increases to the right, y downwards
 data Position = Position !Int !Int
     deriving (Eq, Ord, Show)
 
-instance NormedVectorSpace Position where
+-- | `norm` is the Manhattan metric
+instance NormedModule Position where
     zero = Position 0 0
     Position x1 y1 .+. Position x2 y2 = Position (x1+x2) (y1+y2)
     Position x1 y1 .-. Position x2 y2 = Position (x1-x2) (y1-y2)
@@ -79,7 +80,8 @@ showGrid def m
 data Point2 = Point2 !Int !Int
     deriving (Eq, Ord, Show)
 
-instance NormedVectorSpace Point2 where
+-- | `norm` is the Manhattan metric
+instance NormedModule Point2 where
     zero = Point2 0 0
     Point2 x1 y1 .+. Point2 x2 y2 = Point2 (x1+x2) (y1+y2)
     Point2 x1 y1 .-. Point2 x2 y2 = Point2 (x1-x2) (y1-y2)
@@ -90,7 +92,8 @@ instance NormedVectorSpace Point2 where
 data Point3 = Point3 !Int !Int !Int
     deriving (Eq, Ord, Show)
 
-instance NormedVectorSpace Point3 where
+-- | `norm` is the Manhattan metric
+instance NormedModule Point3 where
     zero = Point3 0 0 0
     Point3 x1 y1 z1 .+. Point3 x2 y2 z2 = Point3 (x1+x2) (y1+y2) (z1+z2)
     Point3 x1 y1 z1 .-. Point3 x2 y2 z2 = Point3 (x1-x2) (y1-y2) (z1-z2)
@@ -101,7 +104,8 @@ instance NormedVectorSpace Point3 where
 data Point4 = Point4 !Int !Int !Int !Int
     deriving (Eq, Ord, Show)
 
-instance NormedVectorSpace Point4 where
+-- | `norm` is the Manhattan metric
+instance NormedModule Point4 where
     zero = Point4 0 0 0 0
     Point4 x1 y1 z1 t1 .+. Point4 x2 y2 z2 t2 =
         Point4 (x1+x2) (y1+y2) (z1+z2) (t1+t2)
