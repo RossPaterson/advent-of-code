@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import Cartesian
+import Geometry
 import Intcode
 import Data.List
 import Data.Maybe

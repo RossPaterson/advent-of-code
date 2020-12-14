@@ -1,6 +1,6 @@
 module Main where
 
-import Cartesian
+import Geometry
 import Utilities
 import Data.Char
 import qualified Data.Set as Set

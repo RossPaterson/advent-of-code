@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import Cartesian
+import Geometry
 import Parser
 import Control.Applicative
 import Data.Char

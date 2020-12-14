@@ -1,6 +1,6 @@
 module Main where
 
-import Cartesian
+import Geometry
 import Graph
 import Data.Bits
 

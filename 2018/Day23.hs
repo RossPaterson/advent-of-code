@@ -1,6 +1,6 @@
 module Main where
 
-import Cartesian
+import Geometry
 import Parser
 import qualified MaxPriorityQueue as PQ
 import Utilities

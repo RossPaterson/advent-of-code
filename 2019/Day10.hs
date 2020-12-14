@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import Cartesian
+import Geometry
 import Data.List
 import Data.Ratio
 import Data.Map (Map)
