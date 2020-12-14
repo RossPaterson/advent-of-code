@@ -1,6 +1,6 @@
 module Main where
 
-import Cartesian
+import Geometry
 import Parser
 import Control.Applicative
 import qualified Data.Map as Map

@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import Cartesian
+import Geometry
 import Control.Monad
 import Data.Functor
 import Data.Maybe

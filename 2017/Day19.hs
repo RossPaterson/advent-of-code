@@ -2,7 +2,7 @@ module Main where
 
 import Prelude hiding (Either(Left, Right))
 import Utilities
-import Cartesian
+import Geometry
 import Control.Monad
 import Data.Char
 import Data.List

@@ -1,6 +1,6 @@
 module Main where
 
-import Cartesian
+import Geometry
 import qualified CompactSet as CompactSet
 import Graph
 import Utilities

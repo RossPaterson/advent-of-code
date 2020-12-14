@@ -2,7 +2,7 @@
 module Main where
 
 import Utilities
-import Cartesian
+import Geometry
 import Prelude hiding (Either(Left, Right))
 import Data.Map (Map)
 import qualified Data.Map as Map

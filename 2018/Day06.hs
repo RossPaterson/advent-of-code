@@ -1,6 +1,6 @@
 module Main where
 
-import Cartesian
+import Geometry
 import Parser
 import Utilities
 import Data.List

@@ -2,7 +2,7 @@ module Main where
 
 import Utilities
 import Graph
-import Cartesian
+import Geometry
 import Data.Char
 import Data.Maybe
 import Data.Map (Map, (!))

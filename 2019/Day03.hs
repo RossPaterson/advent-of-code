@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import Cartesian
+import Geometry
 import Parser
 import Data.Map (Map)
 import qualified Data.Map as Map

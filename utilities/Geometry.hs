@@ -1,5 +1,5 @@
 -- | Cartesian coordinates
-module Cartesian (
+module Geometry (
     -- * Normed vector spaces
     NormedVectorSpace(..), distance,
     -- * Display coordinates

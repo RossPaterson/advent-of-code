@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import Cartesian
+import Geometry
 import Data.Foldable
 import Data.List
 import Data.Maybe
