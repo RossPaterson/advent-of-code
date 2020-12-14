@@ -106,8 +106,8 @@ but easy enough after working out rotation.
 This is all modular arithmetic, with the twist that the remainders are
 negated.  The second part becomes easy once it is recognized as the
 [Chinese Remainder Problem](https://en.wikipedia.org/wiki/Chinese_remainder_theorem),
-previously seen on day 15 of 2016.  This is applicable because the
-moduli in the given input are pairwise coprime (indeed all prime).
+previously seen on day 15 of 2016.  This is applicable if the moduli
+are pairwise coprime, and in the given input they are all prime.
 Plenty of test cases are supplied, so we can avoid wasted submissions.
 
 ## [Day 14: Docking Data](https://adventofcode.com/2020/day/14)
