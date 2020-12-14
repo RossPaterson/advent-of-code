@@ -1,4 +1,4 @@
--- | Simple geometric algebra
+-- | Simple linear algebra
 module Geometry (
     -- * Normed modules over integers
     NormedModule(..), distance,
@@ -33,7 +33,7 @@ class NormedModule v where
 
     v1 .-. v2 = v1 .+. (-1) *. v2
 
--- | A metric
+-- | A metric, defined as the 'norm' of the difference between the values.
 distance :: NormedModule v => v -> v -> Int
 distance v1 v2 = norm (v1 .-. v2)
 
@@ -41,7 +41,7 @@ distance v1 v2 = norm (v1 .-. v2)
 data Position = Position !Int !Int
     deriving (Eq, Ord, Show)
 
--- | `norm` is the Manhattan metric
+-- | `norm` is the Manhattan norm
 instance NormedModule Position where
     zero = Position 0 0
     Position x1 y1 .+. Position x2 y2 = Position (x1+x2) (y1+y2)
@@ -49,12 +49,12 @@ instance NormedModule Position where
     r *. Position x y = Position (r*x) (r*y)
     norm (Position x y) = abs x + abs y
 
--- | Difference vectors for the cardinal directions
+-- | Unit vectors for the cardinal directions
 cardinalDirections :: [Position]
 cardinalDirections =
     [Position 0 (-1), Position 1 0, Position 0 1, Position (-1) 0]
 
--- | Difference vectors for the corner directions
+-- | Unit vectors for the corner directions
 corners :: [Position]
 corners = [Position 1 (-1), Position 1 1, Position (-1) 1, Position (-1) (-1)]
 
@@ -80,7 +80,7 @@ showGrid def m
 data Point2 = Point2 !Int !Int
     deriving (Eq, Ord, Show)
 
--- | `norm` is the Manhattan metric
+-- | `norm` is the Manhattan norm
 instance NormedModule Point2 where
     zero = Point2 0 0
     Point2 x1 y1 .+. Point2 x2 y2 = Point2 (x1+x2) (y1+y2)
@@ -92,7 +92,7 @@ instance NormedModule Point2 where
 data Point3 = Point3 !Int !Int !Int
     deriving (Eq, Ord, Show)
 
--- | `norm` is the Manhattan metric
+-- | `norm` is the Manhattan norm
 instance NormedModule Point3 where
     zero = Point3 0 0 0
     Point3 x1 y1 z1 .+. Point3 x2 y2 z2 = Point3 (x1+x2) (y1+y2) (z1+z2)
@@ -104,7 +104,7 @@ instance NormedModule Point3 where
 data Point4 = Point4 !Int !Int !Int !Int
     deriving (Eq, Ord, Show)
 
--- | `norm` is the Manhattan metric
+-- | `norm` is the Manhattan norm
 instance NormedModule Point4 where
     zero = Point4 0 0 0 0
     Point4 x1 y1 z1 t1 .+. Point4 x2 y2 z2 t2 =
