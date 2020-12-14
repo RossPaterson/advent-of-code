@@ -104,7 +104,18 @@ but easy enough after working out rotation.
 ## [Day 13: Shuttle Search](https://adventofcode.com/2020/day/13)
 
 This is all modular arithmetic, with the twist that the remainders are
-negated.  The second part is easily recognizable as the
+negated.  The second part becomes easy once it is recognized as the
 [Chinese Remainder Problem](https://en.wikipedia.org/wiki/Chinese_remainder_theorem),
-previously seen on day 15 of 2016.  Plenty of test cases are supplied,
-so we can avoid wasted submissions.
+previously seen on day 15 of 2016.  This is applicable because the
+moduli in the given input are pairwise coprime (indeed all prime).
+Plenty of test cases are supplied, so we can avoid wasted submissions.
+
+## [Day 14: Docking Data](https://adventofcode.com/2020/day/14)
+
+This exercise involved bit manipulation, with a novel twist in the
+second part.  The calculations are precisely specified, but take some
+care to implement.  In the given input, the nondeterminism is limited,
+so a naive approach is effective.
+
+The description specifies a fixed number of bits, but this could be
+relaxed by assuming leading zeros.
