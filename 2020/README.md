@@ -119,3 +119,16 @@ so a naive approach is effective.
 
 The description specifies a fixed number of bits, but this could be
 relaxed by assuming leading zeros.
+
+## [Day 15: Rambunctious Recitation](https://adventofcode.com/2020/day/15)
+
+This was novel.  It took a while to get part one working, partly getting
+the switch between the given list and the generated outputs right,
+but in the end it was fairly clean.  Since I'd already used a `Map`,
+the same code should work for part two, but it had a fatal memory leak
+due to lazy evaluation.  After searching unsuccessfully for a pattern
+in the sequence, I fixed the memory leak with some strictness annotations.
+
+A [reddit thread](https://www.reddit.com/r/adventofcode/comments/kdfvec/2020_day_15_theory_behind_the_problem/)
+points out that this is a generalization of Van Eck's sequence
+([OEIS A181391](https://oeis.org/A181391)), which has no known pattern.
