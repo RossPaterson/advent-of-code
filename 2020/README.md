@@ -132,3 +132,11 @@ in the sequence, I fixed the memory leak with some strictness annotations.
 A [reddit thread](https://www.reddit.com/r/adventofcode/comments/kdfvec/2020_day_15_theory_behind_the_problem/)
 points out that this is a generalization of Van Eck's sequence
 ([OEIS A181391](https://oeis.org/A181391)), which has no known pattern.
+
+## [Day 16: Report Repair](https://adventofcode.com/2020/day/16)
+
+This was a nice exercise in decomposition and data manipulation.
+The first part sets the stage, while the second part needs an efficient
+algorithm to be feasible, in contrast to the brute-forceable early
+questions.  The underlying problem is the same as in day 16 of 2018,
+but I think I came up with a neater solution this time.
