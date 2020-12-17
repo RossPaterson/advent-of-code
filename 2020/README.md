@@ -140,3 +140,13 @@ The first part sets the stage, while the second part needs an efficient
 algorithm to be feasible, in contrast to the brute-forceable early
 questions.  The underlying problem is the same as in day 16 of 2018,
 but I think I came up with a neater solution this time.
+
+## [Day 17: Conway Cubes](https://adventofcode.com/2020/day/17)
+
+Another cellular automaton, this time in 3 and 4 dimensions, which favours
+a generic implementation, which was easily extracted from solutions to
+previous automata puzzles.  The examples are worked out in detail, but
+it's simpler to use the specification, which is clear enough by itself.
+
+I made a mistake with my 4-dimensional neighbours on the first attempt,
+but as it was a separate function, it was easy to debug.
