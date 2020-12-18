@@ -143,10 +143,23 @@ but I think I came up with a neater solution this time.
 
 ## [Day 17: Conway Cubes](https://adventofcode.com/2020/day/17)
 
-Another cellular automaton, this time in 3 and 4 dimensions, which favours
-a generic implementation, which was easily extracted from solutions to
-previous automata puzzles.  The examples are worked out in detail, but
-it's simpler to use the specification, which is clear enough by itself.
+Another cellular automaton, this time in 3 and 4 dimensions.  The examples
+are worked out in detail, but it's simpler to use the specification,
+which is clear enough by itself.  The different settings favour a generic
+implementation, which was easily extracted from solutions to previous
+automata puzzles.  It is a neat exercise in set-level operations.
 
 I made a mistake with my 4-dimensional neighbours on the first attempt,
 but as it was a separate function, it was easy to debug.
+
+## [Day 18: Operation Order](https://adventofcode.com/2020/day/18)
+
+This puzzle involves two variations on an expression parser.  After a
+bit of transformation, the grammar can be implemented cleanly using a
+recursive descent parser.  I had a simple library for that, but several
+alternatives are available.
+
+Instead of combining parsing and evaluation, I parsed to abstract syntax
+and had a separate evaluation function.  That would have helped with
+debugging the parser if anything had gone wrong, and I was able to re-use
+the evaluator for the second part.
