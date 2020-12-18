@@ -12,13 +12,13 @@ type Input = [Expr]
 data Expr = Number Int | Binary Expr Op Expr
     deriving Show
 
-data Op = Plus | Times
+data Op = Plus | Mult
     deriving Show
 
 value :: Expr -> Int
 value (Number n) = n
 value (Binary e1 Plus e2) = value e1 + value e2
-value (Binary e1 Times e2) = value e1 * value e2
+value (Binary e1 Mult e2) = value e1 * value e2
 
 -- Part One
 
@@ -29,7 +29,7 @@ parse1 = runParser expr
     expr =
         foldl (uncurry . Binary) <$> factor <*>
              many ((,) <$ space <*> op <* space <*> factor)
-    op = Plus <$ char '+' <|> Times <$ char '*'
+    op = Plus <$ char '+' <|> Mult <$ char '*'
     factor = Number <$> nat <|> char '(' *> expr <* char ')'
 
 solve1 :: String -> Int
@@ -50,10 +50,10 @@ tests1 = [
 parse2 :: String -> Expr
 parse2 = runParser expr
   where
-    expr = foldl mul <$> term <*> many (string " * " *> term)
-    mul e1 e2 = Binary e1 Times e2
-    term = foldl add <$> factor <*> many (string " + " *> factor)
-    add e1 e2 = Binary e1 Plus e2
+    expr = foldl mult <$> term <*> many (string " * " *> term)
+    mult e1 e2 = Binary e1 Mult e2
+    term = foldl plus <$> factor <*> many (string " + " *> factor)
+    plus e1 e2 = Binary e1 Plus e2
     factor = Number <$> nat <|> char '(' *> expr <* char ')'
 
 solve2 :: String -> Int
