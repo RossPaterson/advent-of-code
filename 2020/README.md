@@ -155,7 +155,7 @@ but as it was a separate function, it was easy to debug.
 ## [Day 18: Operation Order](https://adventofcode.com/2020/day/18)
 
 This puzzle involves two variations on an expression parser.  After a
-bit of transformation, the grammar can be implemented cleanly using a
+bit of transformation, the grammar can be implemented cleanly with a
 recursive descent parser.  I had a simple library for that, but several
 alternatives are available.
 
