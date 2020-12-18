@@ -9,7 +9,7 @@ import Control.Applicative
 type Input = [Expr]
 
 -- abstract syntax of expressions
-data Expr = Number Int | Binary Expr Op Expr
+data Expr = Number Int | Binary Op Expr Expr
     deriving Show
 
 data Op = Plus | Mult
@@ -17,8 +17,8 @@ data Op = Plus | Mult
 
 value :: Expr -> Int
 value (Number n) = n
-value (Binary e1 Plus e2) = value e1 + value e2
-value (Binary e1 Mult e2) = value e1 * value e2
+value (Binary Plus e1 e2) = value e1 + value e2
+value (Binary Mult e1 e2) = value e1 * value e2
 
 -- Part One
 
@@ -26,10 +26,9 @@ value (Binary e1 Mult e2) = value e1 * value e2
 parse1 :: String -> Expr
 parse1 = runParser expr
   where
-    expr =
-        foldl (uncurry . Binary) <$> factor <*>
-             many ((,) <$ space <*> op <* space <*> factor)
-    op = Plus <$ char '+' <|> Mult <$ char '*'
+    expr = foldl binary <$> factor <*> many ((,) <$> operator <*> factor)
+    binary e1 (op, e2) = Binary op e1 e2
+    operator = space *> (Plus <$ char '+' <|> Mult <$ char '*') <* space
     factor = Number <$> nat <|> char '(' *> expr <* char ')'
 
 solve1 :: String -> Int
@@ -50,10 +49,8 @@ tests1 = [
 parse2 :: String -> Expr
 parse2 = runParser expr
   where
-    expr = foldl mult <$> term <*> many (string " * " *> term)
-    mult e1 e2 = Binary e1 Mult e2
-    term = foldl plus <$> factor <*> many (string " + " *> factor)
-    plus e1 e2 = Binary e1 Plus e2
+    expr = foldl (Binary Mult) <$> term <*> many (string " * " *> term)
+    term = foldl (Binary Plus) <$> factor <*> many (string " + " *> factor)
     factor = Number <$> nat <|> char '(' *> expr <* char ')'
 
 solve2 :: String -> Int
