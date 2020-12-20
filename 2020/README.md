@@ -177,3 +177,17 @@ little analysis of the changes to the grammar suggested a way to use
 it to solve the second part.  However, a nondeterministic recognizer
 (no more complex than the deterministic one), would work without change
 on the revised grammar of the second part.
+
+## [Day 20: Jurassic Jigsaw](https://adventofcode.com/2020/day/20)
+
+This puzzle was a considerable increase in difficulty, involving
+assembling a grid of bitmaps so that the edges match, and then some
+extra searching.  It can be done neatly by representing grids as lists
+of lists, plus some use of of containers to speed up some parts.
+
+The first part doesn't actually require a full assembly of the grid, just
+the corners, but it seemed clear that the whole grid would be needed for
+the second part.  My initial version attempted an optimized representation
+of edges, but this turned out to be quite fiddly to get right, and
+only gave a constant factor improvement.  It was both simpler and more
+efficient to use maps to cut the branching in the backtracking search.
