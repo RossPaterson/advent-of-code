@@ -55,7 +55,7 @@ match grammar n ts = case grammar!n of
     Single t
       | take 1 ts == [t] -> [drop 1 ts]
       | otherwise -> []
-    Expansions rhss -> msum (map (foldM (flip (match grammar)) ts) rhss)
+    Expansions rhss -> concat (map (foldM (flip (match grammar)) ts) rhss)
 
 -- the nonterminal matches the whole string
 matchAll :: (Ord n, Eq t) => Grammar n t -> n -> [t] -> Bool
