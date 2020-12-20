@@ -13,8 +13,21 @@ import qualified Data.Set as Set
 
 type Input = Map Int Tile
 
+-- square grid of values
 type Grid a = [[a]]
 type Tile = Grid Bool
+
+parse :: String -> Input
+parse = Map.fromList . map parseCamera . paragraphs
+
+parseCamera :: String -> (Int, Tile)
+parseCamera s = (runParser tileno header, parseTile rest)
+  where
+    header:rest = lines s
+    tileno = string "Tile " *> nat <* char ':'
+
+parseTile :: [String] -> Tile
+parseTile = map (map (== '#'))
 
 showTile :: Tile -> String
 showTile = unlines . map (map showBit)
@@ -22,21 +35,9 @@ showTile = unlines . map (map showBit)
     showBit False = '.'
     showBit True = '#'
 
-parse :: String -> Input
-parse = Map.fromList . map parseTile . paragraphs
-
-parseTile :: String -> (Int, Tile)
-parseTile s = (runParser tileno header, bitmap rest)
-  where
-    header:rest = lines s
-    tileno = string "Tile " *> nat <* char ':'
-
-bitmap :: [String] -> Tile
-bitmap = map (map (== '#'))
-
 -- Part One
 
--- all transformations of a tile
+-- all transformations (flips and rotations) of a tile
 transforms :: Tile -> [Tile]
 transforms tile =
     [times rot rotateGrid $ times fl transpose tile |
@@ -65,12 +66,7 @@ arrangeTiles m = takes side $ reverse $ head $
   where
     -- possible top rows (each reversed)
     top_rows :: [[(Int, Tile)]]
-    top_rows = [row |
-        -- top left corner does not fit with other tiles on top or left
-        start <- all_tiles,
-        not (elem (top_edge (snd start)) (map (bottom_edge . snd) all_tiles)),
-        not (elem (left_edge (snd start)) (map (right_edge . snd) all_tiles)),
-        row <- mk_row 1 [start]]
+    top_rows = [row | start <- all_tiles, row <- mk_row 1 [start]]
 
     -- possible extensions to top row, at each stage looking up tiles
     -- matching the right edge of the preceding tile in the row
@@ -79,7 +75,7 @@ arrangeTiles m = takes side $ reverse $ head $
       | n == side = [done]
       | otherwise = [res |
             ntile <- Map.findWithDefault []
-                (right_edge (snd (head done))) left_edge_map,
+                (right_border (snd (head done))) left_border_map,
             all ((/= fst ntile) . fst) done,
             res <- mk_row (n+1) (ntile:done)]
 
@@ -90,9 +86,9 @@ arrangeTiles m = takes side $ reverse $ head $
       | Set.size ts == Map.size m = [done]
       | otherwise = [res |
             (n, tile) <- Map.findWithDefault []
-                (bottom_edge (snd (done!!(side-1)))) top_edge_map,
+                (bottom_border (snd (done!!(side-1)))) top_border_map,
             not (Set.member n ts),
-            col == 0 || left_edge tile == right_edge (snd (head done)),
+            col == 0 || left_border tile == right_border (snd (head done)),
             res <- add_rest (Set.insert n ts) ((n, tile):done)]
       where
         col = Set.size ts `mod` side
@@ -102,21 +98,21 @@ arrangeTiles m = takes side $ reverse $ head $
         [(n, tile) | (n, tiles) <- Map.assocs all_transforms, tile <- tiles]
 
     all_transforms = Map.map transforms m
-    top_edge_map = tileMap top_edge all_transforms
-    left_edge_map = tileMap left_edge all_transforms
+    top_border_map = tileMap top_border all_transforms
+    left_border_map = tileMap left_border all_transforms
     side = intSqrt (Map.size m)
 
-left_edge :: Grid a -> [a]
-left_edge = map head
+left_border :: Grid a -> [a]
+left_border = map head
 
-right_edge :: Grid a -> [a]
-right_edge = map last
+right_border :: Grid a -> [a]
+right_border = map last
 
-top_edge :: Grid a -> [a]
-top_edge = head
+top_border :: Grid a -> [a]
+top_border = head
 
-bottom_edge :: Grid a -> [a]
-bottom_edge = last
+bottom_border :: Grid a -> [a]
+bottom_border = last
 
 intSqrt :: Int -> Int
 intSqrt n = head [i | i <- [0..], i*i >= n]
@@ -246,17 +242,28 @@ tests1 = [(testInput, 20899048083289)]
 
 -- Part Two
 
-assembleTiles :: Grid Tile -> Tile
-assembleTiles = concat . map (pasteGrids . map trimGrid)
-
-pasteGrids :: [Grid a] -> Grid a
-pasteGrids = map concat . transpose
-
-trimGrid :: Grid a -> Grid a
-trimGrid = map (init . tail) . init . tail
-
+-- Create an image by:
+-- (1) finding the correct arrangement of tiles
+-- (2) removing the border from each tile
+-- (3) glueing the tiles together
 getImage :: Map Int Tile -> Tile
-getImage = assembleTiles . map (map snd) . arrangeTiles
+getImage = glueTiles . map (map (removeBorder . snd)) . arrangeTiles
+
+-- remove the border from a grid
+removeBorder :: Grid a -> Grid a
+removeBorder = map (init . tail) . init . tail
+
+-- glue together a grid of grids
+glueTiles :: Grid (Grid a) -> Grid a
+glueTiles = concat . map (map concat . transpose)
+
+-- convert a tile to a set of positions of the ones
+ones :: Tile -> Set Position
+ones bss =
+    Set.fromList [Position col row |
+        (row, bs) <- zip [0..] bss, (col, b) <- zip [0..] bs, b]
+
+-- the search pattern (sea monster)
 
 seaMonsterText :: String
 seaMonsterText = "\
@@ -264,13 +271,8 @@ seaMonsterText = "\
     \#    ##    ##    ###\n\
     \ #  #  #  #  #  #   \n"
 
-ones :: Tile -> Set Position
-ones bss =
-    Set.fromList [Position col row |
-        (row, bs) <- zip [0..] bss, (col, b) <- zip [0..] bs, b]
-
 seaMonster :: Set Position
-seaMonster = ones $ bitmap $ lines seaMonsterText
+seaMonster = ones $ parseTile $ lines seaMonsterText
 
 -- number of occurrences of the pattern in the image,
 -- assuming that occurrences do not overlap
@@ -283,8 +285,9 @@ occurrences pattern image =
     xmax = max_x image - max_x pattern
     ymax = max_y image - max_y pattern
 
+-- translate a set of positions by an offset
 translateImage :: Position -> Set Position -> Set Position
-translateImage p = Set.mapMonotonic (p .+.)
+translateImage offset = Set.mapMonotonic (offset .+.)
 
 max_x :: Set Position -> Int
 max_x ps = maximum [x | Position x _ <- Set.elems ps]
@@ -295,12 +298,12 @@ max_y ps = maximum [y | Position _ y <- Set.elems ps]
 solve2 :: Input -> Int
 solve2 m =
     head [nbits - n*Set.size seaMonster |
-        tile <- transforms bss,
-        let n = occurrences seaMonster (ones tile),
+        trans_tile <- transforms tile,
+        let n = occurrences seaMonster (ones trans_tile),
         n > 0]
   where
-    bss = getImage m
-    nbits = sum (map (length . filter id) bss)
+    tile = getImage m
+    nbits = sum (map (length . filter id) tile)
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 273)]
