@@ -191,3 +191,15 @@ the second part.  My initial version attempted an optimized representation
 of edges, but this turned out to be quite fiddly to get right, and
 only gave a constant factor improvement.  It was both simpler and more
 efficient to use maps to cut the branching in the backtracking search.
+
+## [Day 21: Allergen Assessment](https://adventofcode.com/2020/day/21)
+
+The problem description was very difficult to penetrate, partly because
+the constraints make no sense in the presented scenario.  The example
+is presented as an input-output pair with no working, because that would
+give too much away.
+
+The task itself is a moderately complex manipulation of sets.  I couldn't
+see any shortcut to the first part without constructing the full matching,
+so there wasn't much more to the second part.  From the Reddit thread, it
+seems that simpler approaches worked with the supplied input.
