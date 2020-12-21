@@ -55,7 +55,7 @@ addMinRule r rs
 -- the first rule implies the second
 implies :: (Ord a, Ord b) => Rule a b -> Rule a b -> Bool
 implies (Contains as1 bs1) (Contains as2 bs2) =
-    bs1 == bs2 && Set.isSubsetOf as1 as2
+    Set.isSubsetOf bs2 bs1 && Set.isSubsetOf as1 as2
 
 -- intersection of two rules, if nontrivial
 intersectRule :: (Ord a, Ord b) => Rule a b -> Rule a b -> Maybe (Rule a b)
@@ -75,17 +75,24 @@ simple (Contains as bs)
 type Iso a b = [(a, b)]
 
 data State a b = State {
-    rules :: [Rule a b],
+    rules :: [Rule a b], -- non-redundant closed collection of rules
     matches :: Iso a b
     }
     deriving Show
 
+-- Start with the non-redundant closure of the given rules, and no matches.
 initState :: (Ord a, Ord b) => [Rule a b] -> State a b
 initState rs = State (closeRules rs) []
 
+-- We are finished when all the rules have been turned into matches.
 finished :: State a b -> Bool
 finished s = null (rules s)
 
+-- One deduction step:
+-- * turn one-to-one rules into matchings
+-- * remove the matched elements from all rules
+-- * delete trivial rules
+-- * delete redundant rules
 reduceState :: (Ord a, Ord b) => State a b -> State a b
 reduceState s = State {
     rules = new_rules,
@@ -104,13 +111,15 @@ reduceState s = State {
         filter (null . simple) $
         rules s
 
+-- A rule with no allergens tells us nothing.
 trivialRule :: Rule a b -> Bool
 trivialRule (Contains _ bs) = Set.null bs
 
--- deduce the matching implied by a list of rules
+-- Deduce the matching implied by a list of rules.
 deduceMatching :: (Ord a, Ord b) => [Rule a b] -> Iso a b
 deduceMatching = matches . until finished reduceState . initState
 
+-- total number of unmatched ingredients in the rules, including repetitions
 solve1 :: Input -> Int
 solve1 rs = sum [Set.size (Set.difference as bad) | Contains as _ <- rs]
   where
@@ -128,6 +137,7 @@ tests1 = [(testInput, 5)]
 
 -- Part Two
 
+-- list of matched ingredients
 solve2 :: Input -> String
 solve2 = intercalate "," . map fst . sortBy (comparing snd) . deduceMatching
 
