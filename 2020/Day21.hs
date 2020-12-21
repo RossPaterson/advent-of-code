@@ -55,7 +55,7 @@ addMinRule r rs
 -- the first rule implies the second
 implies :: (Ord a, Ord b) => Rule a b -> Rule a b -> Bool
 implies (Contains as1 bs1) (Contains as2 bs2) =
-    Set.isSubsetOf bs2 bs1 && Set.isSubsetOf as1 as2
+    bs1 == bs2 && Set.isSubsetOf as1 as2
 
 -- intersection of two rules, if nontrivial
 intersectRule :: (Ord a, Ord b) => Rule a b -> Rule a b -> Maybe (Rule a b)
