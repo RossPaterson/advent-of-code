@@ -203,3 +203,8 @@ The task itself is a moderately complex manipulation of sets.  I couldn't
 see any shortcut to the first part without constructing the full matching,
 so there wasn't much more to the second part.  From the Reddit thread, it
 seems that simpler approaches worked with the supplied input.
+
+## [Day 22: Crab Combat](https://adventofcode.com/2020/day/22)
+
+This is about accurate implementation of the detailed rules of a game.
+The second part is recursive, but not very complex.
