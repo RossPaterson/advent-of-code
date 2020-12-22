@@ -207,4 +207,6 @@ seems that simpler approaches worked with the supplied input.
 ## [Day 22: Crab Combat](https://adventofcode.com/2020/day/22)
 
 This is about accurate implementation of the detailed rules of a game.
-The second part is recursive, but not very complex.
+The second part is recursive, but not very complex.  It wasn't completely
+clear from the description that a repeated state terminated the current
+subgame rather than the whole game.
