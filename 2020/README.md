@@ -1,5 +1,9 @@
 # Notes on each day's solutions
 
+Recurring themes:
+matching problems (days 16 and 20),
+cellular automata (days 11, 17 and 24).
+
 ![Completion times 2020](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2020.png)
 
 (image by [Jo Wood](https://github.com/jwoLondon))
@@ -206,7 +210,21 @@ seems that simpler approaches worked with the supplied input.
 
 ## [Day 22: Crab Combat](https://adventofcode.com/2020/day/22)
 
-This is about accurate implementation of the detailed rules of a game.
+This was about accurate implementation of the detailed rules of a game.
 The second part is recursive, but not very complex.  It wasn't completely
 clear from the description that a repeated state terminated the current
 subgame rather than the whole game.
+
+## [Day 23: Crab Cups](https://adventofcode.com/2020/day/23)
+
+The first part checks understanding the rules, while the second applies
+them to a much larger input.  I tried to find a shortcut, but it seems
+there is none.  I did manage to get an answer by running a naive version
+for five hours.  The real solution is to use a linked list, which was in
+my blind spot.
+
+## [Day 24: Lobby Layout](https://adventofcode.com/2020/day/24)
+
+The first part was moving around on a hex grid, as seen on day 11 of 2017.
+The second part was another cellular automaton on that grid, which could
+be handled with the generic implementation from day 17.
