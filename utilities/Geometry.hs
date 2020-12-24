@@ -9,6 +9,8 @@ module Geometry (
     Point2(..),
     Point3(..),
     Point4(..),
+    -- * Hexagonal tiling
+    HexCoord, hexDirection,
     )
     where
 
@@ -37,7 +39,8 @@ class NormedModule v where
 distance :: NormedModule v => v -> v -> Int
 distance v1 v2 = norm (v1 .-. v2)
 
--- | Point in 2-D display space: x increases to the right, y downwards
+-- | Point in 2-dimensional display space: x increases to the right,
+-- y downwards
 data Position = Position !Int !Int
     deriving (Eq, Ord, Show)
 
@@ -76,7 +79,7 @@ showGrid def m
     minY = minimum [y | Position _ y <- Map.keys m]
     maxY = maximum [y | Position _ y <- Map.keys m]
 
--- | Point in 2-D space
+-- | Point in 2-dimensional space
 data Point2 = Point2 !Int !Int
     deriving (Eq, Ord, Show)
 
@@ -88,7 +91,7 @@ instance NormedModule Point2 where
     r *. Point2 x y = Point2 (r*x) (r*y)
     norm (Point2 x y) = abs x + abs y
 
--- | Point in 3-D space
+-- | Point in 3-dimensional space
 data Point3 = Point3 !Int !Int !Int
     deriving (Eq, Ord, Show)
 
@@ -100,7 +103,7 @@ instance NormedModule Point3 where
     r *. Point3 x y z = Point3 (r*x) (r*y) (r*z)
     norm (Point3 x y z) = abs x + abs y + abs z
 
--- | Point in 4-D space
+-- | Point in 4-dimensional space
 data Point4 = Point4 !Int !Int !Int !Int
     deriving (Eq, Ord, Show)
 
@@ -113,3 +116,30 @@ instance NormedModule Point4 where
         Point4 (x1-x2) (y1-y2) (z1-z2) (t1-t2)
     r *. Point4 x y z t = Point4 (r*x) (r*y) (r*z) (r*t)
     norm (Point4 x y z t) = abs x + abs y + abs z + abs t
+
+-- | Skew coordinate in a 2-dimensional hexagonal tiling
+-- (= axial coordinate at https://www.redblobgames.com/grids/hexagons/)
+data HexCoord = HexCoord !Int !Int
+    deriving (Eq, Ord, Show)
+
+instance NormedModule HexCoord where
+    zero = HexCoord 0 0
+    HexCoord x1 y1 .+. HexCoord x2 y2 = HexCoord (x1+x2) (y1+y2)
+    HexCoord x1 y1 .-. HexCoord x2 y2 = HexCoord (x1-x2) (y1-y2)
+    r *. HexCoord x y = HexCoord (r*x) (r*y)
+    norm (HexCoord x y) = maximum [abs x, abs y, abs (x+y)]
+
+-- | Single step in a direction in hexagonal space
+hexDirection :: Int -> HexCoord
+hexDirection n = hexDirections!!(n `mod` 6)
+
+-- one step in the skew coordinate system, in a numbered direction:
+--
+--   2 | 1 |
+--   3 | * | 0
+--     | 4 | 5
+--
+hexDirections :: [HexCoord]
+hexDirections = [
+    HexCoord 1 0, HexCoord 0 1, HexCoord (-1) 1,
+    HexCoord (-1) 0, HexCoord 0 (-1), HexCoord 1 (-1)]
