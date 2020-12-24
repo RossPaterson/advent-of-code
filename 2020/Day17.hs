@@ -1,5 +1,6 @@
 module Main where
 
+import CellularAutomaton
 import Geometry
 import Utilities
 import Data.Set (Set)
@@ -26,15 +27,6 @@ neighbours3 (Point3 x y z) =
 conway_rule :: Bool -> Int -> Bool
 conway_rule True n = n == 2 || n == 3
 conway_rule False n = n == 3
-
--- The next generation of a cellular automaton (modelled by a set of
--- cells), determined by a neighbours function and a reproduction rule.
-generation :: Ord a => (a -> Set a) -> (Bool -> Int -> Bool) -> Set a -> Set a
-generation neighbours rule s = Set.filter alive candidates
-  where
-    candidates = Set.union s (Set.unions (map neighbours (Set.elems s)))
-    alive c = rule (Set.member c s)
-        (Set.size (Set.intersection s (neighbours c)))
 
 solve1 :: Input -> Int
 solve1 = Set.size . times 6 (generation neighbours3 conway_rule)
