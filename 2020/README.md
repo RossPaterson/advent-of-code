@@ -1,12 +1,12 @@
 # Notes on each day's solutions
 
-Recurring themes:
-matching problems (days 16 and 20),
-cellular automata (days 11, 17 and 24).
-
 ![Completion times 2020](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2020.png)
 
 (image by [Jo Wood](https://github.com/jwoLondon))
+
+Recurring themes:
+matching problems (days 16 and 20),
+cellular automata (days 11, 17 and 24).
 
 ## [Day 1: Report Repair](https://adventofcode.com/2020/day/1)
 
