@@ -21,7 +21,6 @@ module Number(
     ) where
 
 import Data.List
-import Data.Maybe
 import Data.Ord
 
 -- | The infinite list of prime numbers
@@ -98,6 +97,8 @@ totient = multiplicative $ \ p k -> p^(k-1)*(p - 1)
 -- * @j*a*x + i*b*y@ is equivalent to @i@ modulo @a@ and to @j@ modulo @b@
 --   (Chinese Remainder Theorem).
 bezout :: Integral a => a -> a -> (a, a)
+{-# SPECIALIZE bezout :: Int -> Int -> (Int, Int) #-}
+{-# SPECIALIZE bezout :: Integer -> Integer -> (Integer, Integer) #-}
 bezout a b = (approx (signum a) 0 qs, approx 0 (signum b) qs)
   where
     qs = denominators (abs a) (abs b)
@@ -108,6 +109,8 @@ bezout a b = (approx (signum a) 0 qs, approx 0 (signum b) qs)
 -- | @'denominators' a b@ is the list of partial denominators of a
 -- regular continued fraction representation of @a/b@.
 denominators :: Integral a => a -> a -> [a]
+{-# SPECIALIZE denominators :: Int -> Int -> [Int] #-}
+{-# SPECIALIZE denominators :: Integer -> Integer -> [Integer] #-}
 denominators a b
   | b == 0 = []
   | otherwise = q:denominators b r
@@ -131,6 +134,8 @@ chineseRemainder =
 
 -- | @'modularPower' n a k = a^k `mod` n@
 modularPower :: Integral a => a -> a -> Int -> a
+{-# SPECIALIZE modularPower :: Int -> Int -> Int -> Int #-}
+{-# SPECIALIZE modularPower :: Integer -> Integer -> Int -> Integer #-}
 modularPower n a = power_mod
   where
     base = a `mod` n
@@ -145,6 +150,8 @@ modularPower n a = power_mod
 -- | @'modularRoots' n b k@ is the list of @a@ such that
 -- @a^k@ &#x2261; @b@ (mod @n@).
 modularRoots :: Integral a => a -> a -> Int -> [a]
+{-# SPECIALIZE modularRoots :: Int -> Int -> Int -> [Int] #-}
+{-# SPECIALIZE modularRoots :: Integer -> Integer -> Int -> [Integer] #-}
 modularRoots n b i
   | n <= 0 = error "Non-positive modulus"
   | n == 1 = [0]
@@ -160,6 +167,8 @@ modularRoots n b i
         (p, k) <- primeFactors (fromIntegral n), let pk = fromIntegral (p^k)]
 
 naiveModularRoots :: Integral a => a -> a -> Int -> [a]
+{-# SPECIALIZE naiveModularRoots :: Int -> Int -> Int -> [Int] #-}
+{-# SPECIALIZE naiveModularRoots :: Integer -> Integer -> Int -> [Integer] #-}
 naiveModularRoots n b k = [a | a <- [0..n-1], modularPower n a k == b_mod_n]
   where
     b_mod_n = b `mod` n
@@ -167,11 +176,17 @@ naiveModularRoots n b k = [a | a <- [0..n-1], modularPower n a k == b_mod_n]
 -- | @'modularLogarithm' n a b@ is the least @k@ such that
 -- @a^k@ &#x2261; @b@ (mod @n@).
 modularLogarithm :: Integral a => a -> a -> a -> Maybe Int
-modularLogarithm n a b =
-    listToMaybe [k | k <- [1..universalExponent (fromIntegral n) - 1],
-        modularPower n a k == b_mod_n]
+{-# SPECIALIZE modularLogarithm :: Int -> Int -> Int -> Maybe Int #-}
+{-# SPECIALIZE modularLogarithm :: Integer -> Integer -> Integer -> Maybe Int #-}
+modularLogarithm n a b = find_log 0 1
   where
+    find_log k ak
+      | ak `seq` k == limit = Nothing
+      | ak == b_mod_n = Just k
+      | otherwise = find_log (k+1) (ak*a_mod_n `mod` n)
+    a_mod_n = a `mod` n
     b_mod_n = b `mod` n
+    limit = universalExponent (fromIntegral n)
 
 -- | @'universalExponent' n@ is the smallest @k@ such that @a^k@ &#x2261;
 -- @1@ (mod @n@) for each @a@ between @1@ and @n@ that is coprime with @n@
