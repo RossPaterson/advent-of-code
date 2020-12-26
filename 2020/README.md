@@ -7,6 +7,8 @@
 Recurring themes:
 matching problems (days 16 and 20),
 cellular automata (days 11, 17 and 24).
+Unlike past years, this year there was only one puzzle involving an
+abstract machine (day 8).
 
 ## [Day 1: Report Repair](https://adventofcode.com/2020/day/1)
 
@@ -228,3 +230,11 @@ my blind spot.
 The first part was moving around on a hex grid, as seen on day 11 of 2017.
 The second part was another cellular automaton on that grid, which could
 be handled with the generic implementation from day 17.
+
+## [Day 25: Combo Breaker](https://adventofcode.com/2020/day/25)
+
+This was an easy puzzle, introducing
+[Diffie-Hellman key exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange).
+This required a discrete logarithm and modular exponentation.
+A fast algorithm is known for the latter, but not for the former.
+However, the inputs are small enough to solve using exhaustive search.
