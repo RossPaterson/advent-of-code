@@ -6,11 +6,15 @@
 
 Recurring themes:
 matching problems (days 16 and 20),
+basic number theory (days 13 and 25),
 cellular automata (days 11, 17 and 24).
 Unlike past years, this year there was only one puzzle involving an
 abstract machine (day 8).
 
-## [Day 1: Report Repair](https://adventofcode.com/2020/day/1)
+I have added difficulty ratings based on how long I took to solve each puzzle.
+Some of these have become easier due to similarity to past puzzles.
+
+## [Day 1: Report Repair](https://adventofcode.com/2020/day/1) \*
 
 Another simple one to start with.  The leaderboard times are misleading
 because the servers were down for three and a half minutes.
@@ -20,20 +24,20 @@ years.  Some incorrect approaches would have failed on inputs including
 1010, three numbers _n_, _n_, 2020-2*_n_ or two numbers _n_, 2020-2*_n_,
 but my input had none of these.
 
-## [Day 2: Password Philosophy](https://adventofcode.com/2020/day/2)
+## [Day 2: Password Philosophy](https://adventofcode.com/2020/day/2) \*
 
 This was another easy list manipulation, after a little input processing.
 I might have been tempted to write a more complex test for the second part,
 if I hadn't already written an occurrence counter for the first part.
 I messed up my first attempt by adding one rather than subtracting.
 
-## [Day 3: Toboggan Trajectory](https://adventofcode.com/2020/day/3)
+## [Day 3: Toboggan Trajectory](https://adventofcode.com/2020/day/3) \*
 
 This was a fun little puzzle, described in terms of a repeating landscape,
 but neatly solvable using arithmetic on coordinates.  Solutions using
 `repeat` and indexing are shorter, and still feasible for the input size.
 
-## [Day 4: Passport Processing](https://adventofcode.com/2020/day/4)
+## [Day 4: Passport Processing](https://adventofcode.com/2020/day/4) \*
 
 The second part involves checking some very detailed conditions.
 Regular expressions would be very useful here, but its not too difficult
@@ -43,17 +47,17 @@ checking the length of the string (and it appears that the supplied
 inputs included no cases where the lengths were wrong, such as "16cm").
 I compared numbers, which seems easier to get right.
 
-## [Day 5: Binary Boarding](https://adventofcode.com/2020/day/5)
+## [Day 5: Binary Boarding](https://adventofcode.com/2020/day/5) \*
 
 A neat little puzzle after yesterday's nitpicking.  The first part is
 binary representations and the second can be done cleanly with sets.
 
-## [Day 6: Custom Customs](https://adventofcode.com/2020/day/6)
+## [Day 6: Custom Customs](https://adventofcode.com/2020/day/6) \*
 
 Both parts can be done cleanly and very concisely using bulk operations
 on sets.
 
-## [Day 7: Handy Haversacks](https://adventofcode.com/2020/day/7)
+## [Day 7: Handy Haversacks](https://adventofcode.com/2020/day/7) \*\*
 
 There was a bit of fussy parsing, but then some bulk operations on
 containers.  The first part was more involved, inverting the relation
@@ -61,13 +65,13 @@ and then using breadth-first search.  For the second part, I memoized
 the function because it is easy to do in a lazy language, but it turns
 out that with this input it's not necessary.
 
-## [Day 8: Handheld Halting](https://adventofcode.com/2020/day/8)
+## [Day 8: Handheld Halting](https://adventofcode.com/2020/day/8) \*\*
 
 This is presumably the start of this year's virtual machine.  The first
 part is a routine simulation, while the second is a novel piece of reverse
 engineering.  Exhaustive search is sufficient.
 
-## [Day 9: Encoding Error](https://adventofcode.com/2020/day/9)
+## [Day 9: Encoding Error](https://adventofcode.com/2020/day/9) \*\*
 
 The two parts are different list manipulations, and can be solved neatly
 using a number of list library functions.  There is a corner case in the
@@ -77,7 +81,7 @@ My initial solution to the first part was ridiculously over-engineered,
 but not noticeably faster than more straight-forward solutions.
 This and the preceding two puzzles punish premature optimization.
 
-## [Day 10: Adapter Array](https://adventofcode.com/2020/day/10)
+## [Day 10: Adapter Array](https://adventofcode.com/2020/day/10) \*\*
 
 The first part is straightforward once you get past the nonsensical
 description, but the second is the most difficult so far.  As the text
@@ -94,20 +98,20 @@ It seems most people on the [solutions thread](https://www.reddit.com/r/adventof
 used a dynamic programming approach over the whole list, which does not
 rely on the above restriction in the input.
 
-## [Day 11: Seating System](https://adventofcode.com/2020/day/11)
+## [Day 11: Seating System](https://adventofcode.com/2020/day/11) \*
 
 This is yet another variation on a cellular automaton.  Approaches similar
 to those used on previous such puzzles get most of the way, but there are
 a couple of novel twists.  It comes out quite neatly using bulk operations
 on `Set`s and `Map`s, with most code shared between the two parts.
 
-## [Day 12: Rain Risk](https://adventofcode.com/2020/day/12)
+## [Day 12: Rain Risk](https://adventofcode.com/2020/day/12) \*\*
 
 Both parts are following a sequence of instructions to move around
 2-dimensional space, with the second only slightly more elaborate,
 but easy enough after working out rotation.
 
-## [Day 13: Shuttle Search](https://adventofcode.com/2020/day/13)
+## [Day 13: Shuttle Search](https://adventofcode.com/2020/day/13) \*
 
 This is all modular arithmetic, with the twist that the remainders are
 negated.  The second part becomes easy once it is recognized as the
@@ -116,7 +120,7 @@ previously seen on day 15 of 2016.  This is applicable if the moduli
 are pairwise coprime, and in the given input they are all prime.
 Plenty of test cases are supplied, so we can avoid wasted submissions.
 
-## [Day 14: Docking Data](https://adventofcode.com/2020/day/14)
+## [Day 14: Docking Data](https://adventofcode.com/2020/day/14) \*\*
 
 This exercise involved bit manipulation, with a novel twist in the
 second part.  The calculations are precisely specified, but take some
@@ -126,7 +130,7 @@ so a naive approach is effective.
 The description specifies a fixed number of bits, but this could be
 relaxed by assuming leading zeros.
 
-## [Day 15: Rambunctious Recitation](https://adventofcode.com/2020/day/15)
+## [Day 15: Rambunctious Recitation](https://adventofcode.com/2020/day/15) \*\*\*
 
 This was novel.  It took a while to get part one working, partly getting
 the switch between the given list and the generated outputs right,
@@ -139,7 +143,7 @@ A [reddit thread](https://www.reddit.com/r/adventofcode/comments/kdfvec/2020_day
 points out that this is a generalization of Van Eck's sequence
 ([OEIS A181391](https://oeis.org/A181391)), which has no known pattern.
 
-## [Day 16: Report Repair](https://adventofcode.com/2020/day/16)
+## [Day 16: Report Repair](https://adventofcode.com/2020/day/16) \*\*
 
 This was a nice exercise in decomposition and data manipulation.
 The first part sets the stage, while the second part needs an efficient
@@ -147,7 +151,7 @@ algorithm to be feasible, in contrast to the brute-forceable early
 questions.  The underlying problem is the same as in day 16 of 2018,
 but I think I came up with a neater solution this time.
 
-## [Day 17: Conway Cubes](https://adventofcode.com/2020/day/17)
+## [Day 17: Conway Cubes](https://adventofcode.com/2020/day/17) \*
 
 Another cellular automaton, this time in 3 and 4 dimensions.  The examples
 are worked out in detail, but it's simpler to use the specification,
@@ -158,7 +162,7 @@ automata puzzles.  It is a neat exercise in set-level operations.
 I made a mistake with my 4-dimensional neighbours on the first attempt,
 but as it was a separate function, it was easy to debug.
 
-## [Day 18: Operation Order](https://adventofcode.com/2020/day/18)
+## [Day 18: Operation Order](https://adventofcode.com/2020/day/18) \*
 
 This puzzle involves two variations on an expression parser.  After a
 bit of transformation, the grammar can be implemented cleanly with a
@@ -170,7 +174,7 @@ and had a separate evaluation function.  That would have helped with
 debugging the parser if anything had gone wrong, and I was able to re-use
 the evaluator for the second part.
 
-## [Day 19: Monster Messages](https://adventofcode.com/2020/day/19)
+## [Day 19: Monster Messages](https://adventofcode.com/2020/day/19) \*\*
 
 This puzzle involves recognizing strings generated by a context-free
 grammar, first with a finite language, and then adjusted to make
@@ -184,7 +188,7 @@ it to solve the second part.  However, a nondeterministic recognizer
 (no more complex than the deterministic one), would work without change
 on the revised grammar of the second part.
 
-## [Day 20: Jurassic Jigsaw](https://adventofcode.com/2020/day/20)
+## [Day 20: Jurassic Jigsaw](https://adventofcode.com/2020/day/20) \*\*\*
 
 This puzzle was a considerable increase in difficulty, involving
 assembling a grid of bitmaps so that the edges match, and then some
@@ -198,7 +202,7 @@ of edges, but this turned out to be quite fiddly to get right, and
 only gave a constant factor improvement.  It was both simpler and more
 efficient to use maps to cut the branching in the backtracking search.
 
-## [Day 21: Allergen Assessment](https://adventofcode.com/2020/day/21)
+## [Day 21: Allergen Assessment](https://adventofcode.com/2020/day/21) \*\*\*
 
 The problem description was very difficult to penetrate, partly because
 the constraints make no sense in the presented scenario.  The example
@@ -210,14 +214,14 @@ see any shortcut to the first part without constructing the full matching,
 so there wasn't much more to the second part.  From the Reddit thread, it
 seems that simpler approaches worked with the supplied input.
 
-## [Day 22: Crab Combat](https://adventofcode.com/2020/day/22)
+## [Day 22: Crab Combat](https://adventofcode.com/2020/day/22) \*\*\*
 
 This was about accurate implementation of the detailed rules of a game.
 The second part is recursive, but not very complex.  It wasn't completely
 clear from the description that a repeated state terminated the current
 subgame rather than the whole game.
 
-## [Day 23: Crab Cups](https://adventofcode.com/2020/day/23)
+## [Day 23: Crab Cups](https://adventofcode.com/2020/day/23) \*\*\*\*
 
 The first part checks understanding the rules, while the second applies
 them to a much larger input.  I tried to find a shortcut, but it seems
@@ -225,13 +229,13 @@ there is none.  I did manage to get an answer by running a naive version
 for five hours.  The real solution is to use a linked list, which was in
 my blind spot.
 
-## [Day 24: Lobby Layout](https://adventofcode.com/2020/day/24)
+## [Day 24: Lobby Layout](https://adventofcode.com/2020/day/24) \*\*
 
 The first part was moving around on a hex grid, as seen on day 11 of 2017.
 The second part was another cellular automaton on that grid, which could
 be handled with the generic implementation from day 17.
 
-## [Day 25: Combo Breaker](https://adventofcode.com/2020/day/25)
+## [Day 25: Combo Breaker](https://adventofcode.com/2020/day/25) \*
 
 This was an easy puzzle, introducing
 [Diffie-Hellman key exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange).
