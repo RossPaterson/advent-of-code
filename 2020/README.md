@@ -223,7 +223,7 @@ subgame rather than the whole game.
 
 ## [Day 23: Crab Cups](https://adventofcode.com/2020/day/23) \*\*\*\*
 
-The first part checks understanding the rules, while the second applies
+The first part checks understanding of the rules, while the second applies
 them to a much larger input.  I tried to find a shortcut, but it seems
 there is none.  I did manage to get an answer by running a naive version
 for five hours.  The real solution is to use a linked list, which was in
