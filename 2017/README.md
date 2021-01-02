@@ -4,7 +4,7 @@
 
 (image by [Jo Wood](https://github.com/jwoLondon))
 
-Overall, this year was the comparatively easy.
+Overall, this year was comparatively easy.
 
 ## [Day 1: Inverse Captcha](https://adventofcode.com/2017/day/1)
 

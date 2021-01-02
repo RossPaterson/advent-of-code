@@ -9,7 +9,7 @@ matching problems (days 16 and 20),
 basic number theory (days 13 and 25),
 cellular automata (days 11, 17 and 24).
 Unlike past years, this year there was only one puzzle involving an
-abstract machine (day 8).
+abstract machine (day 8), and none involving path-finding.
 
 I have added difficulty ratings based on how long I took to solve each puzzle.
 Some of these have become easier due to similarity to past puzzles.
