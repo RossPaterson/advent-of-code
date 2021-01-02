@@ -36,7 +36,7 @@ rating :: Grid -> Int
 rating (Grid g) = g
 
 neighbours :: Position -> [Position]
-neighbours pos = map (pos .+.) cardinalDirections
+neighbours pos = map (pos .+.) unitVectors
 
 -- neighbours within the grid
 localNeighbours :: Position -> [Position]

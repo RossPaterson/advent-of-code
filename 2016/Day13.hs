@@ -12,7 +12,7 @@ openSpace magic (Position x y) =
     x >= 0 && y >= 0 && even (popCount (x*x + 3*x + 2*x*y + y + y*y + magic))
 
 neighbours :: Int -> Position -> [Position]
-neighbours magic p = filter (openSpace magic) (map (p .+.) cardinalDirections)
+neighbours magic p = filter (openSpace magic) (map (p .+.) unitVectors)
 
 example :: String
 example = unlines

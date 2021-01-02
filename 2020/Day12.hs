@@ -9,7 +9,8 @@ import Control.Applicative
 
 type Input = [(Action, Int)]
 
-data Direction = N | E | S | W
+-- driections, in counterclockwise order
+data Direction = E | N | W | S
     deriving (Bounded, Enum, Show)
 
 data Action = Move Direction | TurnLeft | TurnRight | Forward
@@ -29,10 +30,7 @@ parse = map (runParser cmd) . lines
 
 -- one step in the given direction
 direction :: Direction -> Point2
-direction N = Point2 0 1
-direction S = Point2 0 (-1)
-direction E = Point2 1 0
-direction W = Point2 (-1) 0
+direction = unitVector . fromEnum
 
 data State = State { position :: Point2, waypoint :: Point2 }
     deriving (Show)

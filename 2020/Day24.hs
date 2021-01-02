@@ -13,7 +13,8 @@ import qualified Data.Set as Set
 
 type Input = [[Direction]]
 
-data Direction = E | SE | SW | W | NW | NE
+-- directions in a hexagonal tiling, in counterclockwise order
+data Direction = E | NE | NW | W | SW | SE
     deriving (Bounded, Enum, Show)
 
 parse :: String -> Input
@@ -25,7 +26,7 @@ parse = map (runParser directions) . lines . map toUpper
 
 -- one step in the hexagonal tiling
 direction :: Direction -> HexCoord
-direction = hexDirection . fromEnum
+direction = unitVector . fromEnum
 
 -- tile reached in a sequence of steps
 tile :: [Direction] -> HexCoord

@@ -6,7 +6,8 @@ import Parser
 import Control.Applicative
 import Data.Char
 
-data Direction = L | R | U | D
+-- directions, in counterclockwise order
+data Direction = R | U | L | D
     deriving (Bounded, Enum, Show)
 type Line = [Direction]
 type Input = [Line]
@@ -19,10 +20,7 @@ parse = map (runParser line) . lines
 -- Part One
 
 direction :: Direction -> Position
-direction L = Position (-1) 0
-direction R = Position 1 0
-direction U = Position 0 (-1)
-direction D = Position 0 1
+direction = unitVector . fromEnum
 
 -- square 3x3 keypad, centred on the origin
 -- 1 2 3

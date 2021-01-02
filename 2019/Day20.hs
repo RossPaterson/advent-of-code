@@ -57,7 +57,7 @@ parse s = Maze {
 
 -- adjacent points regardless of walls
 neighbours :: Position -> [Position]
-neighbours pos = map (pos .+.) cardinalDirections
+neighbours pos = map (pos .+.) unitVectors
 
 -- cached steps from each point
 stepMap :: Maze -> Map Position [Position]
