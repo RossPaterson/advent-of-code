@@ -1,7 +1,6 @@
 module Main where
 
 import Utilities
-import Data.Set (Set)
 import qualified Data.Set as Set
 
 -- Input processing

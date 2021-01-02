@@ -4,7 +4,6 @@ import Geometry
 import Utilities
 import Parser
 import Control.Applicative
-import Data.Set (Set)
 import qualified Data.Set as Set
 
 data Turn = L | R

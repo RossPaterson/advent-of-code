@@ -2,7 +2,6 @@ module Main where
 
 import Utilities
 import Parser
-import Data.Set (Set)
 import qualified Data.Set as Set
 
 -- Input processing

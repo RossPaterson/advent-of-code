@@ -16,11 +16,11 @@ parseString = runParser elements
   where
     elements = many (marker <|> single)
     marker = do
-        char '('
+        _ <- char '('
         len <- nat
-        char 'x'
+        _ <- char 'x'
         n <- nat
-        char ')'
+        _ <- char ')'
         str <- count len anyChar
         return (Repeat n str)
     single = Single <$> satisfy (/= '(')
