@@ -4,8 +4,8 @@ import Geometry
 import Utilities
 import Data.Char
 
--- directions in an infinite hexagonal tiling
-data Direction = N | NE | SE | S | SW | NW
+-- directions in an infinite hexagonal tiling, in counterclockwise order
+data Direction = N | NW | SW | S | SE | NE
     deriving (Enum, Read, Show)
 
 type Input = [Direction]
@@ -13,9 +13,9 @@ type Input = [Direction]
 parse :: String -> Input
 parse cs = read ("[" ++ map toUpper cs ++ "]")
 
--- one step in the hexagonal tiling
+-- one step in the hexagonal tiling, with North as reference direction
 direction :: Direction -> HexCoord
-direction = hexDirection . fromEnum
+direction = unitVector . fromEnum
 
 solve1 :: Input -> Int
 solve1 = norm . foldl (.+.) zero . map direction

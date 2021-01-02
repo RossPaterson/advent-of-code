@@ -15,26 +15,22 @@ type Input = Diagram
 parse :: String -> Input
 parse s = Map.fromList [(p, c) | (p, c) <- readGrid s, c /= ' ']
 
-data Direction = Up | Down | Left | Right
-    deriving Show
+-- directions, in counterclockwise order
+data Direction = Right | Up | Left | Down
+    deriving (Bounded, Enum, Eq, Show)
 
 turnLeft :: Direction -> Direction
-turnLeft Up = Left
-turnLeft Left = Down
-turnLeft Down = Right
-turnLeft Right = Up
+turnLeft dir
+  | dir == maxBound = minBound
+  | otherwise = succ dir
 
 turnRight :: Direction -> Direction
-turnRight Up = Right
-turnRight Right = Down
-turnRight Down = Left
-turnRight Left = Up
+turnRight dir
+  | dir == minBound = maxBound
+  | otherwise = pred dir
 
 direction :: Direction -> Position
-direction Up = Position 0 (-1)
-direction Down = Position 0 1
-direction Left = Position (-1) 0
-direction Right = Position 1 0
+direction = unitVector . fromEnum
 
 type State = (Position, Direction)
 

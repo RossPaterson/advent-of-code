@@ -45,7 +45,7 @@ neighbours :: Grid -> Position -> [Position]
 neighbours g pos
   | Set.member pos g =
     [pos' |
-        dir <- cardinalDirections,
+        dir <- unitVectors,
         let pos' = pos .+. dir,
         Set.member pos' g]
   | otherwise = []

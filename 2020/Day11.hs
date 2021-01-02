@@ -19,7 +19,7 @@ parse s = Set.fromList [p | (p, c) <- readGrid s, c == 'L']
 
 -- unit vectors for the eight directions
 directions :: [Position]
-directions = cardinalDirections ++ corners
+directions = unitVectors ++ corners
 
 -- for each seat, the set of seats that are immediately adjacent to it
 adjacentSeats :: Set Position -> Map Position (Set Position)

@@ -17,7 +17,7 @@ import qualified Data.Set as Set
 type Input = (Maze, Position)
 
 neighbours :: Position -> [Position]
-neighbours pos = map (pos .+.) cardinalDirections
+neighbours pos = map (pos .+.) unitVectors
 
 -- identifier of a door and corresponding key
 type DoorId = Int

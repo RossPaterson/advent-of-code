@@ -14,7 +14,8 @@ type Wire = [Segment]
 
 data Segment = Segment Direction Int
     deriving Show
-data Direction = L | R | U | D
+-- directions, in counterclockwise order
+data Direction = R | U | L | D
     deriving (Bounded, Enum, Show)
 
 parse :: String -> Input
@@ -35,10 +36,7 @@ segmentDeltas :: Segment -> [Position]
 segmentDeltas (Segment d n) = replicate n (direction d)
 
 direction :: Direction -> Position
-direction U = Position 0 (-1)
-direction D = Position 0 1
-direction L = Position (-1) 0
-direction R = Position 1 0
+direction = unitVector . fromEnum
 
 -- points visited by both wires
 intersections :: Wire -> Wire -> [Position]

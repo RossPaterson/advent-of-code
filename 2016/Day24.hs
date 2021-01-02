@@ -29,7 +29,7 @@ parse s = Maze {
 neighbours :: Maze -> Position -> [Position]
 neighbours m p =
     [p' |
-        dp <- cardinalDirections,
+        dp <- unitVectors,
         let p' = p .+. dp,
         Set.member p' (openPos m)]
 
