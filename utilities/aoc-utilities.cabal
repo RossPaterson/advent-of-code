@@ -21,6 +21,7 @@ library
     Geometry
     Graph
     MD5
+    Matching
     MaxPriorityQueue
     MinPriorityQueue
     Number
