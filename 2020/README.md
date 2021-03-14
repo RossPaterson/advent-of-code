@@ -12,9 +12,11 @@ optimization led to over-engineered solutions.  Then on day 14 space
 was an issue, and from day 15, time.
 
 Recurring themes:
-matching problems (days 16 and 21),
+cellular automata (days 11, 17 and 24),
 basic number theory (days 13 and 25),
-cellular automata (days 11, 17 and 24).
+matching problems (days 16 and 21).
+Two puzzles based on context-free grammars (days 18 and 19) stopped
+many people.
 Unlike past years, this year there was only one puzzle involving an
 abstract machine (day 8), and none involving path-finding.
 
@@ -192,7 +194,7 @@ of them to use.  There are many possible solutions to choose between.
 My initial recognizer for the first part was deterministic, and a
 little analysis of the changes to the grammar suggested a way to use
 it to solve the second part.  However, a nondeterministic recognizer
-(no more complex than the deterministic one), would work without change
+(no more complex than the deterministic one) would work without change
 on the revised grammar of the second part.
 
 ## [Day 20: Jurassic Jigsaw](https://adventofcode.com/2020/day/20) \*\*\*
