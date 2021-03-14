@@ -76,8 +76,8 @@ resolve = uniquePerfectMatching . analyse
 -- The set of possible opcodes for each value consistent with the samples
 analyse :: [Sample] -> Map Int (Set OpCode)
 analyse samples =
-    Map.unionsWith Set.intersection
-        [Map.singleton opcode (Set.fromList (possibles s)) |
+    Map.fromListWith Set.intersection
+        [(opcode, Set.fromList (possibles s)) |
             s@(_, Instruction opcode _ _ _, _) <- samples]
 
 main :: IO ()

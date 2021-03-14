@@ -27,10 +27,10 @@ parse = prerequisites . map (runParser dependency) . lines
 type Prerequisites a = Map a (Set a)
 
 prerequisites :: Ord a => [Dependency a] -> Prerequisites a
-prerequisites ds = Map.unionsWith Set.union
-    ([Map.singleton after (Set.singleton before) | Before before after <- ds]
+prerequisites ds = Map.fromListWith Set.union
+    ([(after, Set.singleton before) | Before before after <- ds]
     ++
-    [Map.singleton before Set.empty | Before before _after <- ds])
+    [(before, Set.empty) | Before before _after <- ds])
 
 -- Part One
 

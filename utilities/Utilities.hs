@@ -165,14 +165,14 @@ tsortG :: Ord a => Map a [a] -> [a]
 tsortG g = map fst $ sortBy (comparing (Down . snd)) $ Map.assocs depth_map
   where
     depth_map = fmap depth (Map.union g empties)
-    empties = Map.unions [Map.singleton x [] | xs <- Map.elems g, x <- xs]
+    empties = Map.fromList [(x, []) | xs <- Map.elems g, x <- xs]
     depth [] = 0::Int
     depth ys = maximum [depth_map!y | y <- ys] + 1
 
-relationToGraph :: Ord a => [(a, a)] -> Map a [a]
+relationToGraph :: (Ord a, Ord b) => [(a, b)] -> Map a [b]
 relationToGraph xys =
-    Map.map Set.toList $ Map.unionsWith Set.union $
-        [Map.singleton x (Set.singleton y) | (x, y) <- xys]
+    Map.map Set.toList $ Map.fromListWith Set.union $
+        [(x, Set.singleton y) | (x, y) <- xys]
 
 -- | For a non-constant upward-closed predicate @p@, @'bsearch' p@ returns
 -- the least @n@ satisfying @p@, using /O(log n)/ evaluations of @p@.

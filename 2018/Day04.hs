@@ -74,7 +74,7 @@ strategy1 gs = (g, bestMinute)
 
 -- All naps for each guard (combining all shifts)
 guardNaps :: [Shift] -> Map Int [Nap]
-guardNaps gs = Map.unionsWith (++) [Map.singleton g naps | Shift g naps <- gs]
+guardNaps gs = Map.fromListWith (++) [(g, naps) | Shift g naps <- gs]
 
 -- The guard with the most minutes asleep
 sleepiest :: Map Int [Nap] -> Int

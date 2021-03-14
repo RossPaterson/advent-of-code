@@ -33,8 +33,8 @@ parse = Map.fromList . map (runParser rule) . lines
 
 -- inverse of a relation
 invert :: (Ord a, Ord b) => Map a [b] -> Map b [a]
-invert m = Map.map Set.elems $ Map.unionsWith Set.union
-    [Map.singleton y (Set.singleton x) | (x, ys) <- Map.toList m, y <- ys]
+invert m = Map.map Set.elems $ Map.fromListWith Set.union
+    [(y, Set.singleton x) | (x, ys) <- Map.toList m, y <- ys]
 
 -- transitive containers of x
 containers :: Ord a => a -> Contents a -> [a]
