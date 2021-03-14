@@ -4,8 +4,15 @@
 
 (image by [Jo Wood](https://github.com/jwoLondon))
 
+The level of difficulty this year felt about right: easier than the last
+two years, but with a bit more challenge than 2017.  (The graphs are not
+directly comparable between years, due to increasing participation.)
+The first 14 problems could be solved with brute force, and any
+optimization led to over-engineered solutions.  Then on day 14 space
+was an issue, and from day 15, time.
+
 Recurring themes:
-matching problems (days 16 and 20),
+matching problems (days 16 and 21),
 basic number theory (days 13 and 25),
 cellular automata (days 11, 17 and 24).
 Unlike past years, this year there was only one puzzle involving an
@@ -212,7 +219,8 @@ give too much away.
 The task itself is a moderately complex manipulation of sets.  I couldn't
 see any shortcut to the first part without constructing the full matching,
 so there wasn't much more to the second part.  From the Reddit thread, it
-seems that simpler approaches worked with the supplied input.
+seems the staging of the parts hinted at neater solutions in which the
+second part is the matching procedure used on day 16.
 
 ## [Day 22: Crab Combat](https://adventofcode.com/2020/day/22) \*\*\*
 
@@ -239,6 +247,6 @@ be handled with the generic implementation from day 17.
 
 This was an easy puzzle, introducing
 [Diffie-Hellman key exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange).
-This required a discrete logarithm and modular exponentation.
+This required a discrete logarithm and modular exponentiation.
 A fast algorithm is known for the latter, but not for the former.
 However, the inputs are small enough to solve using exhaustive search.
