@@ -1,3 +1,5 @@
 *.o
 *.hi
 Day[0-2][0-9]
+dist
+dist-newstyle
