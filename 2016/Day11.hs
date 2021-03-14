@@ -2,14 +2,41 @@ module Main where
 
 import Utilities
 import Graph
+import Parser
+import Control.Applicative
 import Data.List
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
 
+-- Input processing
+
+type Input = [[Object String]]
+
 data Object a = Gen a | Chip a
   deriving (Show, Eq, Ord)
-type Input = [[Object String]]
+
+parse :: String -> Input
+parse = map (runParser level) . lines
+  where
+    level =
+        string "The " *> ordinal *> string " floor contains " *> objects <*
+        char '.'
+    objects =
+        [] <$ string "nothing relevant" <|>
+        (:[]) <$> object <|>
+        (\ x y -> [x, y]) <$> object <* string " and " <*> object <|>
+        (\ xs y -> xs ++ [y]) <$>
+            some (object <* string ", ") <* string "and " <*> object
+    ordinal =
+        string "first" <|> string "second" <|>
+        string "third" <|> string "fourth"
+    object = article *> space *> phrase
+    article = string "a" <|> string "an"
+    phrase =
+        Gen <$> element <* string " generator" <|>
+        Chip <$> element <* string "-compatible microchip"
+    element = some letter
 
 generators :: [Object a] -> [a]
 generators os = [e | Gen e <- os]
@@ -90,49 +117,37 @@ moveTo f os (State _ gcs) =
         (if Gen p `elem` os then f else g,
          if Chip p `elem` os then f else c)
 
-solve :: Input -> Int
-solve rs = length $ takeWhile (not . any finished) $ bfs moves $ [mkState rs]
+solve1 :: Input -> Int
+solve1 rs = length $ takeWhile (not . any finished) $ bfs moves $ [mkState rs]
 
-testInput :: Input
-testInput = [
-    -- The first floor contains a hydrogen-compatible microchip and
-    -- a lithium-compatible microchip.
-    [Chip "hydrogen", Chip "lithium"],
-    -- The second floor contains a hydrogen generator.
-    [Gen "hydrogen"],
-    -- The third floor contains a lithium generator.
-    [Gen "lithium"],
-    -- The fourth floor contains nothing relevant.
-    []]
+testInput :: String
+testInput = "\
+    \The first floor contains a hydrogen-compatible microchip and a lithium-compatible microchip.\n\
+    \The second floor contains a hydrogen generator.\n\
+    \The third floor contains a lithium generator.\n\
+    \The fourth floor contains nothing relevant.\n"
 
-initInput :: Input
-initInput = [
-    -- The first floor contains a thulium generator, a thulium-compatible
-    -- microchip, a plutonium generator, and a strontium generator.
-    [Gen "thulium", Chip "thulium", Gen "plutonium", Gen "strontium"],
-    -- The second floor contains a plutonium-compatible microchip and a
-    --  strontium-compatible microchip.
-    [Chip "plutonium", Chip "strontium"],
-    -- The third floor contains a promethium generator, 
-    -- a promethium-compatible microchip, a ruthenium generator, and 
-    -- a ruthenium-compatible microchip.
-    [Gen "promethium", Chip "promethium", Gen "ruthenium", Chip "ruthenium"],
-    -- The fourth floor contains nothing relevant.
-    []]
+tests1 :: [(String, Int)]
+tests1 = [(testInput, 11)]
 
 -- Part Two --
 
-initInput2 :: Input
-initInput2 = (extras++floor1):rest
-  where
-    floor1:rest = initInput
-    -- An elerium generator.
-    -- An elerium-compatible microchip.
-    -- A dilithium generator.
-    -- A dilithium-compatible microchip
-    extras = [Gen "elerium", Chip "elerium", Gen "dilithium", Chip "dilithium"]
+-- An elerium generator.
+-- An elerium-compatible microchip.
+-- A dilithium generator.
+-- A dilithium-compatible microchip
+extraParts :: [Object String]
+extraParts =
+    [Gen "elerium", Chip "elerium", Gen "dilithium", Chip "dilithium"]
+
+solve2 :: Input -> Int
+solve2 (floor1:rest) = solve1 ((extraParts++floor1):rest)
+solve2 [] = error "no floors"
 
 main :: IO ()
 main = do
-    print (solve initInput)
-    print (solve initInput2)
+    s <- readFile "input/11.txt"
+    let input = parse s
+    putStr (unlines (failures "solve1" (solve1 . parse) tests1))
+    print (solve1 input)
+    print (solve2 input)
