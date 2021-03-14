@@ -62,7 +62,7 @@ initRobot = Robot {
 
 showRobot :: Robot -> String
 showRobot r = showGrid ' ' $
-    Map.singleton (position r) (showDirection (direction r)) `Map.union`
+    Map.insert (position r) (showDirection (direction r)) $
     fmap showPaint (paint r)
 
 getPaint :: Robot -> Position -> Paint

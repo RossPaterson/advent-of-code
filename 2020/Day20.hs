@@ -50,8 +50,8 @@ rotateGrid = transpose . reverse
 -- tiles having a particular value for the property
 tileMap :: Ord a => (Tile -> a) -> Map Int [Tile] -> Map a [(Int, Tile)]
 tileMap property m =
-    Map.unionsWith (++)
-        [Map.singleton (property tile) [(n, tile)] |
+    Map.fromListWith (++)
+        [(property tile, [(n, tile)]) |
             (n, tiles) <- Map.assocs m, tile <- tiles]
 
 -- Find an arrangement of tiles (possibly transformed) so that adjacent
