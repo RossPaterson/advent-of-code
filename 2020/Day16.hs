@@ -1,9 +1,11 @@
 module Main where
 
 import Utilities
+import Matching
 import Parser
 import Control.Applicative
 import Data.List
+import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
 
@@ -80,33 +82,11 @@ tests1 = [(testInput, 71)]
 valid :: [Rule] -> Ticket -> Bool
 valid rs vs = null (invalid_nos rs vs)
 
--- consistent assignments of field names to field indices
-field_codings :: [Rule] -> [Ticket] -> [[(String, Int)]]
-field_codings rs ts = assignments $ possible_rule_fields rs ts
-
--- | Extract an element of the list that has a minimal value under @f@.
-extractMinBy :: Ord b => (a -> b) -> [a] -> Maybe (a, [a])
-extractMinBy _ [] = Nothing
-extractMinBy f (x:xs) = Just (ext x (f x) [] xs)
-  where
-    ext y _ done [] = (y, done)
-    ext y fy done (z:zs)
-      | fz < fy = ext z fz (y:done) zs
-      | otherwise = ext y fy (z:done) zs
-      where
-        fz = f z
-
--- | Possible pairings of each @x@ with a distinct member of the
--- corresponding set.
--- Choosing the value with the smallest set of possibilities at each
--- stage minimizes branching in the search space.
-assignments :: Ord b => [(a, Set b)] -> [[(a, b)]]
-assignments rel = case extractMinBy (Set.size . snd) rel of
-    Nothing -> [[]]
-    Just ((x, ys), xys) ->
-        [(x, y):rest |
-            y <- Set.elems ys,
-            rest <- assignments (map (fmap (Set.delete y)) xys)]
+-- consistent assignment of field names to field indices
+field_coding :: [Rule] -> [Ticket] -> [(String, Int)]
+field_coding rs ts =
+    Map.assocs $ uniquePerfectMatching $
+        Map.fromList $ possible_rule_fields rs ts
 
 -- for each rule name, the set of field indices that hold only valid values
 possible_rule_fields :: [Rule] -> [Ticket] -> [(String, Set Int)]
@@ -120,7 +100,7 @@ solve2 :: Input -> Int
 solve2 (Input rs t ts) =
     product [t!!f | (n, f) <- coding, isPrefixOf "departure" n]
   where
-    coding = head $ field_codings rs (t:filter (valid rs) ts)
+    coding = field_coding rs (t:filter (valid rs) ts)
 
 testInput2 :: String
 testInput2 = "\
