@@ -20,11 +20,10 @@ tests1 = [
 solve2 :: String -> Int
 solve2 s = head [n | n <- [0..], let h = hash s n, "000000" `isPrefixOf` h]
 
-input :: String
-input = "yzbqklnj"
-
 main :: IO ()
 main = do
+    s <- readFile "input/04.txt"
+    let input = head (lines s)
     putStr (unlines (failures "solve1" solve1 tests1))
     print (solve1 input)
     print (solve2 input)

@@ -10,9 +10,6 @@ import qualified Data.Sequence as Seq
 
 type Input = String
 
-parse :: String -> Input
-parse = head . lines
-
 -- Part One
 
 solve1 :: Input -> String
@@ -73,8 +70,8 @@ tests2 = [("51589", 9), ("01245", 5), ("92510", 18), ("59414", 2018)]
 main :: IO ()
 main = do
     s <- readFile "input/14.txt"
-    let input = parse s
+    let input = head (lines s)
     putStr (unlines (failures "solve1" solve1 tests1))
-    print (solve1 input)
+    putStrLn (solve1 input)
     putStr (unlines (failures "solve2" solve2 tests2))
     print (solve2 input)

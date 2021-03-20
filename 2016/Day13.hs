@@ -26,9 +26,6 @@ solve magic goal =
 test :: IO ()
 test = print (solve 10 (Position 7 4))
 
-input :: Int
-input = 1362
-
 -- Part Two
 
 solve2 :: Int -> Int -> Int
@@ -37,5 +34,7 @@ solve2 magic depth =
 
 main :: IO ()
 main = do
+    s <- readFile "input/13.txt"
+    let input = read s
     print (solve input (Position 31 39))
     print (solve2 input 50)

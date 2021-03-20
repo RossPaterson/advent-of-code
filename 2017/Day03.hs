@@ -70,11 +70,10 @@ test2 = [1, 1, 2, 4, 5, 10, 11, 23, 25, 26, 54, 57, 59, 122, 133, 142, 147, 304,
 solve2 :: Input -> Int
 solve2 n = head $ dropWhile (<= n) values
 
-input :: Int
-input = 325489
-
 main :: IO ()
 main = do
+    s <- readFile "input/03.txt"
+    let input = read s
     putStr (unlines (failures "solve1" solve1 tests1))
     print (solve1 input)
     print (solve2 input)

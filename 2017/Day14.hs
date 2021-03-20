@@ -13,7 +13,7 @@ type Grid = Set Position
 type Input = Grid
 
 parse :: String -> Input
-parse = mkGrid
+parse = mkGrid . head . lines
 
 mkGrid :: String -> Grid
 mkGrid key = Set.fromList [Position r (pos*8 + b) |
@@ -32,9 +32,6 @@ solve1 = Set.size
 
 testInput :: Input
 testInput = mkGrid "flqrgnkx"
-
-input :: Input
-input = mkGrid "hfdlxzhv"
 
 tests1 :: [(Input, Int)]
 tests1 = [(testInput, 8108)]
@@ -61,6 +58,8 @@ tests2 = [(testInput, 1242)]
 
 main :: IO ()
 main = do
+    s <- readFile "input/14.txt"
+    let input = parse s
     putStr (unlines (failures "solve1" solve1 tests1))
     print (solve1 input)
     putStr (unlines (failures "solve2" solve2 tests2))

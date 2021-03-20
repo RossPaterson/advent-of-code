@@ -1,5 +1,7 @@
 module Main where
 
+import Utilities
+
 -- position in an infinite sequence of (row, column) coordinates in the
 -- diagonalization
 index :: Int -> Int -> Int
@@ -22,4 +24,6 @@ getNumber r c = numbers !! (index r c - 1)
 
 main :: IO ()
 main = do
-    print (getNumber 2981 3075)
+    s <- readFile "input/25.txt"
+    let [row, col] = readNumbers s
+    print (getNumber row col)

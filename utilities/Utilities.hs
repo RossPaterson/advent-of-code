@@ -6,6 +6,7 @@ module Utilities (
     predWrap,
     -- * Lists
     paragraphs,
+    readNumbers,
     takes,
     pairWith,
     fastNub,
@@ -32,6 +33,7 @@ module Utilities (
     failures,
     ) where
 
+import Data.Char
 import Data.List
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
@@ -64,6 +66,15 @@ paragraphs ('\n':'\n':cs) = "\n":paragraphs cs
 paragraphs (c:cs) = case paragraphs cs of
     [] -> [[c, '\n']]
     p:ps -> (c:p):ps
+
+-- | Extract positive numbers from a string
+readNumbers :: String -> [Int]
+readNumbers s
+  | null start = []
+  | otherwise = read number : readNumbers rest
+  where
+    start = dropWhile (not . isDigit) s
+    (number, rest) = span isDigit start
 
 -- | @'takes' n xs@ partitions @xs@ into groups of size @n@, with the
 -- possible exception of the last one, which is non-empty.

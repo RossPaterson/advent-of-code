@@ -12,9 +12,6 @@ look_and_say = iterate count
 test :: [String]
 test = take 6 (look_and_say "1")
 
-input :: String
-input = "1321131112"
-
 solve1 :: String -> Int
 solve1 s = length (look_and_say s!!40)
 
@@ -25,5 +22,7 @@ solve2 s = length (look_and_say s!!50)
 
 main :: IO ()
 main = do
+    s <- readFile "input/10.txt"
+    let input = head (lines s)
     print (solve1 input)
     print (solve2 input)

@@ -38,11 +38,10 @@ add _ _ = error "string is too short"
 tests2 :: [(String, String)]
 tests2 = [("abc", "05ace8e3")]
 
-input :: String
-input = "ojvtpuvg"
-
 main :: IO ()
 main = do
+    s <- readFile "input/05.txt"
+    let input = head (lines s)
     putStr (unlines (failures "solve1" solve1 tests1))
     putStrLn (solve1 input)
     putStr (unlines (failures "solve2" solve2 tests2))

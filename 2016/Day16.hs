@@ -37,10 +37,9 @@ solve size = bitsToString .
   where
     (n, k) = twos size
 
-input :: String
-input = "01111010110010011"
-
 main :: IO ()
 main = do
+    s <- readFile "input/06.txt"
+    let input = head (lines s)
     putStrLn (solve 272 input)
     putStrLn (solve 35651584 input)

@@ -27,9 +27,6 @@ straight :: String -> Bool
 straight (c1:c2:c3:_) = ord c2 == ord c1 + 1 && ord c3 == ord c2 + 1
 straight _ = False
 
-input :: String
-input = "cqjxjnds"
-
 solve1 :: String -> String
 solve1 = head . filter requirements . iterate incr
 
@@ -40,5 +37,7 @@ solve2 = head . tail . filter requirements . iterate incr
 
 main :: IO ()
 main = do
+    s <- readFile "input/11.txt"
+    let input = head (lines s)
     putStrLn (solve1 input)
     putStrLn (solve2 input)

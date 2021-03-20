@@ -119,8 +119,8 @@ bossAttack s
   where
     damage = max 1 (boss_damage s - player_armor s)
 
-initState :: State
-initState = startState 50 500 55 8
+initState :: Int -> Int -> State
+initState h d = startState 50 500 h d
 
 testState :: State
 testState = startState 10 250 13 8
@@ -133,15 +133,17 @@ solve level =
     fst . head . filter (success . snd) . shortestPaths (step level) .
     mod_player_hit_points (subtract level)
 
-solve1 :: Int
-solve1 = solve 0 initState
+solve1 :: Int -> Int -> Int
+solve1 h d = solve 0 (initState h d)
 
 -- Part Two --
 
-solve2 :: Int
-solve2 = solve 1 initState
+solve2 :: Int -> Int -> Int
+solve2 h d = solve 1 (initState h d)
 
 main :: IO ()
 main = do
-    print solve1
-    print solve2
+    s <- readFile "input/22.txt"
+    let [hp, d] = readNumbers s
+    print (solve1 hp d)
+    print (solve2 hp d)

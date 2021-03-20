@@ -5,9 +5,6 @@ import Utilities
 import Data.List
 import Data.Maybe
 
-input_salt :: String
-input_salt = "ahsbgdzn"
-
 hash1 :: String -> String
 hash1 = md5s
 
@@ -47,8 +44,10 @@ tests2 = [("abc", 22551)]
 
 main :: IO ()
 main = do
+    s <- readFile "input/14.txt"
+    let input = head (lines s)
     putStr (unlines (failures "solve1" solve1 tests1))
-    print (solve1 input_salt)
+    print (solve1 input)
     -- These are quite slow
     putStr (unlines (failures "solve2" solve2 tests2))
-    print (solve2 input_salt)
+    print (solve2 input)

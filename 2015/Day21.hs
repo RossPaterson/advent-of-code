@@ -2,6 +2,17 @@ module Main where
 
 import Utilities
 
+data PlayerState = Player {
+    hit_points :: Int,
+    damage_score :: Int,
+    armor_score :: Int
+    }
+
+parse :: String -> PlayerState
+parse s = Player h d a
+  where
+    [h, d, a] = readNumbers s
+
 data Item = Item {
     name :: String,
     cost :: Int,
@@ -35,17 +46,8 @@ ring_items = [
     Item "Defense +2"   40     0       2,
     Item "Defense +3"   80     0       3]
 
-data PlayerState = Player {
-    hit_points :: Int,
-    damage_score :: Int,
-    armor_score :: Int
-    }
-
 initHP :: Int
 initHP = 100
-
-boss :: PlayerState
-boss = Player 103 9 2
 
 total :: (a -> Int) -> [a] -> Int
 total f = sum . map f
@@ -74,15 +76,19 @@ beats :: PlayerState -> PlayerState -> Bool
 beats p1 p2 =
     odd $ length $ takeWhile (not . finished) $ iterate attack (p1, p2)
 
-solve1 :: Int
-solve1 = minimum [total cost is | is <- purchases, beats (initState is) boss]
+solve1 :: PlayerState -> Int
+solve1 boss =
+    minimum [total cost is | is <- purchases, beats (initState is) boss]
 
 -- Part Two --
 
-solve2 :: Int
-solve2 = maximum [total cost is | is <- purchases, beats boss (initState is)]
+solve2 :: PlayerState -> Int
+solve2 boss =
+    maximum [total cost is | is <- purchases, beats boss (initState is)]
 
 main :: IO ()
 main = do
-    print solve1
-    print solve2
+    s <- readFile "input/21.txt"
+    let input = parse s
+    print (solve1 input)
+    print (solve2 input)

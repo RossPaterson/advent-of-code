@@ -41,11 +41,10 @@ solve2 = play2 . initState
 tests2 :: [(Int, Int)]
 tests2 = [(5, 2)]
 
-input :: Int
-input = 3017957
-
 main :: IO ()
 main = do
+    s <- readFile "input/19.txt"
+    let input = read s
     putStr (unlines (failures "solve1" solve1 tests1))
     print (solve1 input)
     putStr (unlines (failures "solve2" solve2 tests2))

@@ -77,11 +77,10 @@ tests2 = [
     ("kglvqrro", 492),
     ("ulqzkmiv", 830)]
 
-input :: String
-input = "qljzarfv"
-
 main :: IO ()
 main = do
+    s <- readFile "input/17.txt"
+    let input = head (lines s)
     putStr (unlines (failures "solve1" solve1 tests1))
     putStrLn (solve1 input)
     putStr (unlines (failures "solve2" solve2 tests2))
