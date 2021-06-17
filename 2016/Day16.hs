@@ -39,7 +39,7 @@ solve size = bitsToString .
 
 main :: IO ()
 main = do
-    s <- readFile "input/06.txt"
+    s <- readFile "input/16.txt"
     let input = head (lines s)
     putStrLn (solve 272 input)
     putStrLn (solve 35651584 input)
