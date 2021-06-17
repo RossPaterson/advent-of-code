@@ -99,12 +99,9 @@ totient = multiplicative $ \ p k -> p^(k-1)*(p - 1)
 bezout :: Integral a => a -> a -> (a, a)
 {-# SPECIALIZE bezout :: Int -> Int -> (Int, Int) #-}
 {-# SPECIALIZE bezout :: Integer -> Integer -> (Integer, Integer) #-}
-bezout a b = (approx (signum a) 0 qs, approx 0 (signum b) qs)
-  where
-    qs = denominators (abs a) (abs b)
-
-    approx x _ [] = x
-    approx x y (c:cs) = approx y (x - c*y) cs
+bezout a b
+  | b == 0 = (signum a, 0)
+  | otherwise = case bezout b (a `mod` b) of (x, y) -> (y, x - y*(a `div` b))
 
 -- | @'denominators' a b@ is the list of partial denominators of a
 -- regular continued fraction representation of @a/b@.
