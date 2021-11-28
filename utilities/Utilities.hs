@@ -11,10 +11,10 @@ module Utilities (
     pairWith,
     fastNub,
     frequency,
+    groupSortOn,
     mostCommon,
     initSets,
     leastBy,
-    same,
     tsort,
     tsortG,
     -- * Iteration
@@ -34,10 +34,11 @@ module Utilities (
     ) where
 
 import Data.Char
+import Data.Function
 import Data.List
+import Data.Ord
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
-import Data.Ord
 import Data.Set (Set)
 import qualified Data.Set as Set
 
@@ -93,6 +94,10 @@ frequency xs = [(head g, length g) | g <- group (sort xs)]
 -- | Unique elements of the input list, in decreasing order of frequency
 mostCommon :: Ord a => [a] -> [a]
 mostCommon xs = map snd (sort [(-n, w) | (w, n) <- frequency xs])
+
+-- | Order and group by value of @f@.
+groupSortOn :: (Ord b) => (a -> b) -> [a] -> [[a]]
+groupSortOn f = groupBy ((==) `on` f) . sortBy (compare `on` f)
 
 -- | Faster equivalent of @map Set.fromList (inits xs)@.
 -- Zipping this with the original list gives a way to find repetitions.
@@ -153,27 +158,25 @@ chooseBetween m n (x:xs) =
 -- | Select all the elements of xs that have the least value of f
 -- (f is evaluated once for each element of the list.)
 leastBy :: (Ord v) => (a -> v) -> [a] -> [a]
-leastBy f =
-    map fst . head . groupBy (same snd) . sortBy (comparing snd) . map add_f
+leastBy f = map fst . head . groupSortOn snd . map add_f
   where
     add_f x = (x, f x)
-
--- | Equal results under f (useful for 'groupBy')
-same :: (Eq b) => (a -> b) -> a -> a -> Bool
-same f x y = f x == f y
 
 -- | Sort and eliminate repetitions.
 -- /O(n log(m))/ where m is the number of unique elements
 fastNub :: Ord a => [a] -> [a]
 fastNub = Set.toList . Set.fromList
 
--- | Topological sort
+-- | Topological sort: given a list of pairs, produces a list of the
+-- values contained in the pairs such that for each pair @(x, y)@, @x@
+-- occurs earlier in the list than @y@.
 tsort :: Ord a => [(a, a)] -> [a]
 tsort = tsortG . relationToGraph
 
--- | Topological sort
+-- | Topological sort: a list comprising the values in the map, such that
+-- each key occurs earlier in the list than all of its associated values.
 tsortG :: Ord a => Map a [a] -> [a]
-tsortG g = map fst $ sortBy (comparing (Down . snd)) $ Map.assocs depth_map
+tsortG g = map fst $ sortBy (compare `on` (Down . snd)) $ Map.assocs depth_map
   where
     depth_map = fmap depth (Map.union g empties)
     empties = Map.fromList [(x, []) | xs <- Map.elems g, x <- xs]

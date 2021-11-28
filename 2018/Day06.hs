@@ -5,7 +5,6 @@ import Parser
 import Utilities
 import Data.List
 import Data.Maybe
-import Data.Ord
 import qualified Data.Set as Set
 
 -- Input processing
@@ -63,8 +62,7 @@ closestAll ps cs = [c | p <- ps, c <- maybeToList (closest p cs)]
 -- the unique closest coordinate to p
 closest :: Position -> [Position] -> Maybe Position
 closest p cs =
-    unique $ map fst $ head $ groupBy (same snd) $ sortBy (comparing snd) $
-    [(c, distance p c) | c <- cs]
+    unique $ map fst $ head $ groupSortOn snd [(c, distance p c) | c <- cs]
   where
     unique [x] = Just x
     unique _ = Nothing

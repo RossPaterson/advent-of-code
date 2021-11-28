@@ -90,8 +90,7 @@ collisions :: System -> Set Int
 collisions ps =
     foldl addCollisions Set.empty $
     map (map snd) $
-    groupBy (same fst) $
-    sortBy (comparing fst) $
+    groupSortOn fst $
     [(t, (n1, n2)) |
         (n1, p1):rest <- tails (zip [0..] ps), (n2, p2) <- rest,
         t <- collisionTimes p1 p2]

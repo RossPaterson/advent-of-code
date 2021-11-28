@@ -55,7 +55,7 @@ outcome (Result n units) = n * snd (head (summary units))
 summary :: Units -> [(Unit, Int)]
 summary units =
     [(fst (head us), sum (map snd us)) |
-        us <- groupBy (same fst) (sortBy (comparing fst) (Map.elems units))]
+        us <- groupSortOn fst (Map.elems units)]
 
 -- Run a complete battle
 battle :: (Unit -> Int) -> Cavern -> Units -> Result

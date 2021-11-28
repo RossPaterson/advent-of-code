@@ -4,6 +4,7 @@ import Parser
 import Utilities
 import Control.Applicative
 import Data.Char
+import Data.Function
 import Data.List
 import Data.Maybe
 import Data.Ord
@@ -107,7 +108,7 @@ sizeArmy = sum . map numUnits . Map.elems
 -- because they are immune to the weapon used, or the attacker's damage
 -- is less than a single unit's hit points.
 battle :: State -> State
-battle = convergeBy (same size) . iterate fight
+battle = convergeBy ((==) `on` size) . iterate fight
 
 -- one round of battle
 fight :: State -> State
@@ -145,7 +146,7 @@ armyTargets attackers defenders =
 selectionOrder :: Army -> GroupNo -> GroupNo -> Ordering
 selectionOrder army =
     comparing (Down . effectivePower . (army!)) <>
-    comparing (Down . initiative . unitType. (army!))
+        comparing (Down . initiative . unitType. (army!))
 
 -- select a target for a group from the untargeted groups of the
 -- opposing army

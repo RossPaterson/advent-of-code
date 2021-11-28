@@ -20,6 +20,7 @@ module Number(
     isPrimitiveRootOf,
     ) where
 
+import Data.Function
 import Data.List
 import Data.Ord
 
@@ -119,7 +120,7 @@ denominators a b
 -- @n `mod` m == r@ for all of these pairs.  (Chinese Remainder Theorem)
 chineseRemainder :: [(Int, Int)] -> Int
 chineseRemainder =
-    fromInteger . fst . foldr1 match . map promote . sortBy (comparing snd)
+    fromInteger . fst . foldr1 match . map promote . sortBy (compare `on` snd)
   where
     promote (r, m) = (toInteger r, toInteger m)
     -- (k, m*n) such that k == i (mod m) and k == j (mod n)
