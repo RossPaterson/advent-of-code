@@ -6,11 +6,11 @@
 
 The most enjoyable puzzles were days 3, 6, 7, 10 and 22.  Day 25 was cute.
 
-Some common AoC themes:
+A recurring theme was an abstract machine, developed on days 2, 5,
+7, 9 and then used to run inputs that served as block boxes on each
+odd-numbered day thereafter.  (I didn't disassemble any of them.)
 
-* assembly code: developed on days 2, 5, 7, 9, with black box programs
-  for it supplied as input on each odd-numbered day thereafter.
-* path finding: days 15, 18 and 20.
+Another common AoC theme was path finding, seen on days 15, 18 and 20.
 
 I have added difficulty ratings based on how long each puzzle took.
 

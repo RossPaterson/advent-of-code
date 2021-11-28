@@ -76,9 +76,9 @@ out that with this input it's not necessary.
 
 ## [Day 8: Handheld Halting](https://adventofcode.com/2020/day/8) \*\*
 
-This is presumably the start of this year's virtual machine.  The first
-part is a routine simulation, while the second is a novel piece of reverse
-engineering.  Exhaustive search is sufficient.
+This is presumably the start of this year's virtual machine (it wasn't).
+The first part is a routine simulation, while the second is a novel
+piece of reverse engineering.  Exhaustive search is sufficient.
 
 ## [Day 9: Encoding Error](https://adventofcode.com/2020/day/9) \*\*
 
@@ -133,8 +133,8 @@ Plenty of test cases are supplied, so we can avoid wasted submissions.
 
 This exercise involved bit manipulation, with a novel twist in the
 second part.  The calculations are precisely specified, but take some
-care to implement.  In the given input, the nondeterminism is limited,
-so a naive approach is effective.
+care to implement.  The given input has limited nondeterminism, so a
+naive approach is effective.
 
 The description specifies a fixed number of bits, but this could be
 relaxed by assuming leading zeros.

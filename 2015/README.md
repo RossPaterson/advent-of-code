@@ -75,8 +75,9 @@ knock up a parser for the subset used here.
 
 ## [Day 13: Knights of the Dinner Table](https://adventofcode.com/2015/day/13)
 
-This is an exhaustive search of permutations to maximize a function.
-The second part is a trivial variation.
+This is a slightly disguised
+[traveling salesman problem](https://en.wikipedia.org/wiki/Travelling_salesman_problem),
+with a circuit for first part and a path for the second.
 
 ## [Day 14: Reindeer Olympics](https://adventofcode.com/2015/day/14)
 
