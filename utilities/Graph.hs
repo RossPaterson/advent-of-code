@@ -6,8 +6,8 @@ module Graph (
     component, components
     ) where
 
-import qualified MinPriorityQueue as PQ
-import qualified PrioritySearchQueue as PSQ
+import qualified Data.MinPriorityQueue as PQ
+import qualified Data.PrioritySearchQueue as PSQ
 
 import Data.List
 import Data.Set (Set)

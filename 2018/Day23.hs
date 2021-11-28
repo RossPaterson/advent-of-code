@@ -2,7 +2,7 @@ module Main where
 
 import Geometry
 import Parser
-import qualified MaxPriorityQueue as PQ
+import qualified Data.MaxPriorityQueue as PQ
 import Utilities
 import Data.Foldable
 import Data.Ord

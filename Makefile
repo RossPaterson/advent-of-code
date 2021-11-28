@@ -11,4 +11,4 @@ clean: $(YEARS)
 $(YEARS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 
-.PHONY: all clean $(YEARS)
+.PHONY: all run test clean $(YEARS)

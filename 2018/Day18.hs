@@ -4,7 +4,7 @@ import Utilities
 import Data.Maybe
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import qualified RationalList as Rep
+import qualified Data.RationalList as RL
 
 -- Input processing
 
@@ -97,7 +97,7 @@ testInput =
 -- similar to solve1, but use RationalList to get the larger index
 -- in a reasonable time
 solve2 :: Input -> Int
-solve2 = value . fromJust . Rep.elementAt 1000000000 . Rep.iterate step
+solve2 = value . fromJust . RL.elementAt 1000000000 . RL.iterate step
 
 main :: IO ()
 main = do

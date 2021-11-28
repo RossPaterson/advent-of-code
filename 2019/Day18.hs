@@ -1,7 +1,7 @@
 module Main where
 
 import Geometry
-import qualified CompactSet as CompactSet
+import qualified Data.CompactSet as CompactSet
 import Graph
 import Utilities
 import Control.Monad

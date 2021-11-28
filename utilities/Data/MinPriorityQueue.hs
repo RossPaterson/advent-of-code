@@ -1,7 +1,7 @@
 -- | Minimum priority queue, implemented with lazy skew heaps, from
 -- "Fun with Binary Heap Trees" by Chris Okasaki in
 -- "The Fun of Programming", pp 1-16.
-module MinPriorityQueue (PQ, singleton, insert, extract) where
+module Data.MinPriorityQueue (PQ, singleton, insert, extract) where
 
 -- | Minimum priority queue
 data PQ p a = Null | Fork p a (PQ p a) (PQ p a)

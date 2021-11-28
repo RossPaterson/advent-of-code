@@ -1,5 +1,5 @@
 -- | Permutations that are the identity almost everywhere.
-module SmallPermutation (
+module Data.SmallPermutation (
     SmallPermutation,
     apply,
     invert,

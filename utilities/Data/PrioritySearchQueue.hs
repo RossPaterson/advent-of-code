@@ -1,5 +1,5 @@
 -- | Priority search queue
-module PrioritySearchQueue (
+module Data.PrioritySearchQueue (
     PSQ, empty, singleton, insert, extract
     ) where
 

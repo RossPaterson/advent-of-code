@@ -1,7 +1,7 @@
 module Main where
 
 import Parser
-import qualified RationalList as RL
+import qualified Data.RationalList as RL
 import Utilities
 import Control.Applicative
 import Data.List

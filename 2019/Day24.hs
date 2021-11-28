@@ -2,7 +2,7 @@ module Main where
 
 import Utilities
 import Geometry
-import qualified RationalList as RL
+import qualified Data.RationalList as RL
 import Data.Bits
 import qualified Data.Map as Map
 

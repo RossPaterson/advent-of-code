@@ -1,7 +1,7 @@
 module Main where
 
 import Parser
-import SmallPermutation
+import Data.SmallPermutation
 import Utilities
 import Control.Applicative
 import Data.Char

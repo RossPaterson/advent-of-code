@@ -1,5 +1,5 @@
 -- | Compact representation of a finite set of natural numbers.
-module CompactSet (
+module Data.CompactSet (
     -- * Set type
     Set,
     -- * Construction

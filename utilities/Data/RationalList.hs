@@ -1,5 +1,5 @@
 -- | A sequence that is either finite or repeats from some point.
-module RationalList (
+module Data.RationalList (
     RationalList,
     finiteList, iterate, elementAt, foldMapTake,
     prefix, repetend

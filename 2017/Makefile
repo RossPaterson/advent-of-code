@@ -13,6 +13,9 @@ test: $(PROGS)
 clean:
 	$(RM) $(PROGS) *.o *.hi $(LIBDIR)/*.o $(LIBDIR)/*.hi
 
-Day%: Day%.hs $(LIBDIR)/*.hs
+Day%: Day%.hs $(LIBDIR)/*.hs $(LIBDIR)/*/*.hs
 	/usr/bin/ghc -Wall --make -O -i$(LIBDIR) Day$*.hs
 	@touch $@
+
+Day10: Knothash.hs
+Day14: Knothash.hs

@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import qualified RationalList as RL
+import qualified Data.RationalList as RL
 
 type Input = Banks
 type Banks = [Int]
