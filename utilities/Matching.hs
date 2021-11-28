@@ -8,7 +8,7 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 
 -- | Match each key of the map with one element of the corresponding set,
--- such that each element of the sets is paired with exaxtly one key.
+-- such that each element of the sets is paired with exactly one key.
 -- The function assumes that a unique such matching exists, and will
 -- fail otherwise.
 uniquePerfectMatching :: (Ord a, Ord b) => Map a (Set b) -> Map a b
