@@ -22,13 +22,13 @@ parse = map (runParser command) . lines
 
 -- Part One
 
-action1 :: Position -> Command -> Position
-action1 (Position h d) (Forward n) = Position (h+n) d
-action1 (Position h d) (Down n) = Position h (d+n)
-action1 (Position h d) (Up n) = Position h (d-n)
+move :: Command -> Position
+move (Forward n) = Position n 0
+move (Down n) = Position 0 n
+move (Up n) = Position 0 (-n)
 
 solve1 :: Input -> Int
-solve1 = multiply . foldl action1 zero
+solve1 = multiply . foldl (.+.) zero . map move
 
 multiply :: Position -> Int
 multiply (Position h d) = h*d
@@ -54,16 +54,13 @@ data State2 = State2 { position :: Position, aim :: Int }
 start :: State2
 start = State2 zero 0
 
-action2 :: State2 -> Command -> State2
-action2 s (Forward n) = s { position = forward n (position s) (aim s) }
-action2 s (Down n) = s { aim = aim s + n }
-action2 s (Up n) = s { aim = aim s - n }
-
-forward :: Int -> Position -> Int -> Position
-forward n (Position h d) a = Position (h+n) (d + a*n)
+action :: State2 -> Command -> State2
+action s (Forward n) = s { position = position s .+. Position n (aim s*n) }
+action s (Down n) = s { aim = aim s + n }
+action s (Up n) = s { aim = aim s - n }
 
 solve2 :: Input -> Int
-solve2 = multiply . position . foldl action2 start
+solve2 = multiply . position . foldl action start
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 900)]
