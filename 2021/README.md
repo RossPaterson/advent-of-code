@@ -9,3 +9,8 @@
 This was an easy exercise with list functions, especially `zip`.
 I did the second part as a direct implementation of the description,
 but a little analysis yields a more efficient solution.
+
+## [Day 2: Dive!](https://adventofcode.com/2021/day/2)
+
+This was an exercise in applying a list of commands to a state, as seen
+in early puzzles in previous years.
