@@ -8,7 +8,7 @@ import Data.List
 type Input = [Int]
 
 parse :: String -> Input
-parse = readNumbers
+parse = map read . lines
 
 -- Part One
 
