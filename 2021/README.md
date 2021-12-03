@@ -14,3 +14,10 @@ but a little analysis yields a more efficient solution.
 
 This was an exercise in applying a list of commands to a state, as seen
 in early puzzles in previous years.
+
+## [Day 3: Binary Diagnostic](https://adventofcode.com/2021/day/3)
+
+The description (particularly the second part) is lengthy, but the first
+part is a neat list manipulation, while the second requires recursion.
+In each part, using two separate traversals is much easier than trying
+to do both at once.  Both parts rely on unstated properties of the input.
