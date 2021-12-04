@@ -21,3 +21,10 @@ The description (particularly the second part) is lengthy, but the first
 part is a neat list manipulation, while the second requires recursion.
 In each part, using two separate traversals is much easier than trying
 to do both at once.  Both parts rely on unstated properties of the input.
+
+## [Day 4: Giant Squid](https://adventofcode.com/2021/day/4)
+
+The bingo game is a moderately involved sequential computation.  I fixed
+on a convenient representation early, but then flailed around a bit and
+also didn't read the scoring function properly.  In the end the solution
+is quite clean.
