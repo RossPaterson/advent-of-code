@@ -28,3 +28,10 @@ The bingo game is a moderately involved sequential computation.  I fixed
 on a convenient representation early, but then flailed around a bit and
 also didn't read the scoring function properly.  In the end the solution
 is quite clean.
+
+## [Day 5: Hydrothermal Venture](https://adventofcode.com/2021/day/5)
+
+A somewhat easier puzzle, requiring a little parsing and then some
+processing of 2-dimensional coordinates.  The extension in the second part
+is mostly implicit in the description of the first.  My main stumbling
+block in both parts was with getting the right ranges of numbers.
