@@ -38,8 +38,12 @@ block in both parts was with getting the right ranges of numbers.
 
 ## [Day 5: Lanternfish](https://adventofcode.com/2021/day/5)
 
-This looked like a computation that would explode with more iterations,
-so I started with a more efficient representation, which also worked for
-the second half.  I fretted a bit about integer overflow, but it wasn't
-an issue with this input.  I could have avoided that by using `Integer`
-in the first place.
+This puzzle hinges on the choice of data representation.  The description
+mentions exponential growth, but also presents a naive representation
+that will obviously explode with the extra iterations expected from the
+second part.  I started with a more efficient representation (there's
+really only one choice), which worked for both parts without change.
+
+I fretted a bit about integer overflow, but it wasn't an issue with
+this input.  I could have avoided the issue by using `Integer` in the
+first place.
