@@ -35,3 +35,11 @@ A somewhat easier puzzle, requiring a little parsing and then some
 processing of 2-dimensional coordinates.  The extension in the second part
 is mostly implicit in the description of the first.  My main stumbling
 block in both parts was with getting the right ranges of numbers.
+
+## [Day 5: Lanternfish](https://adventofcode.com/2021/day/5)
+
+This looked like a computation that would explode with more iterations,
+so I started with a more efficient representation, which also worked for
+the second half.  I fretted a bit about integer overflow, but it wasn't
+an issue with this input.  I could have avoided that by using `Integer`
+in the first place.
