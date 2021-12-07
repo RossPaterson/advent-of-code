@@ -51,6 +51,10 @@ first place.
 ## [Day 6: The Treachery of Whales](https://adventofcode.com/2021/day/6)
 
 This one was quite a bit simpler.  In contrast to yesterday's
-resourse-sensitive puzzle, this time direct exhaustive search was
+resource-sensitive puzzle, this time a direct exhaustive search was
 sufficient.  There was only a slightly more complex cost function in
-the second part.
+the second part (a little basic maths helps here).
+
+From the Reddit thread, the minima for the two parts occur at the median
+and near the mean respectively.  On the other hand, the exhaustive search
+ran in 85 ms.
