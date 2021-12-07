@@ -47,3 +47,10 @@ really only one choice), which worked for both parts without change.
 I fretted a bit about integer overflow, but it wasn't an issue with
 this input.  I could have avoided the issue by using `Integer` in the
 first place.
+
+## [Day 6: The Treachery of Whales](https://adventofcode.com/2021/day/6)
+
+This one was quite a bit simpler.  In contrast to yesterday's
+resourse-sensitive puzzle, this time direct exhaustive search was
+sufficient.  There was only a slightly more complex cost function in
+the second part.
