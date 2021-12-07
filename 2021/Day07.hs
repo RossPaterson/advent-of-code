@@ -11,17 +11,15 @@ parse = readNumbers
 
 -- Part One
 
-distances :: Int -> [Int] -> [Int]
-distances v xs = [abs (x - v) | x <- xs]
+distance :: Int -> Int -> Int
+distance x1 x2 = abs (x1 - x2)
 
-move_cost1 :: [Int] -> Int -> Int
-move_cost1 xs v = sum (distances v xs)
-
-minimize :: (Enum a, Ord a, Ord b) => (a -> b) -> [a] -> b
-minimize f xs = minimum (map f [minimum xs..maximum xs])
+least_total_cost :: (Int -> Int -> Int) -> [Int] -> Int
+least_total_cost cost xs =
+    minimum [sum (map (cost v) xs) | v <- [minimum xs..maximum xs]]
 
 solve1 :: Input -> Int
-solve1 xs = minimize (move_cost1 xs) xs
+solve1 = least_total_cost distance
 
 testInput :: String
 testInput = "16,1,2,0,4,2,7,1,2,14"
@@ -31,14 +29,15 @@ tests1 = [(testInput, 37)]
 
 -- Part Two
 
+-- assuming non-negative n, same as sum [1..n]
 sum_triangle :: Int -> Int
 sum_triangle n = n*(n+1) `div` 2
 
-move_cost2 :: [Int] -> Int -> Int
-move_cost2 xs v = sum (map sum_triangle (distances v xs))
+cost2 :: Int -> Int -> Int
+cost2 x1 x2 = sum_triangle (distance x1 x2)
 
 solve2 :: Input -> Int
-solve2 xs = minimize (move_cost2 xs) xs
+solve2 = least_total_cost cost2
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 168)]
