@@ -58,3 +58,15 @@ the second part (a little basic maths helps here).
 From the Reddit thread, the minima for the two parts occur at the median
 and near the mean respectively.  On the other hand, the exhaustive search
 ran in 85 ms.
+
+## [Day 7: Seven Segment Search](https://adventofcode.com/2021/day/7)
+
+This puzzle had an intricate description.  The first part is easy
+enough, but I made quite a meal of the second part, partly by not fully
+understanding the description, and partly by implementing a general
+constraint-solving approach to get the wire-segment and display-digit
+mappings, which was quite tricky to get right.  But it is much simpler
+to deduce the display-digit mapping directly using a traditional
+puzzle-solving approach, which amounts to set manipulation.  Part one
+hinted at this approach, but the description of part two dwelled on the
+wire-segment mapping.
