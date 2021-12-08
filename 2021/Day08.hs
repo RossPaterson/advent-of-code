@@ -3,19 +3,22 @@ module Main where
 import Utilities
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
-import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.CompactSet (Set)
+import qualified Data.CompactSet as Set
 
 -- Input processing
 
 type Input = [([Display], [Display])]
 -- the order of segments in a display is irrelevant
-type Display = Set Segment
+type Display = Set Int
 type Segment = Char
+
+display :: String -> Display
+display cs = Set.fromList [fromEnum c - fromEnum 'a' | c <- cs]
 
 parse :: String -> Input
 parse s =
-    [(map Set.fromList (words f), map Set.fromList (words (drop 1 b))) |
+    [(map display (words f), map display (words (drop 1 b))) |
         l <- lines s, let (f, b) = span (/= '|') l]
 
 -- Part One
@@ -29,7 +32,7 @@ parse s =
 --   -    .    -    -    .    -    -    .    -    -
 --
 digits :: [Display]
-digits = map Set.fromList [
+digits = map display [
     "abcefg", "cf", "acdeg", "acdfg", "bcdf",
     "abdfg", "abdefg", "acf", "abcdefg", "abcdfg"]
 
@@ -40,7 +43,7 @@ unique_lengths =
 solve1 :: Input -> Int
 solve1 =
     length . filter (`Set.member` unique_lengths) .
-        map length . concat . map snd
+        map Set.size . concat . map snd
 
 testInput :: String
 testInput = "\
