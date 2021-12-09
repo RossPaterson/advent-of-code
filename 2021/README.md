@@ -67,6 +67,14 @@ understanding the description, and partly by implementing a general
 constraint-solving approach to get the wire-segment and display-digit
 mappings, which was quite tricky to get right.  But it is much simpler
 to deduce the display-digit mapping directly using a traditional
-puzzle-solving approach, which amounts to set manipulation.  Part one
-hinted at this approach, but the description of part two dwelled on the
-wire-segment mapping.
+puzzle-solving approach, which amounts to operating on sets instead
+of elements.  Part one hinted at this approach, but the description of
+part two dwelled on the wire-segment mapping.
+
+## [Day 8: Smoke Basin](https://adventofcode.com/2021/day/8)
+
+In the end, this is a fairly simple graph puzzle.  The second part is a
+lot simpler than it first appeared, due to restrictions on the input that
+were given in the description.  Before I realized that, I had written
+a fair bit of unnecessary code.
+
