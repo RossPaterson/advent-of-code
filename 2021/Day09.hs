@@ -24,7 +24,7 @@ neighbours m p = [p' | d <- unitVectors, let p' = p .+. d, Map.member p' m]
 -- local minima in the map
 lowPoints :: Ord a => Map Position a -> [(Position, a)]
 lowPoints m =
-    [(p, v) | (p, v) <- Map.assocs m, all (v <) $ map (m!) $ neighbours m p]
+    [(p, v) | (p, v) <- Map.assocs m, and [v < m!p' | p' <- neighbours m p]]
 
 solve1 :: Input -> Int
 solve1 m = sum [v+1 | (_, v) <- lowPoints m]
@@ -47,10 +47,12 @@ tests1 = [(testInput, 15)]
 -- Locations of height 9 do not belong to any basin.  We are told that
 -- every other location belongs to the basin of exactly one lowpoint.
 basins :: Map Position Int -> [[Position]]
-basins m = [fill (Map.filter (/= 9) m) p | (p, _) <- lowPoints m]
+basins m = [fill m' p | (p, _) <- lowPoints m]
+  where
+    m' = Map.filter (/= 9) m
 
 -- all points in m reachable from p
-fill :: Map Position Int -> Position -> [Position]
+fill :: Map Position a -> Position -> [Position]
 fill m = concat . bfs (neighbours m) . pure
 
 solve2 :: Input -> Int
