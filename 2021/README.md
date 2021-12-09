@@ -36,7 +36,7 @@ processing of 2-dimensional coordinates.  The extension in the second part
 is mostly implicit in the description of the first.  My main stumbling
 block in both parts was with getting the right ranges of numbers.
 
-## [Day 5: Lanternfish](https://adventofcode.com/2021/day/5)
+## [Day 6: Lanternfish](https://adventofcode.com/2021/day/6)
 
 This puzzle hinges on the choice of data representation.  The description
 mentions exponential growth, but also presents a naive representation
@@ -48,7 +48,7 @@ I fretted a bit about integer overflow, but it wasn't an issue with
 this input.  I could have avoided the issue by using `Integer` in the
 first place.
 
-## [Day 6: The Treachery of Whales](https://adventofcode.com/2021/day/6)
+## [Day 7: The Treachery of Whales](https://adventofcode.com/2021/day/7)
 
 This one was quite a bit simpler.  In contrast to yesterday's
 resource-sensitive puzzle, this time a direct exhaustive search was
@@ -59,7 +59,7 @@ From the Reddit thread, the minima for the two parts occur at the median
 and near the mean respectively.  On the other hand, the exhaustive search
 ran in 85 ms.
 
-## [Day 7: Seven Segment Search](https://adventofcode.com/2021/day/7)
+## [Day 8: Seven Segment Search](https://adventofcode.com/2021/day/8)
 
 This puzzle had an intricate description.  The first part is easy
 enough, but I made quite a meal of the second part, partly by not fully
@@ -71,7 +71,7 @@ puzzle-solving approach, which amounts to operating on sets instead
 of elements.  Part one hinted at this approach, but the description of
 part two dwelled on the wire-segment mapping.
 
-## [Day 8: Smoke Basin](https://adventofcode.com/2021/day/8)
+## [Day 9: Smoke Basin](https://adventofcode.com/2021/day/9)
 
 In the end, this is a fairly simple graph puzzle.  The second part is a
 lot simpler than it first appeared, due to restrictions on the input that
