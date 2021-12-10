@@ -78,3 +78,7 @@ lot simpler than it first appeared, due to restrictions on the input that
 were given in the description.  Before I realized that, I had written
 a fair bit of unnecessary code.
 
+## [Day 10: Syntax Scoring](https://adventofcode.com/2021/day/10)
+
+This bracket-watching task was easier than than the last few days, with
+little scope for different solutions.
