@@ -53,7 +53,7 @@ basins m = [fill m' p | (p, _) <- lowPoints m]
 
 -- all points in m reachable from p
 fill :: Map Position a -> Position -> [Position]
-fill m = concat . bfs (neighbours m) . pure
+fill m p = concat (bfs (neighbours m) [p])
 
 solve2 :: Input -> Int
 solve2 = product . take 3 . reverse . sort . map length . basins
