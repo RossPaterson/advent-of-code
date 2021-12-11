@@ -82,3 +82,10 @@ a fair bit of unnecessary code.
 
 This bracket-watching task was easier than than the last few days, with
 little scope for different solutions.
+
+## [Day 11: Dumbo Octopus](https://adventofcode.com/2021/day/11)
+
+Another fairly easy puzzle, consisting of a novel cellular automaton.
+I found it a nice exercise with maps, but procedural solutions with
+arrays have similar complexity.  The second part is a different query
+on the same sequence of counts.
