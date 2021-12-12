@@ -89,3 +89,18 @@ Another fairly easy puzzle, consisting of a novel cellular automaton.
 I found it a nice exercise with maps, but procedural solutions with
 arrays have similar complexity.  The second part is a different query
 on the same sequence of counts.
+
+As noted on the Reddit thread, this is a
+[model of firefly synchonization](http://dx.doi.org/10.1007/978-3-319-78512-7_8)
+([preprint](https://www.researchgate.net/publication/325791357)).
+
+## [Day 12: Passage Pathing](https://adventofcode.com/2021/day/12)
+
+This puzzle involved two novel variations on path-finding.  There are
+no pairs of adjacent big caves in the input, which isn't stated in the
+description, but is necessary of the task to make sense.
+
+I optimized the calculation by transforming the original graph to
+eliminate the big caves, which speeds things up considerably.  From the
+Reddit thread, this seems not to have been necessary for the small graphs
+we are given.
