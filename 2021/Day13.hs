@@ -70,8 +70,14 @@ solve2 :: Input -> String
 solve2 (ps, fs) =
     showGrid '.' (Map.fromList [(p, '#') | p <- foldl foldPaper ps fs])
 
-tests2 :: [(String, Int)]
-tests2 = [(testInput, 0)]
+tests2 :: [(String, String)]
+tests2 = [(testInput, "\
+    \#####\n\
+    \#...#\n\
+    \#...#\n\
+    \#...#\n\
+    \#####\n\
+    \")]
 
 main :: IO ()
 main = do
@@ -79,5 +85,5 @@ main = do
     let input = parse s
     putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     print (solve1 input)
-    -- putStr (unlines (failures "solve2" (solve2 . parse) tests2))
+    putStr (unlines (failures "solve2" (solve2 . parse) tests2))
     putStr (solve2 input)
