@@ -25,9 +25,13 @@ parse s =
 
 -- Part One
 
+-- fold values above the pivot down
+foldInt :: Int -> Int -> Int
+foldInt pivot x = pivot - abs (pivot - x)
+
 foldPos :: Fold -> Position -> Position
-foldPos (FoldX xf) (Position x y) = Position (xf - abs (xf - x)) y
-foldPos (FoldY yf) (Position x y) = Position x (yf - abs (yf - y))
+foldPos (FoldX xf) (Position x y) = Position (foldInt xf x) y
+foldPos (FoldY yf) (Position x y) = Position x (foldInt yf y)
 
 foldPaper :: [Position] -> Fold -> [Position]
 foldPaper ps f = map (foldPos f) ps
