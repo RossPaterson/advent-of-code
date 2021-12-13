@@ -104,3 +104,7 @@ I optimized the calculation by transforming the original graph to
 eliminate the big caves, which speeds things up considerably.  From the
 Reddit thread, this seems not to have been necessary for the small graphs
 we are given.
+
+## [Day 13: Transparent Origami](https://adventofcode.com/2021/day/13)
+
+This was a nice little exercise, with a bit of simple geometry.
