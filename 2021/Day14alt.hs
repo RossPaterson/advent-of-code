@@ -47,15 +47,12 @@ expand m ps =
             Just e -> [(e1, e), (e, e2)]]
 
 -- Get element counts from pair counts.
--- Each element in the string is counted twice except the first and last
--- elements of the original string, so we add those before halving.
+-- Each element in the string except the first is the second of a pair,
+-- so we add that.
 elementCounts :: Polymer -> Bag Pair -> Bag Element
-elementCounts es ps =
-    fmap (`div` 2) $
-    Map.fromListWith (+) $
-        (head es, 1) :
-        (last es, 1) :
-        [(e, n) | ((e1, e2), n) <- Map.assocs ps, e <- [e1, e2]]
+elementCounts (e:_) ps =
+    Map.fromListWith (+) ((e, 1) : [(e2, n) | ((_, e2), n) <- Map.assocs ps])
+elementCounts [] _ = error "empty polymer"
 
 summarize :: [Int] -> Int
 summarize ns = maximum ns - minimum ns
