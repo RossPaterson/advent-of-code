@@ -65,7 +65,7 @@ This puzzle had an intricate description.  The first part is easy
 enough, but I made quite a meal of the second part, partly by not fully
 understanding the description, and partly by implementing a general
 constraint-solving approach to get the wire-segment and display-digit
-mappings, which was quite tricky to get right.  But it is much simpler
+mappings, which was quite tricky to get right.  It is much simpler
 to deduce the display-digit mapping directly using a traditional
 puzzle-solving approach, which amounts to operating on sets instead
 of elements.  Part one hinted at this approach, but the description of
@@ -80,8 +80,8 @@ a fair bit of unnecessary code.
 
 ## [Day 10: Syntax Scoring](https://adventofcode.com/2021/day/10)
 
-This bracket-watching task was easier than than the last few days, with
-little scope for different solutions.
+This bracket-watching task was easier than the last few days, with little
+scope for different solutions.
 
 ## [Day 11: Dumbo Octopus](https://adventofcode.com/2021/day/11)
 
@@ -107,4 +107,16 @@ we are given.
 
 ## [Day 13: Transparent Origami](https://adventofcode.com/2021/day/13)
 
-This was a nice little exercise, with a bit of simple geometry.
+This was a nice little exercise in `foldl` and containers, with a bit
+of simple geometry.
+
+## [Day 14: Extended Polymerization](https://adventofcode.com/2021/day/14)
+
+Another case where the second part asks us to scale up a calculation
+for which the naive implementation uses exponential space and time,
+which will obviously be infeasible.  I did this by focussing on what
+happens inside each pair, which was a nice exercise with bulk containers
+and respectably fast, but several people on the
+[Reddit thread](https://www.reddit.com/r/adventofcode/comments/rfzq6f/2021_day_14_solutions/)
+kept track of the number of occurrences of each pair instead, which is
+a bit simpler and faster.
