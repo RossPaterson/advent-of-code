@@ -125,6 +125,7 @@ a bit simpler and faster.
 
 A straight-forward application of
 [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
-(previously used on 2015 day 22 and 2019 day 18).  The second part
-involves a fairly easy expansion.  Ihe same algorithm is still feasible,
-though A* would be faster.
+(previously used on 2015 day 22 and 2019 day 18).  The first part is
+[Project Euler Problem 83](https://projecteuler.net/problem=83)
+The second part involves a fairly easy expansion.  Ihe same algorithm
+is still feasible, though A* would be faster.
