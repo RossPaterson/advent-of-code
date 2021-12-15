@@ -120,3 +120,11 @@ and respectably fast, but several people on the
 [Reddit thread](https://www.reddit.com/r/adventofcode/comments/rfzq6f/2021_day_14_solutions/)
 kept track of the number of occurrences of each pair instead, which is
 a bit simpler and faster.
+
+## [Day 15: Chiton](https://adventofcode.com/2021/day/15)
+
+A straight-forward application of
+[Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
+(previously used on 2015 day 22 and 2019 day 18).  The second part
+involves a fairly easy expansion.  Ihe same algorithm is still feasible,
+though A* would be faster.
