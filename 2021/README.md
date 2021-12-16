@@ -98,12 +98,12 @@ As noted on the Reddit thread, this is a
 
 This puzzle involved two novel variations on path-finding.  There are
 no pairs of adjacent big caves in the input, which isn't stated in the
-description, but is necessary of the task to make sense.
+description, but is necessary for the task to make sense.
 
 I optimized the calculation by transforming the original graph to
 eliminate the big caves, which speeds things up considerably.  From the
-Reddit thread, this seems not to have been necessary for the small graphs
-we are given.
+[Reddit thread](https://www.reddit.com/r/adventofcode/comments/rehj2r/2021_day_12_solutions/),
+this seems not to have been necessary for the small graphs we are given.
 
 ## [Day 13: Transparent Origami](https://adventofcode.com/2021/day/13)
 
@@ -126,6 +126,13 @@ a bit simpler and faster.
 A straight-forward application of
 [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
 (previously used on 2015 day 22 and 2019 day 18).  The first part is
-[Project Euler Problem 83](https://projecteuler.net/problem=83)
-The second part involves a fairly easy expansion.  Ihe same algorithm
+[Project Euler Problem 83](https://projecteuler.net/problem=83).
+The second part involves a fairly easy expansion.  The same algorithm
 is still feasible, though A* would be faster.
+
+## [Day 16: Packet Decoder](https://adventofcode.com/2021/day/16)
+
+This one was fiddly, without any need for invention.  The first part
+was implementation of an intricate specification of a recursive bit
+sequence decoder.  A state monad was handy here.  Once the input was
+converted to a recursive datatype, the rest was just recursive reduction.
