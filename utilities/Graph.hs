@@ -29,7 +29,7 @@ bfs f = takeWhile (not . null) . map fst . iterate step . new_level Set.empty
         (ys, seen') = new_level (Set.insert x seen) xs
 
 -- | All nodes reachable from the start point, with shortest distances,
--- assuming all edge costs are positive.
+-- in increasing order of distance.  All edge costs must be positive.
 shortestPaths :: Ord a => (a -> [(Int, a)]) -> a -> [(Int, a)]
 shortestPaths adjacent start = dijkstra Set.empty (PSQ.singleton start 0)
   where
