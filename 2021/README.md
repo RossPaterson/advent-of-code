@@ -128,11 +128,20 @@ A straight-forward application of
 (previously used on 2015 day 22 and 2019 day 18).  The first part is
 [Project Euler Problem 83](https://projecteuler.net/problem=83).
 The second part involves a fairly easy expansion.  The same algorithm
-is still feasible, though A* would be faster.
+is still feasible, though A\* would be faster.
 
 ## [Day 16: Packet Decoder](https://adventofcode.com/2021/day/16)
 
 This one was fiddly, without any need for invention.  The first part
-was implementation of an intricate specification of a recursive bit
-sequence decoder.  A state monad was handy here.  Once the input was
-converted to a recursive datatype, the rest was just recursive reduction.
+was implementation of a very convoluted specification of a recursive
+bit sequence decoder.  A state monad was handy here.  Once the input
+was converted to a recursive datatype, the rest of the first part and
+all of the second part were just recursive reduction.
+
+## [Day 17: Trick Shot](https://adventofcode.com/2021/day/17)
+
+This is superficially a particle system, but we need to work out
+mathematical relationships (cf 2017 day 20, 2018 day 10, 2019 day 12).
+It's fairly easy to work out enough to devise a feasible exhaustive
+search.  A little more analysis makes it quite fast and I stopped there,
+but it would be possible to go further.
