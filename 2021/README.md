@@ -145,3 +145,12 @@ mathematical relationships (cf 2017 day 20, 2018 day 10, 2019 day 12).
 It's fairly easy to work out enough to devise a feasible exhaustive
 search.  A little more analysis makes it quite fast and I stopped there,
 but it would be possible to go further.
+
+## [Day 18: Snailfish](https://adventofcode.com/2021/day/18)
+
+This is a complex recursive traversal.  The description is convoluted and
+uses confusing terminology.  Once that is understood, the transformation
+it describes is also quite complicated, but ultimately comes out as
+a fairly clean recursion.  The bult of the work is in the first part.
+The second part is an easy extension reusing functions from the first
+part.
