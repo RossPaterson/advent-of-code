@@ -3,6 +3,7 @@ module Main where
 import Utilities
 import Parser
 import Control.Applicative
+import Data.Maybe
 
 -- Input processing
 
@@ -45,15 +46,11 @@ explodeDepth n (Pair (Leaf x) (Leaf y))
   | n >= 4 = Just (Just x, Leaf 0, Just y)
 explodeDepth n (Pair l r) = case explodeDepth (n+1) l of
     Just (mb_x, l', mb_y) ->
-        Just (mb_x, Pair l' (apply addFirst mb_y r), Nothing)
+        Just (mb_x, Pair l' (fromMaybe id (addFirst <$> mb_y) r), Nothing)
     Nothing -> case explodeDepth (n+1) r of
         Just (mb_x, r', mb_y) ->
-            Just (Nothing, Pair (apply addLast mb_x l) r', mb_y)
+            Just (Nothing, Pair (fromMaybe id (addLast <$> mb_x) l) r', mb_y)
         Nothing -> Nothing
-
-apply :: (a -> Tree -> Tree) -> Maybe a -> Tree -> Tree
-apply _ Nothing t = t
-apply f (Just x) t = f x t
 
 addFirst :: Int -> Tree -> Tree
 addFirst x (Leaf y) = Leaf (x+y)
