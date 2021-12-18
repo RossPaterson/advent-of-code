@@ -3,6 +3,7 @@ module Main where
 import Utilities
 import Parser
 import Control.Applicative
+import Data.Functor
 import Data.Maybe
 
 -- Input processing
@@ -44,13 +45,11 @@ explodeDepth :: Int -> Tree -> Maybe (Maybe Int, Tree, Maybe Int)
 explodeDepth _ (Leaf _) = Nothing
 explodeDepth n (Pair (Leaf x) (Leaf y))
   | n >= 4 = Just (Just x, Leaf 0, Just y)
-explodeDepth n (Pair l r) = case explodeDepth (n+1) l of
-    Just (mb_x, l', mb_y) ->
-        Just (mb_x, Pair l' (fromMaybe id (addFirst <$> mb_y) r), Nothing)
-    Nothing -> case explodeDepth (n+1) r of
-        Just (mb_x, r', mb_y) ->
-            Just (Nothing, Pair (fromMaybe id (addLast <$> mb_x) l) r', mb_y)
-        Nothing -> Nothing
+explodeDepth n (Pair l r) =
+    (explodeDepth (n+1) l <&> \ (mb_x, l', mb_y) ->
+        (mb_x, Pair l' (fromMaybe id (addFirst <$> mb_y) r), Nothing)) <|>
+    (explodeDepth (n+1) r <&> \ (mb_x, r', mb_y) ->
+        (Nothing, Pair (fromMaybe id (addLast <$> mb_x) l) r', mb_y))
 
 addFirst :: Int -> Tree -> Tree
 addFirst x (Leaf y) = Leaf (x+y)
@@ -67,11 +66,9 @@ split :: Tree -> Maybe Tree
 split (Leaf n)
   | n >= 10 = Just (Pair (Leaf (n `div` 2)) (Leaf ((n+1) `div` 2)))
   | otherwise = Nothing
-split (Pair l r) = case split l of
-    Just l' -> Just (Pair l' r)
-    Nothing -> case split r of
-        Just r' -> Just (Pair l r')
-        Nothing -> Nothing
+split (Pair l r) =
+    (split l <&> \ l' -> Pair l' r) <|>
+    (split r <&> \ r' -> Pair l r')
 
 -- reduction
 
