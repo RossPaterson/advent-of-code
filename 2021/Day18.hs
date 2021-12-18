@@ -51,10 +51,12 @@ explodeDepth n (Pair l r) =
     (explodeDepth (n+1) r <&> \ (mb_x, r', mb_y) ->
         (Nothing, Pair (fromMaybe id (addLast <$> mb_x) l) r', mb_y))
 
+-- add x to the leftmost leaf
 addFirst :: Int -> Tree -> Tree
 addFirst x (Leaf y) = Leaf (x+y)
 addFirst x (Pair l r) = Pair (addFirst x l) r
 
+-- add x to the rightmost leaf
 addLast :: Int -> Tree -> Tree
 addLast x (Leaf y) = Leaf (x+y)
 addLast x (Pair l r) = Pair l (addLast x r)
@@ -72,12 +74,13 @@ split (Pair l r) =
 
 -- reduction
 
-step :: Tree -> Maybe Tree
-step t = explode t <|> split t
+action :: Tree -> Maybe Tree
+action t = explode t <|> split t
 
 reduce :: Tree -> Tree
-reduce = whileJust step
+reduce = whileJust action
 
+-- "addition" of trees
 add :: Tree -> Tree -> Tree
 add l r = reduce (Pair l r)
 

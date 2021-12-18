@@ -150,7 +150,7 @@ but it would be possible to go further.
 
 This is a complex recursive traversal.  The description is convoluted and
 uses confusing terminology.  Once that is understood, the transformation
-it describes is also quite complicated, but ultimately comes out as
-a fairly clean recursion.  The bult of the work is in the first part.
-The second part is an easy extension reusing functions from the first
-part.
+it describes is also quite complicated, but ultimately comes out as a
+fairly clean recursion and application of `Maybe`.  The bulk of the work
+is in the first part, with the second part an easy extension reusing
+the top-level functions.
