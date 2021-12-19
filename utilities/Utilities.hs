@@ -162,10 +162,15 @@ leastBy f = map fst . head . groupSortOn snd . map add_f
   where
     add_f x = (x, f x)
 
--- | Sort and eliminate repetitions.
+-- | Remove repeated elements from a list.
 -- /O(n log(m))/ where m is the number of unique elements
 fastNub :: Ord a => [a] -> [a]
-fastNub = Set.toList . Set.fromList
+fastNub = nub_aux Set.empty
+  where
+    nub_aux _ [] = []
+    nub_aux seen (x:xs)
+      | Set.member x seen = nub_aux seen xs
+      | otherwise = x : nub_aux (Set.insert x seen) xs
 
 -- | Topological sort: given a list of pairs, produces a list of the
 -- values contained in the pairs such that for each pair @(x, y)@, @x@
