@@ -154,3 +154,10 @@ it describes is also quite complicated, but ultimately comes out as a
 fairly clean recursion and application of `Maybe`.  The bulk of the work
 is in the first part, with the second part an easy extension reusing
 the top-level functions.
+
+## [Day 19: Beacon Scanner](https://adventofcode.com/2021/day/19)
+
+This was tough, partly due to the 3-dimensional geometry and partly
+finding a workable approach.  But the problem decomposes neatly into
+a series of steps, and an exhaustive search of the possibilities
+completes in a few seconds.
