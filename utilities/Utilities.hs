@@ -89,7 +89,7 @@ pairWith _ xs = xs
 
 -- | Unique elements of the input list, paired with their number of occurrences
 frequency :: Ord a => [a] -> [(a, Int)]
-frequency xs = [(head g, length g) | g <- group (sort xs)]
+frequency xs = Map.assocs (Map.fromListWith (+) [(x, 1) | x <- xs])
 
 -- | Unique elements of the input list, in decreasing order of frequency
 mostCommon :: Ord a => [a] -> [a]
