@@ -3,6 +3,7 @@ module Geometry (
     -- * Classes
     Module(..),
     NormedModule(..), distance,
+    InnerProduct(..),
     Planar(..), unitVector,
     -- * Particular spaces
     -- ** Display coordinates
@@ -10,7 +11,7 @@ module Geometry (
     readGrid, showGrid,
     -- ** Cartesian spaces of various dimensions
     Point2(..),
-    Point3(..),
+    Point3(..), cross,
     Point4(..),
     -- ** Hexagonal tiling
     HexCoord(..),
@@ -47,6 +48,11 @@ class Module v => NormedModule v where
 -- | A metric, defined as the 'norm' of the difference between the values.
 distance :: NormedModule v => v -> v -> Int
 distance v1 v2 = norm (v1 .-. v2)
+
+-- | Module over the integers with an inner product
+class Module v => InnerProduct v where
+    -- | Inner product
+    dot :: v -> v -> Int
 
 -- | Two-dimensional plane divided into some number of equal-sized sectors.
 -- The 'unitVectors' are the unit vectors at the start of each sector,
@@ -97,6 +103,9 @@ instance NormedModule Position where
 
     unitVectors =
         [Position 1 0, Position 0 (-1), Position (-1) 0, Position 0 1]
+
+instance InnerProduct Position where
+    dot (Position x1 y1) (Position x2 y2) = x1*x2 + y1*y2
 
 -- | four sectors of 90 degrees each
 instance Planar Position where
@@ -154,6 +163,9 @@ instance NormedModule Point2 where
     unitVectors =
         [Point2 1 0, Point2 0 1, Point2 (-1) 0, Point2 0 (-1)]
 
+instance InnerProduct Point2 where
+    dot (Point2 x1 y1) (Point2 x2 y2) = x1*x2 + y1*y2
+
 -- | four sectors of 90 degrees each
 instance Planar Point2 where
     rotateSectors n p = p .*. (unitVectors!!(n `mod` 4))
@@ -189,6 +201,14 @@ instance NormedModule Point3 where
         [Point3 1 0 0, Point3 (-1) 0 0, Point3 0 1 0, Point3 0 (-1) 0,
          Point3 0 0 1, Point3 0 0 (-1)]
 
+instance InnerProduct Point3 where
+    dot (Point3 x1 y1 z1) (Point3 x2 y2 z2) = x1*x2 + y1*y2 + z1*z2
+
+-- | cross product of two vectors
+cross :: Point3 -> Point3 -> Point3
+cross (Point3 x1 y1 z1) (Point3 x2 y2 z2) =
+    Point3 (y1*z2 - y2*z1) (z1*x2 - z2*x1) (x1*y2 - y1*x2)
+
 -- | Cartesian coordinate in 4-dimensional space
 data Point4 = Point4 !Int !Int !Int !Int
     deriving (Eq, Ord, Show)
@@ -208,6 +228,10 @@ instance NormedModule Point4 where
     unitVectors =
         [Point4 1 0 0 0, Point4 (-1) 0 0 0, Point4 0 1 0 0, Point4 0 (-1) 0 0,
          Point4 0 0 1 0, Point4 0 0 (-1) 0, Point4 0 0 0 1, Point4 0 0 0 (-1)]
+
+instance InnerProduct Point4 where
+    dot (Point4 x1 y1 z1 t1) (Point4 x2 y2 z2 t2) =
+        x1*x2 + y1*y2 + z1*z2 + t1*t2
 
 -- | Axial (or skewed) coordinate in a 2-dimensional hexagonal grid
 -- (<https://www.redblobgames.com/grids/hexagons/>),
