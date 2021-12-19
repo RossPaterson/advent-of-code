@@ -3,7 +3,6 @@ module Main where
 import Utilities
 import Geometry
 import Parser
-import Data.List
 import Data.Set (Set)
 import qualified Data.Set as Set
 
@@ -32,21 +31,11 @@ data LinearTransform = LinearTransform Point3 Point3 Point3
 apply :: LinearTransform -> Point3 -> Point3
 apply (LinearTransform rx ry rz) p = Point3 (dot rx p) (dot ry p) (dot rz p)
 
-data Direction = X | Y | Z
-    deriving Show
-
-axisVectors :: Direction -> [Point3]
-axisVectors X = [Point3 d 0 0 | d <- [-1, 1]]
-axisVectors Y = [Point3 0 d 0 | d <- [-1, 1]]
-axisVectors Z = [Point3 0 0 d | d <- [-1, 1]]
-
 -- the 24 rotations that map axes to axes
 unitRotations :: [LinearTransform]
 unitRotations =
     [LinearTransform rx ry (cross rx ry) |
-        [dx, dy, _] <- permutations [X, Y, Z],
-        rx <- axisVectors dx,
-        ry <- axisVectors dy]
+        rx <- unitVectors, ry <- unitVectors, dot rx ry == 0]
 
 -- offsets to ps2 that produce an overlap of at least 12 points with ps1
 overlap_offsets :: [Point3] -> [Point3] -> Set Point3
