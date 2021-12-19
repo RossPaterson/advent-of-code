@@ -74,8 +74,8 @@ locate_one (PartialAlignment done todo) =
         rot <- unitRotations,
         let rot_ps = map (apply rot) ps,
         -- each shift of the rotated scanner overlapping with a located one
-        (_, Scanner _ sps) <- done,
-        d <- overlap_offsets sps rot_ps,
+        d <- fastNub $ concat
+            [overlap_offsets sps rot_ps | (_, Scanner _ sps) <- done],
         let new = (d, Scanner n (map (d .+.) rot_ps)),
         -- check that the shifted rotated scanner fits with those we have
         and [consistent old new | old <- done]]
