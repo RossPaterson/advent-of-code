@@ -38,11 +38,9 @@ unitRotations =
         rx <- unitVectors, ry <- unitVectors, dot rx ry == 0]
 
 -- offsets to ps2 that produce an overlap of at least 12 points with ps1
-overlap_offsets :: [Point3] -> [Point3] -> Set Point3
+overlap_offsets :: [Point3] -> [Point3] -> [Point3]
 overlap_offsets ps1 ps2 =
-    Set.fromList [d |
-        (d, n) <- frequency [p1 .-. p2 | p1 <- ps1, p2 <- ps2],
-        n >= 12]
+    [d | (d, n) <- frequency [p1 .-. p2 | p1 <- ps1, p2 <- ps2], n >= 12]
 
 -- the point is within range of a sensor at the origin
 inRange :: Point3 -> Bool
@@ -76,8 +74,8 @@ locate_one (PartialAlignment done todo) =
         rot <- unitRotations,
         let rot_ps = map (apply rot) ps,
         -- each shift of the rotated scanner overlapping with a located one
-        d <- Set.elems $ Set.unions
-            [overlap_offsets sps rot_ps | (_, Scanner _ sps) <- done],
+        (_, Scanner _ sps) <- done,
+        d <- overlap_offsets sps rot_ps,
         let new = (d, Scanner n (map (d .+.) rot_ps)),
         -- check that the shifted rotated scanner fits with those we have
         and [consistent old new | old <- done]]
