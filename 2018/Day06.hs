@@ -3,7 +3,6 @@ module Main where
 import Geometry
 import Parser
 import Utilities
-import Data.List
 import Data.Maybe
 import qualified Data.Set as Set
 

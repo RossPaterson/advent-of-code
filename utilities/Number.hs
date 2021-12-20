@@ -22,7 +22,6 @@ module Number(
 
 import Data.Function
 import Data.List
-import Data.Ord
 
 -- | The infinite list of prime numbers
 -- (OEIS Sequence <http://oeis.org/A000040 A000040>)
