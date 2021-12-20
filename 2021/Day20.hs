@@ -41,14 +41,15 @@ enhance_pixel :: Algorithm -> Pixels -> Position -> Bool
 enhance_pixel alg g p =
     Set.member (bitsToInt [Set.member p' g | p' <- neighbours 1 p]) alg
 
--- A single enhancement step, assuming that an all-empty neighbourhood
--- becomes 1 (true of the test input, but not the actual input).
+-- A single enhance step, assuming that the first bit of the algorithm
+-- is 0, so that the state will still have a finite number of 1s (true
+-- of the test input, but not the actual input).
 enhance :: Algorithm -> Pixels -> Pixels
 enhance alg g = Set.fromList [p | p <- halo 1 g, enhance_pixel alg g p]
 
--- Two enhance steps, assuming that an all-empty neighbourhood will
--- become 0 after one or two steps (true of both the test input and the
--- actual input).
+-- Two enhance steps, assuming that either the first or the last bit of
+-- the algorithm is 0, so that the state returns to a finite number of 1s
+-- in one or two steps (true of both the test input and the actual input).
 enhance2 :: Algorithm -> Pixels -> Pixels
 enhance2 alg g = Set.fromList [p | p <- halo 2 g, enhance_pixel alg g' p]
   where
