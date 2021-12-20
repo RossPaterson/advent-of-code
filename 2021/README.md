@@ -173,4 +173,4 @@ It is necessary to work in double steps.  Once this is done properly, the
 second part is an easy extension, though it takes a few seconds to run.
 
 **Lesson:** identify any assumptions your solution makes about the input
-and check whether that actual input satisfies them.
+and check whether the actual input satisfies them.
