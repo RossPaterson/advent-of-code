@@ -171,3 +171,6 @@ This was sneaky.  It looks like a simple cellular automaton, and is easy
 to make it work for the test input, but the actual input is different.
 It is necessary to work in double steps.  Once this is done properly, the
 second part is an easy extension, though it takes a few seconds to run.
+
+**Lesson:** identify any assumptions your solution makes about the input
+and check whether that actual input satisfies them.
