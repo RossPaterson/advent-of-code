@@ -161,3 +161,13 @@ This was tough, partly due to the 3-dimensional geometry and partly
 finding a workable approach.  But the problem decomposes neatly into
 a series of steps, and an exhaustive search of the possibilities
 completes in a few seconds.
+
+It seems that the actual inputs do not trigger the extra tests that
+are needed for the general case.
+
+## [Day 20: Beacon Scanner](https://adventofcode.com/2021/day/20)
+
+This was sneaky.  It looks like a simple cellular automaton, and is easy
+to make it work for the test input, but the actual input is different.
+It is necessary to work in double steps.  Once this is done properly, the
+second part is an easy extension, though it takes a few seconds to run.
