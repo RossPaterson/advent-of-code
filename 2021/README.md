@@ -91,7 +91,7 @@ arrays have similar complexity.  The second part is a different query
 on the same sequence of counts.
 
 As noted on the Reddit thread, this is a
-[model of firefly synchonization](http://dx.doi.org/10.1007/978-3-319-78512-7_8)
+[model of firefly synchronization](http://dx.doi.org/10.1007/978-3-319-78512-7_8)
 ([preprint](https://www.researchgate.net/publication/325791357)).
 
 ## [Day 12: Passage Pathing](https://adventofcode.com/2021/day/12)
@@ -174,3 +174,9 @@ second part is an easy extension, though it takes a few seconds to run.
 
 **Lesson:** identify any assumptions your solution makes about the input
 and check whether the actual input satisfies them.
+
+## [Day 21: Dirac Dice](https://adventofcode.com/2021/day/21)
+
+The first part is a simple iterative calculation.  The second can be
+expressed recursively and evaluated efficiently using memoization, since
+the state space isn't too large.
