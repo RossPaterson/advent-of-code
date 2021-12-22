@@ -180,3 +180,17 @@ and check whether the actual input satisfies them.
 The first part is a simple iterative calculation.  The second can be
 expressed recursively and evaluated efficiently using memoization, since
 the state space isn't too large.
+
+The time could be cut by a factor of 4 by counting dice combinations
+with the same sum.  Another solution in the
+[Reddit thread](https://www.reddit.com/r/adventofcode/comments/rl6p8y/2021_day_21_solutions/)
+uses the fact that the progress of the two players is independent and
+identical.
+
+## [Day 22: Reactor Reboot](https://adventofcode.com/2021/day/22)
+
+It is clear from the start that a point counting approach will be enough
+for the first part but infeasible for the second.  I used a block splitting
+approach like many others, but as noted in the
+[Reddit thread](https://www.reddit.com/r/adventofcode/comments/rlxhmg/2021_day_22_solutions/)
+there is a much cleaner solution using signed blocks.
