@@ -13,19 +13,19 @@ import qualified Data.Set as Set
 data Range = Range Int Int
     deriving Show
 
-data Block = Block Range Range Range
+data Cuboid = Cuboid Range Range Range
     deriving Show
 
 data Signed a = On a | Off a
     deriving Show
 
-type Input = [Signed Block]
+type Input = [Signed Cuboid]
 
 parse :: String -> Input
 parse = map (runParser step) . lines
   where
-    step = On <$ string "on " <*> block <|> Off <$ string "off " <*> block
-    block = Block <$ string "x=" <*> range <* string ",y=" <*>
+    step = On <$ string "on " <*> cuboid <|> Off <$ string "off " <*> cuboid
+    cuboid = Cuboid <$ string "x=" <*> range <* string ",y=" <*>
         range <* string ",z=" <*> range
     range = Range <$> int <* string ".." <*> int
 
@@ -34,11 +34,11 @@ parse = map (runParser step) . lines
 values :: Range -> [Int]
 values (Range lo hi) = [lo..hi]
 
-cubes :: Block -> Set Point3
-cubes (Block xr yr zr) =
+cubes :: Cuboid -> Set Point3
+cubes (Cuboid xr yr zr) =
     Set.fromList [Point3 x y z | x <- values xr, y <- values yr, z <- values zr]
 
-apply :: Set Point3 -> Signed Block -> Set Point3
+apply :: Set Point3 -> Signed Cuboid -> Set Point3
 apply ps (On b) = Set.union ps (cubes b)
 apply ps (Off b) = Set.difference ps (cubes b)
 
@@ -47,13 +47,13 @@ apply ps (Off b) = Set.difference ps (cubes b)
 initialRange :: Range -> Bool
 initialRange (Range lo hi) = -50 <= lo && hi <= 50
 
-initialBlock :: Block -> Bool
-initialBlock (Block xr yr zr) =
+initialCuboid :: Cuboid -> Bool
+initialCuboid (Cuboid xr yr zr) =
     initialRange xr && initialRange yr && initialRange zr
 
-initialSigned :: Signed Block -> Bool
-initialSigned (On b) = initialBlock b
-initialSigned (Off b) = initialBlock b
+initialSigned :: Signed Cuboid -> Bool
+initialSigned (On b) = initialCuboid b
+initialSigned (Off b) = initialCuboid b
 
 solve1 :: Input -> Int
 solve1 = Set.size . foldl apply Set.empty . filter initialSigned
@@ -188,8 +188,8 @@ testInput3 = "\
 sizeRange :: Range -> Int
 sizeRange (Range lo hi) = hi - lo + 1
 
-sizeBlock :: Block -> Int
-sizeBlock (Block xr yr zr) = sizeRange xr * sizeRange yr * sizeRange zr
+sizeCuboid :: Cuboid -> Int
+sizeCuboid (Cuboid xr yr zr) = sizeRange xr * sizeRange yr * sizeRange zr
 
 intersectionRange :: Range -> Range -> Maybe Range
 intersectionRange (Range lo1 hi1) (Range lo2 hi2)
@@ -212,38 +212,38 @@ differenceRange (Range lo1 hi1) (Range lo2 hi2)
 differenceRange r1 r2 =
     error $ "unhandled split " ++ show r1 ++ " with " ++ show r2
 
--- If the two blocks intersect, partition the first into disjoint blocks
+-- If the two cuboids intersect, partition the first into disjoint cuboids
 -- and drop the intersection.
-splitBlock :: Block -> Block -> Maybe [Block]
-splitBlock (Block xr1 yr1 zr1) (Block xr2 yr2 zr2) = do
+splitCuboid :: Cuboid -> Cuboid -> Maybe [Cuboid]
+splitCuboid (Cuboid xr1 yr1 zr1) (Cuboid xr2 yr2 zr2) = do
     xm <- intersectionRange xr1 xr2
     ym <- intersectionRange yr1 yr2
     zm <- intersectionRange zr1 zr2
     return $
-        [Block xr yr zr | xr <- xrs, yr <- yrs, zr <- zrs] ++
-        [Block xm yr zr | yr <- yrs, zr <- zrs] ++
-        [Block xr ym zr | xr <- xrs, zr <- zrs] ++
-        [Block xr yr zm | xr <- xrs, yr <- yrs] ++
-        [Block xm ym zr | zr <- zrs] ++
-        [Block xr ym zm | xr <- xrs] ++
-        [Block xm yr zm | yr <- yrs]
+        [Cuboid xr yr zr | xr <- xrs, yr <- yrs, zr <- zrs] ++
+        [Cuboid xm yr zr | yr <- yrs, zr <- zrs] ++
+        [Cuboid xr ym zr | xr <- xrs, zr <- zrs] ++
+        [Cuboid xr yr zm | xr <- xrs, yr <- yrs] ++
+        [Cuboid xm ym zr | zr <- zrs] ++
+        [Cuboid xr ym zm | xr <- xrs] ++
+        [Cuboid xm yr zm | yr <- yrs]
   where
     xrs = differenceRange xr1 xr2
     yrs = differenceRange yr1 yr2
     zrs = differenceRange zr1 zr2
 
--- differenceBlock b1 b2 and the intersection of b1 and b2 together
+-- differenceCuboid b1 b2 and the intersection of b1 and b2 together
 -- comprise a partition of b1
-differenceBlock :: Block -> Block -> [Block]
-differenceBlock b1 b2 = fromMaybe [b1] (splitBlock b1 b2)
+differenceCuboid :: Cuboid -> Cuboid -> [Cuboid]
+differenceCuboid b1 b2 = fromMaybe [b1] (splitCuboid b1 b2)
 
--- update a collection of disjoint blocks
-apply2 :: [Block] -> Signed Block -> [Block]
-apply2 bs (On nb) = nb:[fragment | b <- bs, fragment <- differenceBlock b nb]
-apply2 bs (Off nb) = [fragment | b <- bs, fragment <- differenceBlock b nb]
+-- update a collection of disjoint cuboids
+apply2 :: [Cuboid] -> Signed Cuboid -> [Cuboid]
+apply2 bs (On nb) = nb:[fragment | b <- bs, fragment <- differenceCuboid b nb]
+apply2 bs (Off nb) = [fragment | b <- bs, fragment <- differenceCuboid b nb]
 
 solve2 :: Input -> Int
-solve2 = sum . map sizeBlock . foldl apply2 []
+solve2 = sum . map sizeCuboid . foldl apply2 []
 
 tests2 :: [(String, Int)]
 tests2 = [

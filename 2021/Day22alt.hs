@@ -10,19 +10,19 @@ import Data.Maybe
 data Range = Range Int Int
     deriving Show
 
-data Block = Block Range Range Range
+data Cuboid = Cuboid Range Range Range
     deriving Show
 
 data Signed a = On a | Off a
     deriving Show
 
-type Input = [Signed Block]
+type Input = [Signed Cuboid]
 
 parse :: String -> Input
 parse = map (runParser step) . lines
   where
-    step = On <$ string "on " <*> block <|> Off <$ string "off " <*> block
-    block = Block <$ string "x=" <*> range <* string ",y=" <*>
+    step = On <$ string "on " <*> cuboid <|> Off <$ string "off " <*> cuboid
+    cuboid = Cuboid <$ string "x=" <*> range <* string ",y=" <*>
         range <* string ",z=" <*> range
     range = Range <$> int <* string ".." <*> int
 
@@ -31,12 +31,12 @@ parse = map (runParser step) . lines
 sizeRange :: Range -> Int
 sizeRange (Range lo hi) = hi - lo + 1
 
-sizeBlock :: Block -> Int
-sizeBlock (Block xr yr zr) = sizeRange xr * sizeRange yr * sizeRange zr
+sizeCuboid :: Cuboid -> Int
+sizeCuboid (Cuboid xr yr zr) = sizeRange xr * sizeRange yr * sizeRange zr
 
-sizeSigned :: Signed Block -> Int
-sizeSigned (On b) = sizeBlock b
-sizeSigned (Off b) = - sizeBlock b
+sizeSigned :: Signed Cuboid -> Int
+sizeSigned (On b) = sizeCuboid b
+sizeSigned (Off b) = - sizeCuboid b
 
 intersectionRange :: Range -> Range -> Maybe Range
 intersectionRange (Range lo1 hi1) (Range lo2 hi2)
@@ -46,44 +46,44 @@ intersectionRange (Range lo1 hi1) (Range lo2 hi2)
     lo = max lo1 lo2
     hi = min hi1 hi2
 
-intersectionBlock :: Block -> Block -> Maybe Block
-intersectionBlock (Block xr1 yr1 zr1) (Block xr2 yr2 zr2) =
-    Block <$> intersectionRange xr1 xr2 <*> intersectionRange yr1 yr2 <*>
+intersectionCuboid :: Cuboid -> Cuboid -> Maybe Cuboid
+intersectionCuboid (Cuboid xr1 yr1 zr1) (Cuboid xr2 yr2 zr2) =
+    Cuboid <$> intersectionRange xr1 xr2 <*> intersectionRange yr1 yr2 <*>
         intersectionRange zr1 zr2
 
-intersectionSigned :: Block -> Signed Block -> Maybe (Signed Block)
-intersectionSigned b1 (On b2) = On <$> intersectionBlock b1 b2
-intersectionSigned b1 (Off b2) = Off <$> intersectionBlock b1 b2
+intersectionSigned :: Cuboid -> Signed Cuboid -> Maybe (Signed Cuboid)
+intersectionSigned b1 (On b2) = On <$> intersectionCuboid b1 b2
+intersectionSigned b1 (Off b2) = Off <$> intersectionCuboid b1 b2
 
 flipSign :: Signed a -> Signed a
 flipSign (On x) = Off x
 flipSign (Off x) = On x
 
--- collection of blocks added or removed
--- The number of positive blocks containing a particular point is either
--- equal to or one more than the number of negative blocks containing
+-- collection of cuboids added or removed
+-- The number of positive cuboids containing a particular point is either
+-- equal to or one more than the number of negative cuboids containing
 -- that point.
-type Composition = [Signed Block]
+type Composition = [Signed Cuboid]
 
-removeBlock :: Block -> Composition -> Composition
-removeBlock b ss = map flipSign (mapMaybe (intersectionSigned b) ss) ++ ss
+removeCuboid :: Cuboid -> Composition -> Composition
+removeCuboid b ss = map flipSign (mapMaybe (intersectionSigned b) ss) ++ ss
 
-apply :: Composition -> Signed Block -> Composition
-apply comp (On b) = On b : removeBlock b comp
-apply comp (Off b) = removeBlock b comp
+apply :: Composition -> Signed Cuboid -> Composition
+apply comp (On b) = On b : removeCuboid b comp
+apply comp (Off b) = removeCuboid b comp
 
 -- smaller range for part one
 
 initialRange :: Range -> Bool
 initialRange (Range lo hi) = -50 <= lo && hi <= 50
 
-initialBlock :: Block -> Bool
-initialBlock (Block xr yr zr) =
+initialCuboid :: Cuboid -> Bool
+initialCuboid (Cuboid xr yr zr) =
     initialRange xr && initialRange yr && initialRange zr
 
-initialSigned :: Signed Block -> Bool
-initialSigned (On b) = initialBlock b
-initialSigned (Off b) = initialBlock b
+initialSigned :: Signed Cuboid -> Bool
+initialSigned (On b) = initialCuboid b
+initialSigned (Off b) = initialCuboid b
 
 solve1 :: Input -> Int
 solve1 = solve2 . filter initialSigned
