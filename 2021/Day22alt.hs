@@ -4,14 +4,16 @@ import Utilities
 import Parser
 import Control.Applicative
 import Data.Maybe
+import Data.Map (Map)
+import qualified Data.Map as Map
 
 -- Input processing
 
 data Range = Range Int Int
-    deriving Show
+    deriving (Eq, Ord, Show)
 
 data Cuboid = Cuboid Range Range Range
-    deriving Show
+    deriving (Eq, Ord, Show)
 
 data Signed a = On a | Off a
     deriving Show
@@ -34,10 +36,6 @@ sizeRange (Range lo hi) = hi - lo + 1
 sizeCuboid :: Cuboid -> Int
 sizeCuboid (Cuboid xr yr zr) = sizeRange xr * sizeRange yr * sizeRange zr
 
-sizeSigned :: Signed Cuboid -> Int
-sizeSigned (On b) = sizeCuboid b
-sizeSigned (Off b) = - sizeCuboid b
-
 intersectionRange :: Range -> Range -> Maybe Range
 intersectionRange (Range lo1 hi1) (Range lo2 hi2)
   | lo <= hi = Just (Range lo hi)
@@ -51,26 +49,28 @@ intersectionCuboid (Cuboid xr1 yr1 zr1) (Cuboid xr2 yr2 zr2) =
     Cuboid <$> intersectionRange xr1 xr2 <*> intersectionRange yr1 yr2 <*>
         intersectionRange zr1 zr2
 
-intersectionSigned :: Cuboid -> Signed Cuboid -> Maybe (Signed Cuboid)
-intersectionSigned b1 (On b2) = On <$> intersectionCuboid b1 b2
-intersectionSigned b1 (Off b2) = Off <$> intersectionCuboid b1 b2
+-- Collection of cuboids added or removed, so multiplicities may be negative.
+-- For any point, the sum of the multiplicities of cuboids containing that
+-- point is either 0 or 1.
+type Composition = Map Cuboid Int
 
-flipSign :: Signed a -> Signed a
-flipSign (On x) = Off x
-flipSign (Off x) = On x
+normalize :: Composition -> Composition
+normalize = Map.filter (/= 0)
 
--- collection of cuboids added or removed
--- The number of positive cuboids containing a particular point is either
--- equal to or one more than the number of negative cuboids containing
--- that point.
-type Composition = [Signed Cuboid]
-
+-- remove all the points of the cuboid
 removeCuboid :: Cuboid -> Composition -> Composition
-removeCuboid b ss = map flipSign (mapMaybe (intersectionSigned b) ss) ++ ss
+removeCuboid c comp =
+    Map.unionWith (+) comp $
+        Map.fromListWith (+) [(overlap, -n) |
+            (part, n) <- Map.assocs comp,
+            overlap <- maybeToList (intersectionCuboid c part)]
 
 apply :: Composition -> Signed Cuboid -> Composition
-apply comp (On b) = On b : removeCuboid b comp
-apply comp (Off b) = removeCuboid b comp
+apply comp (On c) = normalize (Map.insertWith (+) c 1 (removeCuboid c comp))
+apply comp (Off c) = normalize (removeCuboid c comp)
+
+size :: Composition -> Int
+size comp = sum [n*sizeCuboid c | (c, n) <- Map.assocs comp]
 
 -- smaller range for part one
 
@@ -82,14 +82,14 @@ initialCuboid (Cuboid xr yr zr) =
     initialRange xr && initialRange yr && initialRange zr
 
 initialSigned :: Signed Cuboid -> Bool
-initialSigned (On b) = initialCuboid b
-initialSigned (Off b) = initialCuboid b
+initialSigned (On c) = initialCuboid c
+initialSigned (Off c) = initialCuboid c
 
 solve1 :: Input -> Int
 solve1 = solve2 . filter initialSigned
 
 solve2 :: Input -> Int
-solve2 = sum . map sizeSigned . foldl apply []
+solve2 = size . foldl apply Map.empty
 
 testInput1 :: String
 testInput1 = "\

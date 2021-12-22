@@ -34,13 +34,13 @@ parse = map (runParser step) . lines
 values :: Range -> [Int]
 values (Range lo hi) = [lo..hi]
 
-cubes :: Cuboid -> Set Point3
-cubes (Cuboid xr yr zr) =
+points :: Cuboid -> Set Point3
+points (Cuboid xr yr zr) =
     Set.fromList [Point3 x y z | x <- values xr, y <- values yr, z <- values zr]
 
 apply :: Set Point3 -> Signed Cuboid -> Set Point3
-apply ps (On b) = Set.union ps (cubes b)
-apply ps (Off b) = Set.difference ps (cubes b)
+apply ps (On c) = Set.union ps (points c)
+apply ps (Off c) = Set.difference ps (points c)
 
 -- smaller range for part one
 
@@ -52,11 +52,12 @@ initialCuboid (Cuboid xr yr zr) =
     initialRange xr && initialRange yr && initialRange zr
 
 initialSigned :: Signed Cuboid -> Bool
-initialSigned (On b) = initialCuboid b
-initialSigned (Off b) = initialCuboid b
+initialSigned (On c) = initialCuboid c
+initialSigned (Off c) = initialCuboid c
 
 solve1 :: Input -> Int
-solve1 = Set.size . foldl apply Set.empty . filter initialSigned
+-- solve1 = Set.size . foldl apply Set.empty . filter initialSigned
+solve1 = solve2 . filter initialSigned
 
 testInput1 :: String
 testInput1 = "\
@@ -96,6 +97,64 @@ tests1 :: [(String, Int)]
 tests1 = [(testInput1, 39), (testInput2, 590784)]
 
 -- Part Two
+
+sizeRange :: Range -> Int
+sizeRange (Range lo hi) = hi - lo + 1
+
+sizeCuboid :: Cuboid -> Int
+sizeCuboid (Cuboid xr yr zr) = sizeRange xr * sizeRange yr * sizeRange zr
+
+intersectionRange :: Range -> Range -> Maybe Range
+intersectionRange (Range lo1 hi1) (Range lo2 hi2)
+    | lo <= hi = Just (Range lo hi)
+    | otherwise = Nothing
+  where
+    lo = max lo1 lo2
+    hi = min hi1 hi2
+
+-- differenceRange r1 r2 and the intersection of r1 and r2 together
+-- comprise a partition of r1
+differenceRange :: Range -> Range -> [Range]
+differenceRange (Range lo1 hi1) (Range lo2 hi2)
+  | hi1 < lo2 = []
+  | hi2 < lo1 = []
+  | lo2 <= lo1 && hi1 <= hi2 = []
+  | lo1 < lo2 && hi2 < hi1 = [Range lo1 (lo2-1), Range (hi2+1) hi1]
+  | lo1 < lo2 = [Range lo1 (lo2-1)]
+  | hi2 < hi1 = [Range (hi2+1) hi1]
+differenceRange r1 r2 =
+    error $ "unhandled split " ++ show r1 ++ " with " ++ show r2
+
+-- If the two cuboids intersect, partition the first into disjoint cuboids
+-- and drop the intersection.
+splitCuboid :: Cuboid -> Cuboid -> Maybe [Cuboid]
+splitCuboid (Cuboid xr1 yr1 zr1) (Cuboid xr2 yr2 zr2) = do
+    _xm <- intersectionRange xr1 xr2
+    ym <- intersectionRange yr1 yr2
+    zm <- intersectionRange zr1 zr2
+    return $
+        [Cuboid xr1 yr1 zr | zr <- zrs] ++
+        [Cuboid xr1 yr zm | yr <- yrs] ++
+        [Cuboid xr ym zm | xr <- xrs]
+  where
+    xrs = differenceRange xr1 xr2
+    yrs = differenceRange yr1 yr2
+    zrs = differenceRange zr1 zr2
+
+-- differenceCuboid c1 c2 and the intersection of c1 and c2 together
+-- comprise a partition of c1
+differenceCuboid :: Cuboid -> Cuboid -> [Cuboid]
+differenceCuboid c1 c2 = fromMaybe [c1] (splitCuboid c1 c2)
+
+-- update a collection of disjoint cuboids
+apply2 :: [Cuboid] -> Signed Cuboid -> [Cuboid]
+apply2 parts (On c) =
+    c:[sub_part | part <- parts, sub_part <- differenceCuboid part c]
+apply2 parts (Off c) =
+    [sub_part | part <- parts, sub_part <- differenceCuboid part c]
+
+solve2 :: Input -> Int
+solve2 = sum . map sizeCuboid . foldl apply2 []
 
 testInput2a :: String
 testInput2a = "\
@@ -184,66 +243,6 @@ testInput3 = "\
     \on x=-53470..21291,y=-120233..-33476,z=-44150..38147\n\
     \off x=-93533..-4276,y=-16170..68771,z=-104985..-24507\n\
     \"
-
-sizeRange :: Range -> Int
-sizeRange (Range lo hi) = hi - lo + 1
-
-sizeCuboid :: Cuboid -> Int
-sizeCuboid (Cuboid xr yr zr) = sizeRange xr * sizeRange yr * sizeRange zr
-
-intersectionRange :: Range -> Range -> Maybe Range
-intersectionRange (Range lo1 hi1) (Range lo2 hi2)
-    | lo <= hi = Just (Range lo hi)
-    | otherwise = Nothing
-  where
-    lo = max lo1 lo2
-    hi = min hi1 hi2
-
--- differenceRange r1 r2 and the intersection of r1 and r2 together
--- comprise a partition of r1
-differenceRange :: Range -> Range -> [Range]
-differenceRange (Range lo1 hi1) (Range lo2 hi2)
-  | hi1 < lo2 = []
-  | hi2 < lo1 = []
-  | lo2 <= lo1 && hi1 <= hi2 = []
-  | lo1 < lo2 && hi2 < hi1 = [Range lo1 (lo2-1), Range (hi2+1) hi1]
-  | lo1 < lo2 = [Range lo1 (lo2-1)]
-  | hi2 < hi1 = [Range (hi2+1) hi1]
-differenceRange r1 r2 =
-    error $ "unhandled split " ++ show r1 ++ " with " ++ show r2
-
--- If the two cuboids intersect, partition the first into disjoint cuboids
--- and drop the intersection.
-splitCuboid :: Cuboid -> Cuboid -> Maybe [Cuboid]
-splitCuboid (Cuboid xr1 yr1 zr1) (Cuboid xr2 yr2 zr2) = do
-    xm <- intersectionRange xr1 xr2
-    ym <- intersectionRange yr1 yr2
-    zm <- intersectionRange zr1 zr2
-    return $
-        [Cuboid xr yr zr | xr <- xrs, yr <- yrs, zr <- zrs] ++
-        [Cuboid xm yr zr | yr <- yrs, zr <- zrs] ++
-        [Cuboid xr ym zr | xr <- xrs, zr <- zrs] ++
-        [Cuboid xr yr zm | xr <- xrs, yr <- yrs] ++
-        [Cuboid xm ym zr | zr <- zrs] ++
-        [Cuboid xr ym zm | xr <- xrs] ++
-        [Cuboid xm yr zm | yr <- yrs]
-  where
-    xrs = differenceRange xr1 xr2
-    yrs = differenceRange yr1 yr2
-    zrs = differenceRange zr1 zr2
-
--- differenceCuboid b1 b2 and the intersection of b1 and b2 together
--- comprise a partition of b1
-differenceCuboid :: Cuboid -> Cuboid -> [Cuboid]
-differenceCuboid b1 b2 = fromMaybe [b1] (splitCuboid b1 b2)
-
--- update a collection of disjoint cuboids
-apply2 :: [Cuboid] -> Signed Cuboid -> [Cuboid]
-apply2 bs (On nb) = nb:[fragment | b <- bs, fragment <- differenceCuboid b nb]
-apply2 bs (Off nb) = [fragment | b <- bs, fragment <- differenceCuboid b nb]
-
-solve2 :: Input -> Int
-solve2 = sum . map sizeCuboid . foldl apply2 []
 
 tests2 :: [(String, Int)]
 tests2 = [

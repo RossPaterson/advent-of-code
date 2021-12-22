@@ -193,4 +193,5 @@ It is clear from the start that a point counting approach will be enough
 for the first part but infeasible for the second.  I used a cuboid splitting
 approach like many others, but as noted in the
 [Reddit thread](https://www.reddit.com/r/adventofcode/comments/rlxhmg/2021_day_22_solutions/)
-there is a subtle and much cleaner solution using signed cuboids.
+there is a subtle and much cleaner (but not faster) solution using
+signed cuboids.
