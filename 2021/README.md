@@ -195,3 +195,12 @@ approach like many others, but as noted in the
 [Reddit thread](https://www.reddit.com/r/adventofcode/comments/rlxhmg/2021_day_22_solutions/)
 there is a subtle and much cleaner (but not faster) solution using
 signed cuboids.
+
+## [Day 23: Amphipod](https://adventofcode.com/2021/day/23)
+
+Another shortest-path problem, but it is vital to choose a state
+representation that identifies equivalent states (as learned on day 11
+of 2016), and we know from day 6 that entities with the same attributes
+are indistinguishable.  Expressing the moves was a bit finicky, but once
+the first part was working, the main difficulty in the second part was
+finding all the places where the original size was baked in.
