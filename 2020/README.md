@@ -202,7 +202,7 @@ on the revised grammar of the second part.
 This puzzle was a considerable increase in difficulty, involving
 assembling a grid of bitmaps so that the edges match, and then some
 extra searching.  It can be done neatly by representing grids as lists
-of lists, plus some use of of containers to speed up some parts.
+of lists, plus some use of containers to speed up some parts.
 
 The first part doesn't actually require a full assembly of the grid, just
 the corners, but it seemed clear that the whole grid would be needed for
