@@ -204,3 +204,10 @@ of 2016), and we know from day 6 that entities with the same attributes
 are indistinguishable.  Expressing the moves was a bit finicky, but once
 the first part was working, the main difficulty in the second part was
 finding all the places where the original size was baked in.
+
+## [Day 24: Arithmetic Logic Unit](https://adventofcode.com/2021/day/24)
+
+I wasted a lot of time writing an unnecessary abstract machine, but this
+is a disassembly puzzle (as the description hints), and I ended up solving
+it by hand.  There is a much simpler abstract machine hiding in there.
+The second part is straightforward.
