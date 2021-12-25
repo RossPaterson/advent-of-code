@@ -211,3 +211,8 @@ I wasted a lot of time writing an unnecessary abstract machine, but this
 is a disassembly puzzle (as the description hints), and I ended up solving
 it by hand.  There is a much simpler abstract machine hiding in there.
 The second part is straightforward.
+
+## [Day 25: Sea Cucumber](https://adventofcode.com/2021/day/25)
+
+This is a simple puzzle to end with, but I took ages to find some silly
+errors.
