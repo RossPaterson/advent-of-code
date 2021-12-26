@@ -1,5 +1,9 @@
 # Notes on each day's solutions
 
+![Completion times 2021](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2021.png)
+
+(image by [Jo Wood](https://github.com/jwoLondon))
+
 This year was a bit harder that last year, with sustained difficulty
 from day 17 on, but a bit lighter than 2019 and 2018.
 
@@ -14,10 +18,6 @@ Interesting simulations from the literature were introduced on days 11 and 25.
 The only assembly language puzzle (day 24) involved reverse engineering.
 
 I have added difficulty ratings based on how long I took to solve each puzzle.
-
-![Completion times 2021](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2021.png)
-
-(image by [Jo Wood](https://github.com/jwoLondon))
 
 ## [Day 1: Sonar Sweep](https://adventofcode.com/2021/day/1) \*
 
