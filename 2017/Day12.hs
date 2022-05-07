@@ -5,6 +5,7 @@ import Parser
 import Utilities
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 
 type Node = Int
 -- out-edges from each node
@@ -36,7 +37,7 @@ tests1 = [(testInput, 6)]
 -- Part Two
 
 solve2 :: Input -> Int
-solve2 g = length (components (g!) (Map.keysSet g))
+solve2 g = length (components (fmap Set.fromList g))
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 2)]

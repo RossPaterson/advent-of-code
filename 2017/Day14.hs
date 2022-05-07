@@ -7,6 +7,7 @@ import Utilities
 import Data.Bits
 import Data.Set (Set)
 import qualified Data.Set as Set
+import qualified Data.Map as Map
 
 type Grid = Set Position
 
@@ -38,17 +39,12 @@ tests1 = [(testInput, 8108)]
 
 -- Part Two
 
-neighbours :: Grid -> Position -> [Position]
-neighbours g pos
-  | Set.member pos g =
-    [pos' |
-        dir <- unitVectors,
-        let pos' = pos .+. dir,
-        Set.member pos' g]
-  | otherwise = []
+neighbours :: Grid -> Position -> Set Position
+neighbours g pos =
+    Set.intersection g (Set.fromList (map (pos .+.) unitVectors))
 
 regions :: Grid -> [Set Position]
-regions g = components (neighbours g) g
+regions g = components (Map.fromSet (neighbours g) g)
 
 solve2 :: Input -> Int
 solve2 = length . regions

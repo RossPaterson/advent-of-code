@@ -42,22 +42,42 @@ xpos vx t
 ypos :: Int -> Int -> Int
 ypos = pos
 
--- given negative p, smallest non-negative t such that pos v t <= p
-inv_pos :: Int -> Int -> Int
-inv_pos v p =
-    fromInteger (bsearch (\ t -> t >= 0 && pos v (fromInteger t) <= p))
+-- given negative p, smallest non-negative t such that ypos v t <= p
+-- (ceiling of larger solution of t^2/2 - (v + 1/2)*t + p = 0)
+inv_ypos :: Int -> Int -> Int
+inv_ypos v p = ceiling (v' + sqrt (v'*v' - 2*fromIntegral p))
+  where
+    v' = fromIntegral v + 1/2::Double
 
 -- time interval for which y is in range, given initial vertical velocity v
-time_range :: Range -> Int -> [Int]
-time_range (lo, hi) v = [inv_pos v hi..inv_pos v (lo-1) - 1]
+time_range :: Range -> Int -> Range
+time_range (lo, hi) v = (inv_ypos v hi, inv_ypos v (lo-1) - 1)
+
+-- given p, smallest positive v such that xpos v t >= p
+{-
+xpos v t >= p
+<=>
+t <= v && v*t - t*(t-1)/2 >= p
+||
+t >= v && v*(v+1)/2 >= p
+
+(1) v >= (p + t*(t-1)/2)/t && v >= t
+i.e. v >= max t ((p + t*(t-1)/2 + t-1) `div` t)
+-}
+inv_xpos :: Int -> Int -> Int
+inv_xpos p t =
+    fromInteger $ bsearch $ \ v ->  v > 0 && xpos (fromInteger v) t >= p
+--  | otherwise = undefined
 
 -- initial velocities that will hit the target
 solutions :: Input -> [(Int, Int)]
 solutions (xr, yr) = [(x, y) |
     y <- [fst yr..1-fst yr],
-    let ts = time_range yr y,
-    not (null ts),
-    x <- [1..snd xr], -- could be tighter
+    let (t_min, t_max) = time_range yr y,
+    let ts = [t_min..t_max],
+    t_min <= t_max,
+--  x <- [1..snd xr], -- could be tighter
+    x <- [inv_xpos (fst xr) t_max..inv_xpos (snd xr+1) t_min-1],
     or [inrange xr (xpos x t) | t <- ts]]
 
 solve1 :: Input -> Int

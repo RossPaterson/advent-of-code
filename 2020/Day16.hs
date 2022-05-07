@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import Matching
+import Graph
 import Parser
 import Control.Applicative
 import Data.List

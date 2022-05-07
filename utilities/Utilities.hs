@@ -15,8 +15,6 @@ module Utilities (
     mostCommon,
     initSets,
     leastBy,
-    tsort,
-    tsortG,
     -- * Iteration
     whileJust,
     iterateWhileJust,
@@ -36,8 +34,6 @@ module Utilities (
 import Data.Char
 import Data.Function
 import Data.List
-import Data.Ord
-import Data.Map (Map, (!))
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
@@ -171,27 +167,6 @@ fastNub = nub_aux Set.empty
     nub_aux seen (x:xs)
       | Set.member x seen = nub_aux seen xs
       | otherwise = x : nub_aux (Set.insert x seen) xs
-
--- | Topological sort: given a list of pairs, produces a list of the
--- values contained in the pairs such that for each pair @(x, y)@, @x@
--- occurs earlier in the list than @y@.
-tsort :: Ord a => [(a, a)] -> [a]
-tsort = tsortG . relationToGraph
-
--- | Topological sort: a list comprising the values in the map, such that
--- each key occurs earlier in the list than all of its associated values.
-tsortG :: Ord a => Map a [a] -> [a]
-tsortG g = map fst $ sortBy (compare `on` (Down . snd)) $ Map.assocs depth_map
-  where
-    depth_map = fmap depth (Map.union g empties)
-    empties = Map.fromList [(x, []) | xs <- Map.elems g, x <- xs]
-    depth [] = 0::Int
-    depth ys = maximum [depth_map!y | y <- ys] + 1
-
-relationToGraph :: (Ord a, Ord b) => [(a, b)] -> Map a [b]
-relationToGraph xys =
-    Map.map Set.toList $ Map.fromListWith Set.union $
-        [(x, Set.singleton y) | (x, y) <- xys]
 
 -- | For a non-constant upward-closed predicate @p@, @'bsearch' p@ returns
 -- the least @n@ satisfying @p@, using /O(log n)/ evaluations of @p@.

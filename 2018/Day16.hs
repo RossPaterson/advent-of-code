@@ -1,7 +1,7 @@
 module Main where
 
 import AssemblyCode
-import Matching
+import Graph
 import Parser
 import Utilities
 import Data.Map (Map, (!))

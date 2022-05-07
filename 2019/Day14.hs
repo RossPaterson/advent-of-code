@@ -1,11 +1,13 @@
 module Main where
 
 import Utilities
+import Graph
 import Parser
 import Control.Applicative
 import Data.Char
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 
 -- Input processing
 
@@ -32,7 +34,7 @@ production rs = Map.fromList [(res, (n, qs)) | Reaction qs (n, res) <- rs]
 
 -- everything but the last (ORE) in top-down order
 productionOrder :: Production -> [Chemical]
-productionOrder = init . tsortG . Map.map (map snd . snd)
+productionOrder = init . tsort . Map.map (Set.fromList . map snd . snd)
 
 graphToRelation :: Map a [a] -> [(a, a)]
 graphToRelation g = [(x, y) | (x, ys) <- Map.assocs g, y <- ys]

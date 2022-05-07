@@ -6,6 +6,7 @@ import Parser
 import Utilities
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Data.Set (Set)
 
 -- Input processing
 
@@ -21,19 +22,17 @@ parse = map (runParser point . dropWhile (== ' ')) . lines
 
 -- number of constellations in the input
 solve1 :: Input -> Int
-solve1 ps = length $ components (neighbours point_map) (Map.keysSet point_map)
+solve1 ps = length $ components (fmap (neighbours point_map) point_map)
   where
     point_map = Map.fromList (zip [0..] ps)
 
--- list of points connected to a point
-neighbours :: Map Int Point4 -> Int -> [Int]
-neighbours m n = case Map.lookup n m of
-    Nothing -> []
-    Just p -> [n' | (n', p') <- Map.toList m, near p p' && n' /= n]
+-- set of indices of points connected to a point
+neighbours :: Map Int Point4 -> Point4 -> Set Int
+neighbours m p = Map.keysSet (Map.filter (near p) m)
 
 -- two points are connected if their distance is no more than 3
 near :: Point4 -> Point4 -> Bool
-near p1 p2 = distance p1 p2 <= 3
+near p1 p2 = distance p1 p2 <= 3 && p1 /= p2
 
 tests1 :: [(String, Int)]
 tests1 = [

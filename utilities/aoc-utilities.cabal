@@ -26,7 +26,6 @@ library
     Geometry
     Graph
     MD5
-    Matching
     Matrix
     Number
     Parser
