@@ -14,3 +14,7 @@ the description.
 This involves simple functions on values.  It shouldn't have been
 difficult, but I got in a tangle mixing up the four 3-value types that
 were involved.
+
+## [Day 3: Rucksack Reorganization](https://adventofcode.com/2022/day/3)
+
+An easy exercise using lists and sets.
