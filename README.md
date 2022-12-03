@@ -9,4 +9,4 @@ Completion times of the fastest 100 users to achieve each star (image by [Jo Woo
 
 <img src="https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2018.png" width=49% />&nbsp;&nbsp;&nbsp;<img src="https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2017.png" width=49% />
 
-<img src="https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2016.png" width=49% />&nbsp;&nbsp;&nbsp;<img src="https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2016.png" width=49% />
+<img src="https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2016.png" width=49% />&nbsp;&nbsp;&nbsp;<img src="https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2015.png" width=49% />
