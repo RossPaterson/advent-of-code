@@ -18,3 +18,8 @@ were involved.
 ## [Day 3: Rucksack Reorganization](https://adventofcode.com/2022/day/3)
 
 An easy exercise using lists and sets.
+
+## [Day 4: Camp Cleanup](https://adventofcode.com/2022/day/4)
+
+This one involves a little parsing, and then basic range operations,
+with a neat symmetry between the parts.
