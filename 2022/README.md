@@ -23,3 +23,9 @@ An easy exercise using lists and sets.
 
 This one involves a little parsing, and then basic range operations,
 with a neat symmetry between the parts.
+
+## [Day 5: Supply Stacks](https://adventofcode.com/2022/day/5)
+
+After messy input parsing, the main computation is list processing,
+which works out neatly using list functions.  The second part is slightly
+simpler than the first.
