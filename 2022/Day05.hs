@@ -26,6 +26,22 @@ parse s = (conf, moves)
 
 -- Part One
 
+-- display a configuration (not needed, but useful for tracing)
+showConfiguration :: Configuration -> String
+showConfiguration stacks =
+    unlines (map unwords (transpose (map formatStack stacks))) ++
+        unwords footers ++ "\n"
+  where
+    formatStack cs = replicate (height - length cs) blank ++ map wrap cs
+    wrap c = ['[', c, ']']
+    blank = "   "
+    height = maximum (map length stacks)
+    footers = [column n | n <- [1..length stacks]]
+    column n
+      | n < 10 = " " ++ show n ++ " "
+      | n < 100 = show n ++ " "
+      | otherwise = show n
+
 -- operate on one of the stacks
 
 type Rest = ([Stack], [Stack])
