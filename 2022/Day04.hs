@@ -40,6 +40,7 @@ tests1 = [(testInput, 2)]
 
 -- Part Two
 
+-- ranges overlap <=> not disjoint <=> not (lo1 > hi2 || lo2 > hi1)
 overlap :: Range -> Range -> Bool
 overlap (Range lo1 hi1) (Range lo2 hi2) = lo1 <= hi2 && lo2 <= hi1
 
