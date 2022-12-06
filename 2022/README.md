@@ -29,3 +29,10 @@ with a neat symmetry between the parts.
 After messy input parsing, the main computation is list processing,
 which works out neatly using list functions.  The second part is slightly
 simpler than the first.
+
+## [Day 6: Tuning Trouble](https://adventofcode.com/2022/day/6)
+
+In this small puzzle, the temptation is to engineer an efficient solution
+with a rolling window and possibly other state, but for this input a
+simplistic approach runs quickly enough, even with the increased window
+size of the second part.
