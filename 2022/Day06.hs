@@ -25,9 +25,12 @@ firstMarker w = length . takeWhile (not . marker w) . inits
 
 -- faster version, but still quadratic in w
 firstMarker' :: Eq a => Int -> [a] -> Int
-firstMarker' w xs = w + length (takeWhile (not . allDifferent) windows)
-  where
-    windows = map (take w) (drop w (rev_inits xs))
+firstMarker' w xs =
+    w + length (takeWhile (not . allDifferent) (drop w (windows w xs)))
+
+-- reversed windows of length up to w
+windows :: Int -> [a] -> [[a]]
+windows w xs = map (take w) (rev_inits xs)
 
 -- map reverse . inits
 rev_inits :: [a] -> [[a]]
@@ -35,14 +38,14 @@ rev_inits = scanl (flip (:)) []
 
 -- linear in w (but similar time to previous on this problem size)
 firstMarker'' :: Eq a => Int -> [a] -> Int
-firstMarker'' w xs = w + length (takeWhile (not . all_big) windows)
+firstMarker'' w xs =
+    w + length (takeWhile (not . all_big) (drop w (windows w diff_counts)))
   where
     -- Does each element xk in the window have at least w-k followers
     -- that are different from it?
     all_big diffs = all (>= w) (zipWith (+) [1..] diffs)
-    windows = map (take w) (drop w (rev_inits diff_counts))
     -- for each x, min of w-1 and number of consecutive different elements
-    diff_counts = map (diff_followers . take w) (tail (rev_inits xs))
+    diff_counts = map diff_followers (tail (windows w xs))
     diff_followers [] = error "diff_followers []"
     diff_followers (y:ys) = length (takeWhile (/= y) ys)
 
