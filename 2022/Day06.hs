@@ -19,11 +19,22 @@ allDifferent (x:xs) = not (elem x xs) && allDifferent xs
 marker :: Eq a => Int -> [a] -> Bool
 marker n xs = length xs >= n && allDifferent (take n (reverse xs))
 
+-- naive version, which is fast enough for both parts
 firstMarker :: Eq a => Int -> [a] -> Int
 firstMarker n = length . takeWhile (not . marker n) . inits
 
+-- faster version
+firstMarker' :: Eq a => Int -> [a] -> Int
+firstMarker' n xs = n + length (takeWhile (not . allDifferent) windows)
+  where
+    windows = map (take n) (drop n (rev_inits xs))
+
+-- map reverse . inits
+rev_inits :: [a] -> [[a]]
+rev_inits = scanl (flip (:)) []
+
 solve1 :: Input -> Int
-solve1 = firstMarker 4
+solve1 = firstMarker' 4
 
 tests1 :: [(String, Int)]
 tests1 = [
@@ -36,7 +47,7 @@ tests1 = [
 -- Part Two
 
 solve2 :: Input -> Int
-solve2 = firstMarker 14
+solve2 = firstMarker' 14
 
 tests2 :: [(String, Int)]
 tests2 = [
