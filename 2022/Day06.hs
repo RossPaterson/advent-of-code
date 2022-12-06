@@ -17,24 +17,37 @@ allDifferent [] = True
 allDifferent (x:xs) = not (elem x xs) && allDifferent xs
 
 marker :: Eq a => Int -> [a] -> Bool
-marker n xs = length xs >= n && allDifferent (take n (reverse xs))
+marker w xs = length xs >= w && allDifferent (take w (reverse xs))
 
 -- naive version, which is fast enough for both parts
 firstMarker :: Eq a => Int -> [a] -> Int
-firstMarker n = length . takeWhile (not . marker n) . inits
+firstMarker w = length . takeWhile (not . marker w) . inits
 
--- faster version
+-- faster version, but still quadratic in w
 firstMarker' :: Eq a => Int -> [a] -> Int
-firstMarker' n xs = n + length (takeWhile (not . allDifferent) windows)
+firstMarker' w xs = w + length (takeWhile (not . allDifferent) windows)
   where
-    windows = map (take n) (drop n (rev_inits xs))
+    windows = map (take w) (drop w (rev_inits xs))
 
 -- map reverse . inits
 rev_inits :: [a] -> [[a]]
 rev_inits = scanl (flip (:)) []
 
+-- linear in w (but similar time to previous on this problem size)
+firstMarker'' :: Eq a => Int -> [a] -> Int
+firstMarker'' w xs = w + length (takeWhile (not . all_big) windows)
+  where
+    -- Does each element xk in the window have at least w-k followers
+    -- that are different from it?
+    all_big diffs = all (>= w) (zipWith (+) [1..] diffs)
+    windows = map (take w) (drop w (rev_inits diff_counts))
+    -- for each x, min of w-1 and number of consecutive different elements
+    diff_counts = map (diff_followers . take w) (tail (rev_inits xs))
+    diff_followers [] = error "diff_followers []"
+    diff_followers (y:ys) = length (takeWhile (/= y) ys)
+
 solve1 :: Input -> Int
-solve1 = firstMarker' 4
+solve1 = firstMarker'' 4
 
 tests1 :: [(String, Int)]
 tests1 = [
@@ -47,7 +60,7 @@ tests1 = [
 -- Part Two
 
 solve2 :: Input -> Int
-solve2 = firstMarker' 14
+solve2 = firstMarker'' 14
 
 tests2 :: [(String, Int)]
 tests2 = [

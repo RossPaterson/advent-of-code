@@ -32,7 +32,8 @@ simpler than the first.
 
 ## [Day 6: Tuning Trouble](https://adventofcode.com/2022/day/6)
 
-In this small puzzle, the temptation is to engineer an efficient solution
-with a rolling window and possibly other state, but for this input a
-simplistic approach runs quickly enough, even with the increased window
-size of the second part.
+In this small puzzle, the temptation is to engineer an efficient solution,
+but for this input a simplistic approach runs quickly enough, even with
+the increased window size of the second part.  Working out a version that
+is linear in the window size is a nice exercise, but complete overkill
+for this problem size.
