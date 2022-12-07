@@ -42,12 +42,12 @@ for this problem size.
 
 There's a moderate amount of parsing, but most of the work here is in two
 stages, building and traversing the file tree.  The building came out
-neatly, and the traversal is a faily routine recursion.  In the sample
+neatly, and the traversal is a fairly routine recursion.  In the sample
 input, all file names are unique, but this is not the case for the full
 input.  Because I built a full tree from the start, this had no impact.
-In both inputs, no directory is listed twice, but I didin't rely on that.
+In both inputs, no directory is listed twice, but I didn't rely on that.
 
 After doing all that for the first part, there's little to do in the
-second part, but my first answer was wrong.  After a momemnt fearing
+second part, but my first answer was wrong.  After a moment fearing
 a bug in the tree building, I read the question more carefully and got
 the correct answer.
