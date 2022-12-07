@@ -40,12 +40,16 @@ for this problem size.
 
 ## [Day 7: No Space Left On Device](https://adventofcode.com/2022/day/7)
 
-There's a moderate amount of parsing, but most of the work here is in two
-stages, building and traversing the file tree.  The building came out
+There's a moderate amount of parsing, but most of the work here is in
+two stages, building and traversing the file tree.  The building came out
 neatly, and the traversal is a fairly routine recursion.  In the sample
 input, all file names are unique, but this is not the case for the full
 input.  Because I built a full tree from the start, this had no impact.
-In both inputs, no directory is listed twice, but I didn't rely on that.
+
+In both inputs, the tree is traversed in-order, so no directory is
+listed twice.  I didn't rely on that, but it does allow solutions that
+build up sizes by recursively consuming the list of commands, which
+could be shorter, but probably more complex.
 
 After doing all that for the first part, there's little to do in the
 second part, but my first answer was wrong.  After a moment fearing
