@@ -37,3 +37,17 @@ but for this input a simplistic approach runs quickly enough, even with
 the increased window size of the second part.  Working out a version that
 is linear in the window size is a nice exercise, but complete overkill
 for this problem size.
+
+## [Day 7: No Space Left On Device](https://adventofcode.com/2022/day/7)
+
+There's a moderate amount of parsing, but most of the work here is in two
+stages, building and traversing the file tree.  The building came out
+neatly, and the traversal is a faily routine recursion.  In the sample
+input, all file names are unique, but this is not the case for the full
+input.  Because I built a full tree from the start, this had no impact.
+In both inputs, no directory is listed twice, but I didin't rely on that.
+
+After doing all that for the first part, there's little to do in the
+second part, but my first answer was wrong.  After a momemnt fearing
+a bug in the tree building, I read the question more carefully and got
+the correct answer.
