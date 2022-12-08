@@ -21,7 +21,7 @@ visibleLeft hs = zipWith (>) hs (scanl max (-1) hs)
 
 -- Apply a length-preserving row transformation in all 4 ways: left-right,
 -- right-left, up-down and down-up, combining the results at each point
--- in the grid with op.
+-- in the grid with an associative operator.
 allWays :: ([a] -> [b]) -> (b -> b -> b) -> Grid a -> Grid b
 allWays row op xss =
     zipWith (zipWith op)
@@ -30,7 +30,7 @@ allWays row op xss =
   where
     bothWays xs = zipWith op (row xs) (reverse (row (reverse xs)))
 
--- Reduce the values in a grid with combining function op.
+-- Reduce the values in a grid with an associative combining operator.
 foldGrid :: (a -> a -> a) -> Grid a -> a
 foldGrid op xss = foldr1 op (map (foldr1 op) xss)
 
