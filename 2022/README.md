@@ -56,7 +56,7 @@ second part, but my first answer was wrong.  After a moment fearing
 a bug in the tree building, I read the question more carefully and got
 the correct answer.
 
-## [Day 8: No Space Left On Device](https://adventofcode.com/2022/day/8)
+## [Day 8: Treetop Tree House](https://adventofcode.com/2022/day/8)
 
 This was a novel puzzle, which came out very neatly using bulk operations
 on lists.  The second part shares most of the structure of the first,
