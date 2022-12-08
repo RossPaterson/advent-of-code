@@ -59,5 +59,6 @@ the correct answer.
 ## [Day 8: Treetop Tree House](https://adventofcode.com/2022/day/8)
 
 This was a novel puzzle, which came out very neatly using bulk operations
-on lists.  The second part shares most of the structure of the first,
-encouraging parameterization by simple functions.
+on lists to exploit the 4-fold symmetry.  The second part shares most
+of the structure of the first, encouraging parameterization by simple
+functions.

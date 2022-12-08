@@ -15,13 +15,13 @@ parse s = map (map digitToInt) (lines s)
 -- Part One
 
 -- Is each tree visible from the left of the row?
--- That is, is the value larger than all preceding ones
+-- That is, is the value larger than all preceding ones?
 visibleLeft :: [Int] -> [Bool]
 visibleLeft hs = zipWith (>) hs (scanl max (-1) hs)
 
 -- Apply a length-preserving row transformation in all 4 ways: left-right,
 -- right-left, up-down and down-up, combining the results at each point
--- in the grid with an associative operator.
+-- in the grid with an associative commutative operator.
 allWays :: ([a] -> [b]) -> (b -> b -> b) -> Grid a -> Grid b
 allWays row op xss =
     zipWith (zipWith op)
@@ -30,7 +30,7 @@ allWays row op xss =
   where
     bothWays xs = zipWith op (row xs) (reverse (row (reverse xs)))
 
--- Reduce the values in a grid with an associative combining operator.
+-- Reduce the values in a grid with an associative commutative operator.
 foldGrid :: (a -> a -> a) -> Grid a -> a
 foldGrid op xss = foldr1 op (map (foldr1 op) xss)
 
@@ -52,9 +52,12 @@ tests1 = [(testInput, 21)]
 
 -- The number of trees visible to the right of each tree
 viewRight :: Ord a => [a] -> [Int]
-viewRight [] = []
-viewRight (h:hs) =
-    min (length hs) (length (takeWhile (<h) hs) + 1) : viewRight hs
+viewRight = map view . init . tails
+  where
+    view [] = error "view []"
+    -- view (h:hs) = min (length hs) (length (takeWhile (<h) hs) + 1)
+    view [_] = 0
+    view (h:hs) = length (takeWhile (<h) (init hs)) + 1
 
 solve2 :: Input -> Int
 solve2 = foldGrid (max) . allWays viewRight (*)
