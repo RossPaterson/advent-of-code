@@ -62,3 +62,10 @@ This was a novel puzzle, which came out very neatly using bulk operations
 on lists to exploit the 4-fold symmetry.  The second part shares most
 of the structure of the first, encouraging parameterization by simple
 functions.
+
+## [Day 9: Rope Bridge](https://adventofcode.com/2022/day/9)
+
+This was another novel puzzle, involving lists and a little geometry.
+The first part decomposed quite neatly, and the pieces could be reused
+for the second part.
+
