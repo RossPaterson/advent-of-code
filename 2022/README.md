@@ -69,3 +69,6 @@ This was another novel puzzle, involving lists and a little geometry.
 The first part decomposed quite neatly, and the pieces could be reused
 for the second part.
 
+I implemented the dragging operation with more generality than was
+needed for the first part, because it came out neatly, and so did not
+notice that the second part involved longer moves.  (It just worked.)
