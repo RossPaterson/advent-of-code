@@ -61,11 +61,9 @@ tests1 = [(testInput, 13)]
 
 -- Part Two
 
+-- The head drags the first part of the tail, which drags the 2nd, and so on.
 dragTails :: [Point2] -> Point2 -> [Point2]
-dragTails [] _ = []
-dragTails (tp:tps) hp = tp':dragTails tps tp'
-  where
-    tp' = dragTail tp hp
+dragTails tps hp = tail (scanl (flip dragTail) hp tps)
 
 solve2 :: Input -> Int
 solve2 =
