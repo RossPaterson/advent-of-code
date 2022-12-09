@@ -35,7 +35,7 @@ headPositions = tail . scanl moveHead zero . concatMap expandMove
 dragTail :: Point2 -> Point2 -> Point2
 dragTail tp hp = hp .+. makeClose (tp .-. hp)
 
--- at most 1 in each direction of the original
+-- move to within at most 1 in each direction of the origin
 makeClose :: Point2 -> Point2
 makeClose (Point2 x y) = case compare (abs x) (abs y) of
     LT -> Point2 0 (signum y)
