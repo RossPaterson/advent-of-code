@@ -31,7 +31,7 @@ solve1 = head . values
 -- values compared for equality with register 0
 -- (assumes that there is a single such comparison in the program)
 values :: Program -> [Int]
-values p = map (!r) $ filter breakpoint $ allStates p numRegisters
+values p = map (! r) $ filter breakpoint $ allStates p numRegisters
   where
     breakpoint s = s!ip p == loc
     (loc, r) =

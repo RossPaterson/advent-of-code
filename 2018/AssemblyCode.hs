@@ -86,7 +86,7 @@ allStates c numRegisters =
 -- frequency of execution of each instruction in a sample run
 heatMap :: Program -> Int -> Int -> [(Int, Int)]
 heatMap c numRegisters maxSteps =
-    frequency $ map (!ip c) $ take maxSteps $ allStates c numRegisters
+    frequency $ map (! ip c) $ take maxSteps $ allStates c numRegisters
 
 -- a single fetch-execute step
 step :: Program -> State -> State
