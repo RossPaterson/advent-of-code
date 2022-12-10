@@ -1,0 +1,33 @@
+#!/bin/sh
+
+site=https://adventofcode.com
+usage="usage: $0 [[year] day]"
+
+cd `dirname $0`
+cookies=../cookies.txt
+
+if [ ! -f $cookies ]
+then	echo "Set cookies.txt" >&2
+	exit 1
+fi
+
+case $# in
+0)	year=`date +%Y`
+	d=`date +%d` ;;
+1)	year=`date +%Y`
+	d="$1" ;;
+2)	year="$1"
+	d="$2" ;;
+*)	echo "$usage" >&2
+	exit 1 ;;
+esac
+
+case $d in
+?)	day=0$d ;;
+??)	day=$d
+	d=`echo $d | sed 's/^0//'` ;;
+*)	echo "$usage" >&2
+	exit 1 ;;
+esac
+
+exec curl -b $cookies $site/$year/day/$d/input
