@@ -72,3 +72,8 @@ for the second part.
 I implemented the dragging operation with more generality than was
 needed for the first part, because it came out neatly, and so did not
 notice that the second part involved longer moves.  (It just worked.)
+
+## [Day 10: Cathode-Ray Tube](https://adventofcode.com/2022/day/10)
+
+This one was a bit frustrating, requiring close reading to get the
+precise details right, but ultimately simple code.
