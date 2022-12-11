@@ -77,3 +77,14 @@ notice that the second part involved longer moves.  (It just worked.)
 
 This one was a bit frustrating, requiring close reading to get the
 precise details right, but ultimately simple code.
+
+## [Day 11: Monkey in the Middle](https://adventofcode.com/2022/day/11)
+
+This puzzle followed the common Advent of Code pattern were the first
+part is understanding the situation and the second scales it up so much
+that the naive approach is infeasible, and a deeper understanding of
+what is going on is required.  The first part was itself quite intricate,
+with complex parsing and incremental changes to the state.  The second
+part very clearly says that the size of the numbers is going to be the
+problem, but I took too long trying various optimizations, when what is
+required is a technique that has featured in several past years.
