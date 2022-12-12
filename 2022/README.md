@@ -93,5 +93,6 @@ required is a technique that has featured in several past years.
 
 The first part is an easy variation on past problems involving finding
 paths in a grid.  For the second part, a brute force search reusing the
-first part is fast enough, though an all-pairs algorithm might be faster.
-A minor point is that not all start points have a path to the destination.
+first part is fast enough, but a simple variation is faster and neater.
+
+**Lesson:** sometimes it's useful to run path searches backwards.

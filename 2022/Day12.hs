@@ -26,22 +26,17 @@ parse s = (height_map, start, end)
 
 -- Part One
 
-neighbours :: Map Position Int -> Position -> [Position]
-neighbours m p =
+-- points reachable from p in one step
+successors :: Map Position Int -> Position -> [Position]
+successors m p =
     [p' | u <- unitVectors, let p' = p .+. u,
         h' <- maybeToList (Map.lookup p' m), h' <= h+1]
   where
     h = m ! p
 
-pathLength :: Map Position Int -> Position -> Position -> Maybe Int
-pathLength m s e
-  | null back = Nothing
-  | otherwise = Just (length front)
-  where
-    (front, back) = span (notElem e) $ bfs (neighbours m) [s]
-
 solve1 :: Input -> Int
-solve1 (m, s, e) = fromMaybe (error "no path") (pathLength m s e)
+solve1 (m, s, e) =
+    length $ takeWhile (notElem e) $ bfs (successors m) [s]
 
 testInput :: String
 testInput = "\
@@ -56,10 +51,26 @@ tests1 = [(testInput, 31)]
 
 -- Part Two
 
+-- Fast enough: search forward from each possible startpoint and take
+-- the minimum of the shortest path lengths.  Note that the destination
+-- may not be reachable from some start points.
+-- Faster and simpler: search backward from the destination
+
+-- points from which p is reachable in one step
+predecessors :: Map Position Int -> Position -> [Position]
+predecessors m p =
+    [p' | u <- unitVectors, let p' = p .+. u,
+        h' <- maybeToList (Map.lookup p' m), h <= h'+1]
+  where
+    h = m ! p
+
+-- are any of the points at elevation 0?
+finished :: Map Position Int -> [Position] -> Bool
+finished m ps = or [m ! p == 0 | p <- ps]
+
 solve2 :: Input -> Int
 solve2 (m, _, e) =
-    minimum [n | (p, h) <- Map.assocs m, h == 0,
-        n <- maybeToList (pathLength m p e)]
+    length $ takeWhile (not . finished m) $ bfs (predecessors m) [e]
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 29)]
