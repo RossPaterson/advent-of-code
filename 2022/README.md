@@ -88,3 +88,10 @@ with complex parsing and incremental changes to the state.  The second
 part very clearly says that the size of the numbers is going to be the
 problem, but I took too long trying various optimizations, when what is
 required is a technique that has featured in several past years.
+
+## [Day 12: Hill Climbing Algorithm](https://adventofcode.com/2022/day/12)
+
+The first part is an easy variation on past problems involving finding
+paths in a grid.  For the second part, a brute force search reusing the
+first part is fast enough, though an all-pairs algorithm might be faster.
+A minor point is that not all start points have a path to the destination.
