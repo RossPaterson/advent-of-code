@@ -96,3 +96,9 @@ paths in a grid.  For the second part, a brute force search reusing the
 first part is fast enough, but a simple variation is faster and neater.
 
 **Lesson:** sometimes it's useful to run path searches backwards.
+
+## [Day 13: Distress Signal](https://adventofcode.com/2022/day/13)
+
+After the parsing, the main work here is coding the comparison function
+from the description.  Fortunately the function described is conventional.
+The rest is simple list processing.
