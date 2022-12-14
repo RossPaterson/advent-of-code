@@ -102,3 +102,11 @@ first part is fast enough, but a simple variation is faster and neater.
 After the parsing, the main work here is coding the comparison function
 from the description.  Fortunately the function described is conventional.
 The rest is simple list processing.
+
+## [Day 14: Regolith Reservoir](https://adventofcode.com/2022/day/14)
+
+As noted in the problem description, this problem is a variation of
+[2018 day 17: Reservoir Research](https://adventofcode.com/2018/day/17).
+This version is a bit easier.  Naively tracing each grain of sand worked.
+The second part is a little easier, but slower (because more grains).
+The whole thing runs for 4 seconds, so there is room for improvement.
