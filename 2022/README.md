@@ -110,3 +110,19 @@ As noted in the problem description, this problem is a variation of
 This version is a bit easier.  Naively tracing each grain of sand worked.
 The second part is a little easier, but slower (because more grains).
 The whole thing runs for 4 seconds, so there is room for improvement.
+
+## [Day 15: Beacon Exclusion Zone](https://adventofcode.com/2022/day/15)
+
+I find spatial problems like this quite difficult.  After getting an
+answer to the first part, I sped it up by using intervals, and it was
+natural to try the two-dimensional counterpart in the second part, but
+it took me ages to get the difference operation correct.  Separating out
+a diagonal square lattice abstraction helped, but it's still ugly.
+
+## [Day 16: Proboscidea Volcanium](https://adventofcode.com/2022/day/16)
+
+This is a novel mix of pathfinding and optimization, where the challenge
+is finding a feasible implementation.  I got the first part with a direct
+implementation and over half an hour of runtime, but then was fortunate
+to have to stop and commute to work, giving time to step back and devise
+a multistage solution to both parts (which still took 40 seconds to run).

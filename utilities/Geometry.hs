@@ -15,6 +15,11 @@ module Geometry (
     Point4(..),
     -- ** Hexagonal tiling
     HexCoord(..),
+    -- ** Diagonal square tiling
+    Diagonal(..),
+    positionToDiagonal,
+    DiagonalPosition(..),
+    diagonalPosition,
     )
     where
 
@@ -275,3 +280,37 @@ instance Planar HexCoord where
       | otherwise = 0
 
     HexCoord a b .*. HexCoord c d = HexCoord (a*c - b*d) (a*d + b*c + b*d)
+
+-- | Point in a diagonal grid.
+-- The first component is down and right; the second is down and left.
+data Diagonal = Diagonal !Int !Int
+    deriving (Eq, Ord, Show)
+
+instance Module Diagonal where
+    zero = Diagonal 0 0
+    Diagonal a1 b1 .+. Diagonal a2 b2 = Diagonal (a1+a2) (b1+b2)
+    Diagonal a1 b1 .-. Diagonal a2 b2 = Diagonal (a1-a2) (b1-b2)
+    r *. Diagonal a b = Diagonal (r*a) (r*b)
+
+instance NormedModule Diagonal where
+    norm (Diagonal a b) = abs a + abs b
+
+    unitVectors =
+        [Diagonal 1 0, Diagonal 0 (-1), Diagonal (-1) 0, Diagonal 0 1]
+
+-- | Embedding of 'Position' as the even points of 'Diagonal'.
+-- This preserves the 'Module' operations but not the 'NormedModule' ones.
+positionToDiagonal :: Position -> Diagonal
+positionToDiagonal (Position x y) = Diagonal (x+y) (y-x)
+
+-- | Representation of a 'Position' near the point
+data DiagonalPosition
+    = At Position -- ^ at the position
+    | DownRight Position -- ^ helf a step down and right from the position
+    deriving (Eq, Ord, Show)
+
+-- | A 'Position' near the point
+diagonalPosition :: Diagonal -> DiagonalPosition
+diagonalPosition (Diagonal r l)
+  | even (r+l) = At (Position ((r-l) `div` 2) ((r+l) `div` 2))
+  | otherwise = DownRight (Position ((r-1-l) `div` 2) ((r-1+l) `div` 2))
