@@ -133,3 +133,11 @@ changes on each clock tick, and that can usually be directly implemented,
 at least for small problem sizes.  For a more efficient and scalable
 solution, often one must look at the system in a different way,
 e.g. considering the histories of components of the system.
+
+## [Day 17: Pyroclastic Flow](https://adventofcode.com/2022/day/17)
+
+This problem is a variation on the game of Tetris.  A naive direct
+implementation sufficed for the first part.  It was clear the second part
+would be infeasible unless the behaviour was periodic.  The period for the
+given input could be determined by inspecting a trace of the execution,
+which I did manually.
