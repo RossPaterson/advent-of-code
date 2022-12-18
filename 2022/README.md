@@ -141,3 +141,9 @@ implementation sufficed for the first part.  It was clear the second part
 would be infeasible unless the behaviour was periodic.  The period for the
 given input could be determined by inspecting a trace of the execution,
 which I did manually.
+
+## [Day 18: Boiling Boulders](https://adventofcode.com/2022/day/18)
+
+This was a neat little exercise in set manipulation.  The easy first
+part sets the scene.  The second part looks daunting at first, but an
+implementation follows directly from the description.
