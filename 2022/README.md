@@ -144,6 +144,9 @@ which I did manually.
 
 ## [Day 18: Boiling Boulders](https://adventofcode.com/2022/day/18)
 
-This was a neat little exercise in set manipulation.  The easy first
-part sets the scene.  The second part looks daunting at first, but an
-implementation follows directly from the description.
+This was a neat little exercise in set manipulation, and a welcome
+respite after three gruelling days.  The easy first part sets the scene.
+For the second part, I initially focussed on the trapped pockets, which
+seemed daunting, but the fourth sentence of the description translates
+directly into an implementation (once one limits the search area)
+that can be composed with the function created for the first part.
