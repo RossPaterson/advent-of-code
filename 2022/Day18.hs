@@ -18,9 +18,11 @@ parse = Set.fromList . map (runParser point) . lines
 
 -- Part One
 
+-- The six neighbouring points of a point
 neighbours :: Point3 -> [Point3]
 neighbours p = [p .+. d | d <- unitVectors]
 
+-- Total number of cube sides between points in and not in the set
 surfaceArea :: Set Point3 -> Int
 surfaceArea ps =
     sum [length [p' | p' <- neighbours p, not (Set.member p' ps)] |
@@ -50,10 +52,11 @@ tests1 = [(testInput, 64)]
 
 -- Part Two
 
+-- An axis-aligned box, defined by its minimal and maximal corners
 data Box = Box Point3 Point3
     deriving (Show)
 
--- smallest box with clear space around the set on all sides
+-- Smallest box with clear space around the set on all sides
 surroundingBox :: Set Point3 -> Box
 surroundingBox ps =
     Box (Point3 (min_x-1) (min_y-1) (min_z-1))
@@ -66,11 +69,13 @@ surroundingBox ps =
     max_y = maximum [y | Point3 _ y _ <- Set.elems ps]
     max_z = maximum [z | Point3 _ _ z <- Set.elems ps]
 
+-- All the points in the box
 contents :: Box -> Set Point3
 contents (Box (Point3 min_x min_y min_z) (Point3 max_x max_y max_z)) =
     Set.fromList [Point3 x y z |
         x <- [min_x..max_x], y <- [min_y..max_y], z <- [min_z..max_z]]
 
+-- Is the point inside the box?
 inside :: Point3 -> Box -> Bool
 inside (Point3 x y z)
         (Box (Point3 min_x min_y min_z) (Point3 max_x max_y max_z)) =
@@ -78,12 +83,12 @@ inside (Point3 x y z)
     min_y <= y && y <= max_y &&
     min_z <= z && z <= max_z
 
--- all points not reachable from outside the set
+-- All points not reachable from outside the set
 interior :: Set Point3 -> Set Point3
-interior ps =
-    Set.difference (contents box) $
-        Set.fromList [p | level <- bfs neighbours_in_box [corner], p <- level]
+interior ps = Set.difference (contents box) exterior
   where
+    exterior =
+        Set.fromList [p | level <- bfs neighbours_in_box [corner], p <- level]
     neighbours_in_box p =
         [p' | p' <- neighbours p, inside p' box, not (Set.member p' ps)]
     box@(Box corner _) = surroundingBox ps
