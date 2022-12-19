@@ -150,3 +150,15 @@ For the second part, I initially focussed on the trapped pockets, which
 seemed daunting, but the fourth sentence of the description translates
 directly into an implementation (once one limits the search area)
 that can be composed with the function created for the first part.
+
+## [Day 19: Not Enough Minerals](https://adventofcode.com/2022/day/19)
+
+This was a tough problem, reminiscent of day 16 but more difficult.
+It was also unusual in that the first part was infeasible without constraining
+the search space.  From examination of the input I managed to come up
+with a constraint on the number of robots.  The second part was larger,
+and I needed a hint from the [Reddit thread](https://www.reddit.com/r/adventofcode/comments/zpihwi/2022_day_19_solutions/) for that.
+
+**Lesson:** depth-first search with a heuristic bound can drastically
+reduce the search space.  It can also be decoupled quite neatly in a
+lazy language.
