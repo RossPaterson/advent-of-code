@@ -87,9 +87,9 @@ value time_limit s = get Geode (materials s) + time_left*get Geode (robots s)
   where
     time_left = time_limit - clock s
 
--- Number of geodes produced up to the tile limit if we build a geode
+-- Number of geodes produced up to the time limit if we build a geode
 -- every tick from the clock until then.  This is a bound on the number
--- of geodes that can be produced up to the tile limit.
+-- of geodes that can be produced up to the time limit.
 value_bound :: Int -> State -> Int
 value_bound time_limit s =
     value time_limit s + time_left*(time_left-1) `div` 2
