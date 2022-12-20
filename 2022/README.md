@@ -162,3 +162,10 @@ and I needed a hint from the [Reddit thread](https://www.reddit.com/r/adventofco
 **Lesson:** depth-first search with a heuristic bound can drastically
 reduce the search space.  It can also be decoupled quite neatly in a
 lazy language.
+
+## [Day 20: Grove Positioning System](https://adventofcode.com/2022/day/20)
+
+This one looks like it will need a sophisticated data structure.
+Perhaps the second part will ask us to do the process a billion times,
+or to invert it?  But no, it turns out that simple list manipulation is
+fast enough for both parts, once we get the modular arithmetic right.
