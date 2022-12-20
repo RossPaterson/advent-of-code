@@ -28,34 +28,6 @@ parse = Map.fromList . map (runParser named_valve) . lines
 
 -- Part One
 
--- Rose trees
-
-data Tree a = Node a (Forest a)
-    deriving (Show)
-type Forest a = [Tree a]
-
-instance Functor Tree where
-    fmap f (Node x ts) = Node (f x) (map (fmap f) ts)
-
-showTree :: (Show a) => Tree a -> String
-showTree t = showsTree 0 t ""
-  where
-    showsTree n (Node x ts) =
-        showString (replicate (2*n) ' ') . shows x . showChar '\n' .
-        flip (foldr id) (map (showsTree (n+1)) ts)
-
-iterateTree :: (a -> [a]) -> a -> Tree a
-iterateTree f x = Node x (map (iterateTree f) (f x))
-
--- downwards accumulation
-accumTree :: (b -> a -> b) -> b -> Tree a -> Tree b
-accumTree f s (Node x ts) = Node s' (map (accumTree f s') ts)
-  where
-    s' = f s x
-
-maxTree :: (Ord a) => Tree a -> a
-maxTree (Node x ts) = maximum (x:map maxTree ts)
-
 -- Special valves
 
 start :: ValveName
@@ -109,7 +81,7 @@ valve_flow vs s = time_left s * flow_rate (vs ! location s)
 
 max_flow :: Valves -> WeightedGraph ValveName -> Int -> [ValveName] -> Int
 max_flow vs g time ns =
-    maxTree $ accumTree (+) 0 $ fmap (valve_flow vs) $
+    maximum $ scanTree (+) 0 $ fmap (valve_flow vs) $
         iterateTree (explore g) s0
   where
     s0 = State { location = start, time_left = time, valves_left = ns }

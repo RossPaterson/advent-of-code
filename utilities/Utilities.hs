@@ -27,6 +27,14 @@ module Utilities (
     choose,
     chooseBetween,
     bsearch,
+    -- * Rose trees
+    -- | Functions for use with "Data.Tree"
+    iterateTree,
+    scanTree,
+    takeTree,
+    takeWhileTree,
+    maximumDF,
+    
     -- * Testing
     failures,
     ) where
@@ -37,6 +45,7 @@ import Data.List
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
+import Data.Tree
 
 -- | All the values of a bounded enumerated type
 allValues :: (Bounded a, Enum a) => [a]
@@ -192,6 +201,40 @@ searchIntegerRange p l h
   | p m = searchIntegerRange p l (m-1)
   | otherwise = searchIntegerRange p (m+1) h
   where m = (l+h) `div` 2
+
+-- Utilities on rose trees
+
+-- | Build a tree.
+iterateTree :: (a -> [a]) -> a -> Tree a
+iterateTree f x = Node x (map (iterateTree f) (f x))
+
+-- | Downwards accumulation with the specified binary operation.
+scanTree :: (s -> a -> s) -> s -> Tree a -> Tree s
+scanTree f s (Node x ts) = Node s' (map (scanTree f s') ts)
+  where
+    s' = f s x
+
+-- | Prune a tree at depth @n@. The root is always included.
+takeTree :: Int -> Tree a -> Tree a
+takeTree n (Node x ts)
+  | n == 0 = Node x []
+  | otherwise = Node x (map (takeTree (n-1)) ts)
+
+-- | The subtree including the root and all paths along while @p@ is 'True'.
+takeWhileTree :: (a -> Bool) -> Tree a -> Tree a
+takeWhileTree p (Node x ts) =
+    Node x [takeWhileTree p t | t <- ts, p (rootLabel t)]
+
+-- | Faster version of @'maximum' . 'fmap' score@ using a depth-first
+-- traversal, provided @bound ('rootLabel' t) >= score x@ for any @x@ in @t@.
+maximumDF :: (Ord v) => (a -> v) -> (a -> v) -> Tree a -> v
+maximumDF score bound (Node root subts) = maximumForestDF (score root) subts
+  where
+    maximumForestDF = foldl maximumTreeDF
+
+    maximumTreeDF best (Node x ts)
+      | bound x <= best = best
+      | otherwise = maximumForestDF (max best (score x)) ts
 
 -- | Run a function on a number of test inputs with expected outputs
 -- and report any mismatches.

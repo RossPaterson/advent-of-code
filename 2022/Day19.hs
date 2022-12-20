@@ -36,29 +36,6 @@ type Collection = Map Material Int
 get :: Material -> Collection -> Int
 get m = Map.findWithDefault 0 m
 
--- Rose tree functions
-
-iterateTree :: (a -> [a]) -> a -> Tree a
-iterateTree f x = Node x (map (iterateTree f) (f x))
-
--- delete subtrees for which p is true of the root
-pruneTree :: (a -> Bool) -> Tree a -> Tree a
-pruneTree p (Node x ts) = Node x (pruneForest p ts)
-
-pruneForest :: (a -> Bool) -> Forest a -> Forest a
-pruneForest p ts = [pruneTree p t | t <- ts, p (rootLabel t)]
-
--- faster version of maximum . map score,
--- assuming that bound x >= score y for any y in x, ts
-maximumDF :: (Ord v) => (a -> v) -> (a -> v) -> Tree a -> v
-maximumDF score bound (Node root subts) = maximumForestDF (score root) subts
-  where
-    maximumForestDF = foldl maximumTreeDF
-    
-    maximumTreeDF best (Node x ts)
-      | bound x <= best = best
-      | otherwise = maximumForestDF (max best (score x)) ts
-
 -- States of the system
 
 data State = State {
@@ -122,7 +99,7 @@ value_bound time_limit s =
 mostGeodes :: Int -> Blueprint -> Int
 mostGeodes time_limit =
     maximumDF (value time_limit) (value_bound time_limit) .
-        pruneTree (\ s -> clock s <= time_limit) . buildTree
+        takeWhileTree (\ s -> clock s <= time_limit) . buildTree
 
 solve1 :: Input -> Int
 solve1 input = sum [n*mostGeodes 24 bp | (n, bp) <- input]
