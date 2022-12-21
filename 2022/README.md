@@ -169,3 +169,12 @@ This one looks like it will need a sophisticated data structure.
 Perhaps the second part will ask us to do the process a billion times,
 or to invert it?  But no, it turns out that simple list manipulation is
 fast enough for both parts, once we get the modular arithmetic right.
+
+## [Day 21: Monkey Math](https://adventofcode.com/2022/day/21)
+
+This was another moderate problem, requiring a fair amount of
+straightforward code.  The first part is routine expression evaluation.
+The second part requires solving an equation.  The general case would be
+infeasible, so the input must have some special form.  Part of the work
+is a standard exercise in recursive traversal, after which one can see
+that the input is indeed of a form that can be solved easily.
