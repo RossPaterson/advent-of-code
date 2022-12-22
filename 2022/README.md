@@ -178,3 +178,14 @@ The second part requires solving an equation.  The general case would be
 infeasible, so the input must have some special form.  Part of the work
 is a standard exercise in recursive traversal, after which one can see
 that the input is indeed of a form that can be solved easily.
+
+## [Day 22: Monkey Map](https://adventofcode.com/2022/day/22)
+
+This was the most difficult so far.  The first part is finicky but
+conceptually easy, and sets the scene.  The cube folding in the second
+part is very tough, especially those like me who find spatial reasoning
+difficult, even with scissors and paper.  In addition, the the sample
+input and real input had different shapes.  I went for a (very ugly)
+general solution, but most people in the
+[Reddit thread](https://www.reddit.com/r/adventofcode/comments/zsct8w/2022_day_22_solutions/)
+hardcoded the cube.
