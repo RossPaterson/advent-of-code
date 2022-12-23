@@ -1,13 +1,13 @@
 # Notes on each day's solutions
 
+![Completion times 2022](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2022.png)
+
+(image by [Jo Wood](https://github.com/jwoLondon))
+
 This year had several quite difficult problems, but thankfully mixed in
 with easier ones.
 
 I have added difficulty ratings based on how long I took to solve each puzzle.
-
-![Completion times 2022](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2022.png)
-
-(image by [Jo Wood](https://github.com/jwoLondon))
 
 ## [Day 1: Calorie Counting](https://adventofcode.com/2022/day/1) \*
 
