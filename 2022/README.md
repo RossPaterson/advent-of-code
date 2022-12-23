@@ -7,6 +7,15 @@
 This year had several quite difficult problems, but thankfully mixed in
 with easier ones.
 
+Some recurring themes:
+tree structures (days 7 and 21),
+simple searches (days 12 and 18),
+search optimization problems (days 16 and 19),
+spatial reasoning (days 15 and 22).
+Some problems were easier versions of puzzles from previous years
+(days 12, 14 and 20).
+The most novel were days 8, 9, 16, 17 and 22.
+
 I have added difficulty ratings based on how long I took to solve each puzzle.
 
 ## [Day 1: Calorie Counting](https://adventofcode.com/2022/day/1) \*
@@ -170,7 +179,8 @@ lazy language.
 
 ## [Day 20: Grove Positioning System](https://adventofcode.com/2022/day/20) \*\*
 
-This one looks like it will need a sophisticated data structure.
+This one looks like it will need a sophisticated data structure, like
+[2020 day 23: Crab Cups](https://adventofcode.com/2020/day/23).
 Perhaps the second part will ask us to do the process a billion times,
 or to invert it?  But no, it turns out that simple list manipulation is
 fast enough for both parts, once we get the modular arithmetic right.
