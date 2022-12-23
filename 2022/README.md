@@ -189,3 +189,10 @@ input and real input had different shapes.  I went for a (very ugly)
 general solution, but most people in the
 [Reddit thread](https://www.reddit.com/r/adventofcode/comments/zsct8w/2022_day_22_solutions/)
 hardcoded the cube.
+
+## [Day 23: Unstable Diffusion](https://adventofcode.com/2022/day/23)
+
+Another welcome respite, this problem is neatly expressed using bulk
+operations on sets and maps.  The main issue with the first part was
+reading all the instructions.  The second part is a trivial extension
+if the first part was properly factored.
