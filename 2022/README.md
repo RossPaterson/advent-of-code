@@ -211,3 +211,10 @@ Another welcome respite, this problem is neatly expressed using bulk
 operations on sets and maps.  The main issue with the first part was
 reading all the instructions.  The second part is a trivial extension
 if the first part was properly factored.
+
+## [Day 24: Blizzard Basin](https://adventofcode.com/2022/day/24) \*\*
+
+Once one gets the basic insight necessary for efficient implementation,
+this was an exercise in bulk operations on containers, though with lots
+of opportunities for off-by-one errors.  The second part requires a
+little refactoring of the first.
