@@ -2,6 +2,7 @@ module Main where
 
 import Utilities
 import Data.Char
+import Data.Tuple
 
 -- Input processing
 
@@ -107,6 +108,7 @@ main :: IO ()
 main = do
     s <- readFile "input/25.txt"
     let input = parse s
+    putStr (unlines (failures "fromNumber" (fromNumber . readNumber) (map swap sample)))
     putStr (unlines (failures "toNumber" (showNumber . toNumber) sample))
     putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     putStr (solve1 input)
