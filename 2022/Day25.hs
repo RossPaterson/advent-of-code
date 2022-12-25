@@ -1,0 +1,112 @@
+module Main where
+
+import Utilities
+import Data.Char
+
+-- Input processing
+
+type Input = [Number]
+type Number = [Digit]
+type Digit = Int
+
+parse :: String -> Input
+parse = map readNumber . lines
+
+readNumber :: String -> Number
+readNumber = map readDigit
+
+readDigit :: Char -> Int
+readDigit c
+  | c == '=' = -2
+  | c == '-' = -1
+  | '0' <= c && c <= '2' = ord c - ord '0'
+  | otherwise = error "bad digit"
+
+-- Part One
+
+showNumber :: Number -> String
+showNumber = map showDigit
+
+showDigit :: Int -> Char
+showDigit n
+  | n == -2 = '='
+  | n == -1 = '-'
+  | 0 <= n && n <= 2 = chr (ord '0' + n)
+  | otherwise = error "bad number"
+
+fromNumber :: Number -> Int
+fromNumber = foldl addDigit 0
+  where
+    addDigit n d = n*5 + d
+
+toNumber :: Int -> Number
+toNumber n
+  | q == 0 = [n]
+  | otherwise = toNumber q ++ [r]
+  where
+    -- q*5 + r = n
+    q = (n+2) `div` 5
+    r = (n+2) `mod` 5 - 2
+
+solve1 :: Input -> String
+solve1 = showNumber . toNumber . sum . map fromNumber
+
+sample :: [(Int, String)]
+sample = [
+    (1, "1"),
+    (2, "2"),
+    (3, "1="),
+    (4, "1-"),
+    (5, "10"),
+    (6, "11"),
+    (7, "12"),
+    (8, "2="),
+    (9, "2-"),
+    (10, "20"),
+    (15, "1=0"),
+    (20, "1-0"),
+    (2022, "1=11-2"),
+    (12345, "1-0---0"),
+    (314159265, "1121-1110-1=0"),
+    (1747, "1=-0-2"),
+    (906, "12111"),
+    (198, "2=0="),
+    (11, "21"),
+    (201, "2=01"),
+    (31, "111"),
+    (1257, "20012"),
+    (32, "112"),
+    (353, "1=-1="),
+    (107, "1-12"),
+    (7, "12"),
+    (3, "1="),
+    (37, "122")]
+
+testInput :: String
+testInput = "\
+    \1=-0-2\n\
+    \12111\n\
+    \2=0=\n\
+    \21\n\
+    \2=01\n\
+    \111\n\
+    \20012\n\
+    \112\n\
+    \1=-1=\n\
+    \1-12\n\
+    \12\n\
+    \1=\n\
+    \122\n"
+
+tests1 :: [(String, String)]
+tests1 = [(testInput, "2=-1=0")]
+
+-- there is no Part Two on Day 25
+
+main :: IO ()
+main = do
+    s <- readFile "input/25.txt"
+    let input = parse s
+    putStr (unlines (failures "toNumber" (showNumber . toNumber) sample))
+    putStr (unlines (failures "solve1" (solve1 . parse) tests1))
+    putStr (solve1 input)

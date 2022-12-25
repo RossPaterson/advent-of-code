@@ -218,3 +218,7 @@ Once one gets the basic insight necessary for efficient implementation,
 this was an exercise in bulk operations on containers, though with lots
 of opportunities for off-by-one errors.  The second part requires a
 little refactoring of the first.
+
+## [Day 25: Full of Hot Air](https://adventofcode.com/2022/day/25) \*
+
+This was a simple problem of an unconventional digit system.
