@@ -198,10 +198,10 @@ that the input is indeed of a form that can be solved easily.
 
 This was the most difficult so far.  The first part is finicky but
 conceptually easy, and sets the scene.  The cube folding in the second
-part is very tough, especially those like me who find spatial reasoning
-difficult, even with scissors and paper.  In addition, the the sample
-input and real input had different shapes.  I went for a (very ugly)
-general solution, but most people in the
+part is very tough, especially for those like me who find spatial
+reasoning difficult, even with scissors and paper.  In addition, the
+the sample input and real input had different shapes.  I went for a
+(very ugly) general solution, but most people in the
 [Reddit thread](https://www.reddit.com/r/adventofcode/comments/zsct8w/2022_day_22_solutions/)
 hardcoded the cube.
 
@@ -221,4 +221,5 @@ little refactoring of the first.
 
 ## [Day 25: Full of Hot Air](https://adventofcode.com/2022/day/25) \*
 
-This was a simple problem of an unconventional digit system.
+This was a simple problem introducing a balanced form
+[signed-digit representation](https://en.wikipedia.org/wiki/Signed-digit_representation).
