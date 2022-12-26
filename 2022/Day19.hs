@@ -52,13 +52,19 @@ initState = State {
     robots = Map.singleton Ore 1
     }
 
-builds :: Blueprint -> State -> [State]
-builds bp s =
+-- maximum of any material that can be consumed in an iteration
+use_limits :: Blueprint -> Collection
+use_limits bp =
+    Map.fromListWith max $
+        (Geode, maxBound):[(q, m) | mqs <- Map.elems bp, (m, q) <- mqs]
+
+builds :: Blueprint -> Collection -> State -> [State]
+builds bp limits s =
     [build bp s m |
-        m <- allValues,
+        (m, n) <- Map.assocs limits,
         m == Ore || get (pred m) (robots s) > 0,
-        -- We don't need more than 4 ore per turn for any of the blueprints
-        m /= Ore || get m (robots s) < 4]
+        -- We don't need more of anything than can be consumed in a cycle.
+        get m (robots s) < n]
 
 build :: Blueprint -> State -> Material -> State
 build bp s r = State {
@@ -79,7 +85,7 @@ spend :: (Int, Material) -> Collection -> Collection
 spend (q, m) = Map.adjust (subtract q) m
 
 buildTree :: Blueprint -> Tree State
-buildTree bp = iterateTree (builds bp) initState
+buildTree bp = iterateTree (builds bp (use_limits bp)) initState
 
 -- number of geodes produced up to time n if no further robots made
 value :: Int -> State -> Int
