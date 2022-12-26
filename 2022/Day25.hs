@@ -6,15 +6,19 @@ import Data.Tuple
 
 -- Input processing
 
-type Input = [Number]
-type Number = [Digit]
-type Digit = Int
+type Input = [Int]
+
+base :: Int
+base = 5
 
 parse :: String -> Input
 parse = map readNumber . lines
 
-readNumber :: String -> Number
-readNumber = map readDigit
+-- Base 5, with digits '=' (-1), '-' (-1), '0'..'2'
+readNumber :: String -> Int
+readNumber = foldl addDigit 0
+  where
+    addDigit n d = n*base + readDigit d
 
 readDigit :: Char -> Int
 readDigit c
@@ -25,8 +29,14 @@ readDigit c
 
 -- Part One
 
-showNumber :: Number -> String
-showNumber = map showDigit
+showNumber :: Int -> String
+showNumber n
+  | q == 0 = [showDigit n]
+  | otherwise = showNumber q ++ [showDigit r]
+  where
+    -- q*base + r = n
+    q = (n+2) `div` base
+    r = (n+2) `mod` base - 2
 
 showDigit :: Int -> Char
 showDigit n
@@ -35,22 +45,8 @@ showDigit n
   | 0 <= n && n <= 2 = chr (ord '0' + n)
   | otherwise = error "bad number"
 
-fromNumber :: Number -> Int
-fromNumber = foldl addDigit 0
-  where
-    addDigit n d = n*5 + d
-
-toNumber :: Int -> Number
-toNumber n
-  | q == 0 = [n]
-  | otherwise = toNumber q ++ [r]
-  where
-    -- q*5 + r = n
-    q = (n+2) `div` 5
-    r = (n+2) `mod` 5 - 2
-
 solve1 :: Input -> String
-solve1 = showNumber . toNumber . sum . map fromNumber
+solve1 = showNumber . sum
 
 sample :: [(Int, String)]
 sample = [
@@ -108,7 +104,7 @@ main :: IO ()
 main = do
     s <- readFile "input/25.txt"
     let input = parse s
-    putStr (unlines (failures "fromNumber" (fromNumber . readNumber) (map swap sample)))
-    putStr (unlines (failures "toNumber" (showNumber . toNumber) sample))
+    putStr (unlines (failures "readNumber" readNumber (map swap sample)))
+    putStr (unlines (failures "showNumber" showNumber sample))
     putStr (unlines (failures "solve1" (solve1 . parse) tests1))
     putStr (solve1 input)
