@@ -83,67 +83,28 @@ tests1 = [(testInput, 26)]
 
 -- Part Two
 
-covered :: [Sensor] -> Position -> Bool
-covered sensors p = or [distance s p <= distance s b | Sensor s b <- sensors]
+-- a region is a rhombus
+type Region = AABox Diagonal
 
--- rhombus delimited by top and bottom corners,
--- closed at the top and open at the bottom
-data Region = Region Diagonal Diagonal
-    deriving (Show)
-
--- region including the two points
-region :: Position -> Position -> Region
-region top bottom =
-    Region (positionToDiagonal top)
-        (positionToDiagonal (bottom .+. Position 0 1))
-
--- Is the region empty?
-nullRegion :: Region -> Bool
-nullRegion (Region (Diagonal ta tb) (Diagonal ba bb)) = ta >= ba || tb >= bb
+-- the region with the given centre and Manhattan radius
+kite :: Position -> Int -> Region
+kite c r =
+    AABox (positionToDiagonal (c .-. offset))
+         (positionToDiagonal (c .+. offset))
+  where
+    offset = Position 0 r
 
 -- All the positions inside a region
 contents :: Region -> [Position]
-contents (Region (Diagonal ta tb) (Diagonal ba bb)) =
-    [p | a <- [ta..ba-1], b <- [tb..bb-1],
-        At p <- [diagonalPosition (Diagonal a b)]]
+contents r = [p | d <- boxElements r, At p <- [diagonalPosition d]]
 
 -- The region centred on a sensor and extending out to its closest beacon
 sensorRegion :: Sensor -> Region
-sensorRegion (Sensor s b) = region (s .-. offset) (s .+. offset)
-  where
-    offset = Position 0 (distance s b)
-
--- Subtracting one region from another produces up to four new regions:
---
---       /\
---      /  \
---     /\   \
---    /  \   \
---   /   /\   \
---  /\  /XX\   \
--- /  \/XXX/\  /
--- \   \XX/  \/
---  \   \/   /
---   \   \  /
---    \   \/
---     \  /
---      \/
---
-differenceRegion :: Region -> Region -> [Region]
-differenceRegion (Region (Diagonal t1r t1l) (Diagonal b1r b1l))
-        (Region (Diagonal t2r t2l) (Diagonal b2r b2l)) =
-    filter (not . nullRegion) [
-        Region (Diagonal t1r t1l) (Diagonal b1r (min t2l b1l)),
-        Region (Diagonal t1r (max b2l t1l)) (Diagonal b1r b1l),
-        Region (Diagonal t1r tl) (Diagonal (min t2r b1r) bl),
-        Region (Diagonal (max t1r b2r) tl) (Diagonal b1r bl)]
-  where
-    tl = max t1l t2l
-    bl = min b1l b2l
+sensorRegion (Sensor s b) = kite s (distance s b)
 
 -- is any of the region in the search area [0..n]x[0..n] ?
 candidate :: Int -> Region -> Bool
-candidate n (Region (Diagonal ta tb) (Diagonal ba bb)) =
+candidate n (AABox (Diagonal ta tb) (Diagonal ba bb)) =
     0 <= max_x && min_x <= n && 0 <= max_y && min_y <= n
   where
     min_x = (ta - bb) `div` 2     -- Diagonal ta bb
@@ -153,13 +114,13 @@ candidate n (Region (Diagonal ta tb) (Diagonal ba bb)) =
 
 -- region containing the search area
 boundingRegion :: Int -> Region
-boundingRegion n = region (Position x (-x)) (Position x (n+x))
+boundingRegion n = kite (Position x x) n
   where
     x = n `div` 2
 
 search :: Int -> Region -> [Region] -> [Region]
 search n sr rs =
-    [piece | r <- rs, piece <- differenceRegion r sr, candidate n piece]
+    [piece | r <- rs, piece <- diffBox r sr, candidate n piece]
 
 solutions :: Int -> Input -> [Position]
 solutions n sensors =
