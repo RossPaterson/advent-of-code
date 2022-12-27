@@ -13,7 +13,7 @@ simple searches (days 12 and 18),
 search optimization problems (days 16 and 19),
 spatial reasoning (days 15 and 22).
 Some problems were easier versions of puzzles from previous years
-(days 12, 14 and 20).
+(days 12, 13, 14 and 20).
 The most novel were days 8, 9, 16, 17 and 22.
 
 I have added difficulty ratings based on how long I took to solve each puzzle.
@@ -113,9 +113,11 @@ first part is fast enough, but a simple variation is faster and neater.
 
 ## [Day 13: Distress Signal](https://adventofcode.com/2022/day/13) \*
 
-After the parsing, the main work here is coding the comparison function
-from the description.  Fortunately the function described is conventional.
-The rest is simple list processing.
+This problem has the same input format as
+[2021 day 18: Snailfish](https://adventofcode.com/2021/day/18), but the
+processing is simpler.  After the parsing, the main work here is coding
+the comparison function from the description.  Fortunately the function
+described is conventional.  The rest is simple list processing.
 
 ## [Day 14: Regolith Reservoir](https://adventofcode.com/2022/day/14) \*\*
 
