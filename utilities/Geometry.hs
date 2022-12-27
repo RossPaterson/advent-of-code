@@ -2,7 +2,7 @@
 module Geometry (
     -- * Classes
     Module(..),
-    NormedModule(..), distance,
+    NormedModule(..), distance, composeVector,
     InnerProduct(..),
     Planar(..), unitVector,
     -- * Particular spaces
@@ -20,6 +20,18 @@ module Geometry (
     positionToDiagonal,
     DiagonalPosition(..),
     diagonalPosition,
+    -- * Axis-aligned boxes
+    AABox(..),
+    -- ** Construction
+    singletonBox,
+    boundingBox,
+    -- ** Queries
+    nullBox, boxSize, boxElements, inBox,
+    showBox,
+    -- ** Operations
+    intersectBox,
+    diffBox,
+    growBox,
     )
     where
 
@@ -50,9 +62,19 @@ class Module v => NormedModule v where
     -- | All the vectors with 'norm' of @1@.
     unitVectors :: [v]
 
+    -- | A maximal selection of linearly independent unit vectors.
+    basisVectors :: [v]
+
+    -- | Decompose a vector into coefficients of the basis vectors.
+    vectorComponents :: v -> [Int]
+
 -- | A metric, defined as the 'norm' of the difference between the values.
 distance :: NormedModule v => v -> v -> Int
 distance v1 v2 = norm (v1 .-. v2)
+
+-- | Compose a vector from its components.
+composeVector :: NormedModule v => [Int] -> v
+composeVector xs = foldr1 (.+.) (zipWith (*.) xs basisVectors)
 
 -- | Module over the integers with an inner product
 class Module v => InnerProduct v where
@@ -109,6 +131,10 @@ instance NormedModule Position where
     unitVectors =
         [Position 1 0, Position 0 (-1), Position (-1) 0, Position 0 1]
 
+    basisVectors = [Position 1 0, Position 0 1]
+
+    vectorComponents (Position x y) = [x, y]
+
 instance InnerProduct Position where
     dot (Position x1 y1) (Position x2 y2) = x1*x2 + y1*y2
 
@@ -143,13 +169,7 @@ showGrid :: Char -> Map Position Char -> String
 showGrid def m
   | Map.null m = ""
   | otherwise =
-    unlines [[Map.findWithDefault def (Position x y) m |
-        x <- [minX..maxX]] | y <- [minY..maxY]]
-  where
-    minX = minimum [x | Position x _ <- Map.keys m]
-    maxX = maximum [x | Position x _ <- Map.keys m]
-    minY = minimum [y | Position _ y <- Map.keys m]
-    maxY = maximum [y | Position _ y <- Map.keys m]
+    showBox (boundingBox (Map.keys m)) (flip (Map.findWithDefault def) m)
 
 -- | Cartesian coordinate in 2-dimensional space
 data Point2 = Point2 !Int !Int
@@ -167,6 +187,10 @@ instance NormedModule Point2 where
 
     unitVectors =
         [Point2 1 0, Point2 0 1, Point2 (-1) 0, Point2 0 (-1)]
+
+    basisVectors = [Point2 1 0, Point2 0 1]
+
+    vectorComponents (Point2 x y) = [x, y]
 
 instance InnerProduct Point2 where
     dot (Point2 x1 y1) (Point2 x2 y2) = x1*x2 + y1*y2
@@ -206,6 +230,10 @@ instance NormedModule Point3 where
         [Point3 1 0 0, Point3 (-1) 0 0, Point3 0 1 0, Point3 0 (-1) 0,
          Point3 0 0 1, Point3 0 0 (-1)]
 
+    basisVectors = [Point3 1 0 0, Point3 0 1 0, Point3 0 0 1]
+
+    vectorComponents (Point3 x y z) = [x, y, z]
+
 instance InnerProduct Point3 where
     dot (Point3 x1 y1 z1) (Point3 x2 y2 z2) = x1*x2 + y1*y2 + z1*z2
 
@@ -234,6 +262,11 @@ instance NormedModule Point4 where
         [Point4 1 0 0 0, Point4 (-1) 0 0 0, Point4 0 1 0 0, Point4 0 (-1) 0 0,
          Point4 0 0 1 0, Point4 0 0 (-1) 0, Point4 0 0 0 1, Point4 0 0 0 (-1)]
 
+    basisVectors =
+        [Point4 1 0 0 0, Point4 0 1 0 0, Point4 0 0 1 0, Point4 0 0 0 1]
+
+    vectorComponents (Point4 x y z t) = [x, y, z, t]
+
 instance InnerProduct Point4 where
     dot (Point4 x1 y1 z1 t1) (Point4 x2 y2 z2 t2) =
         x1*x2 + y1*y2 + z1*z2 + t1*t2
@@ -261,6 +294,10 @@ instance NormedModule HexCoord where
     unitVectors =
         [HexCoord 1 0, HexCoord 0 1, HexCoord (-1) 1,
          HexCoord (-1) 0, HexCoord 0 (-1), HexCoord 1 (-1)]
+
+    basisVectors = [HexCoord 1 0, HexCoord 0 1]
+
+    vectorComponents (HexCoord x y) = [x, y]
 
 -- | six sectors of 60 degrees each
 instance Planar HexCoord where
@@ -298,6 +335,10 @@ instance NormedModule Diagonal where
     unitVectors =
         [Diagonal 1 0, Diagonal 0 (-1), Diagonal (-1) 0, Diagonal 0 1]
 
+    basisVectors = [Diagonal 1 0, Diagonal 0 1]
+
+    vectorComponents (Diagonal x y) = [x, y]
+
 -- | Embedding of 'Position' as the even points of 'Diagonal'.
 -- This preserves the 'Module' operations but not the 'NormedModule' ones.
 positionToDiagonal :: Position -> Diagonal
@@ -314,3 +355,101 @@ diagonalPosition :: Diagonal -> DiagonalPosition
 diagonalPosition (Diagonal r l)
   | even (r+l) = At (Position ((r-l) `div` 2) ((r+l) `div` 2))
   | otherwise = DownRight (Position ((r-1-l) `div` 2) ((r-1+l) `div` 2))
+
+-- Axis-aligned boxes
+
+-- | Axis-aligned bounding box
+data AABox a = AABox a a
+    deriving (Eq, Ord, Show)
+
+lub :: NormedModule a => a -> a -> a
+lub a b = composeVector (zipWith max (vectorComponents a) (vectorComponents b))
+
+glb :: NormedModule a => a -> a -> a
+glb a b = composeVector (zipWith min (vectorComponents a) (vectorComponents b))
+
+leq :: NormedModule a => a -> a -> Bool
+leq a b = and (zipWith (<=) (vectorComponents a) (vectorComponents b))
+
+-- | smallest axis-aligned bounding box containing both boxes
+instance (NormedModule a) => Semigroup (AABox a) where
+    AABox lo1 hi1 <> AABox lo2 hi2 = AABox (glb lo1 lo2) (lub hi1 hi2)
+
+-- | An axis-aligned bounding box containing a single point
+singletonBox :: a -> AABox a
+singletonBox p = AABox p p
+
+-- | Minimal axis-aligned box containing a non-empty list of points
+boundingBox :: (NormedModule a) => [a] -> AABox a
+boundingBox = foldr1 (<>) . map singletonBox
+
+-- | Is the box empty?
+nullBox :: (NormedModule a) => AABox a -> Bool
+nullBox (AABox lo hi) = not (lo `leq` hi)
+
+-- | The number of elements of the box
+boxSize :: (NormedModule a) => AABox a -> Int
+boxSize (AABox lo hi) =
+    product $ zipWith range_size (vectorComponents lo) (vectorComponents hi)
+  where
+    range_size l h = h - l + 1
+
+-- | The elements of the box
+boxElements :: (NormedModule a) => AABox a -> [a]
+boxElements (AABox lo hi) =
+    map composeVector $ sequence $
+        zipWith range (vectorComponents lo) (vectorComponents hi)
+  where
+    range l h = [l..h]
+
+-- | Is the element inside the box?
+inBox :: (NormedModule a) => a -> AABox a -> Bool
+inBox p (AABox lo hi) =
+    and $ zipWith3 in_range
+        (vectorComponents lo) (vectorComponents p) (vectorComponents hi)
+  where
+    in_range l v h = l <= v && v <= h
+
+-- | String representation of all the positions in the box
+showBox :: AABox Position -> (Position -> Char) -> String
+showBox (AABox (Position x_min y_min) (Position x_max y_max)) showPos =
+    unlines [[showPos (Position x y) | x <- [x_min..x_max]] |
+        y <- [y_min..y_max]]
+
+-- | The intersection of two axis-aligned bounding boxes, if they overlap
+intersectBox :: (NormedModule a) => AABox a -> AABox a -> Maybe (AABox a)
+intersectBox (AABox lo1 hi1) (AABox lo2 hi2)
+  | lo `leq` hi = Just (AABox lo hi)
+  | otherwise = Nothing
+  where
+    lo = lub lo1 lo2
+    hi = glb hi1 hi2
+
+-- | Subtraction of boxes, producing zero or more boxes.
+-- For an /n/-dimensional space, this may produce up to 2/n/ boxes.
+diffBox :: NormedModule a => AABox a -> AABox a -> [AABox a]
+diffBox (AABox lo1 hi1) (AABox lo2 hi2) =
+    [AABox (composeVector los) (composeVector his) |
+        (los, his) <- diffRanges
+            (vectorComponents lo1) (vectorComponents hi1)
+            (vectorComponents lo2) (vectorComponents hi2)]
+
+diffRanges :: [Int] -> [Int] -> [Int] -> [Int] -> [([Int], [Int])]
+diffRanges (lo1:lo1s) (hi1:hi1s) (lo2:lo2s) (hi2:hi2s) =
+    [(lo1:lo1s, bottom_hi:hi1s) | lo1 <= bottom_hi] ++
+    [(common_lo:los, common_hi:his) |
+        common_lo <= common_hi,
+        (los, his) <- diffRanges lo1s hi1s lo2s hi2s] ++
+    [(top_lo:lo1s, hi1:hi1s) | top_lo <= hi1]
+  where
+    bottom_hi = min hi1 (lo2-1)
+    common_lo = max lo1 lo2
+    common_hi = min hi1 hi2
+    top_lo = max lo1 (hi2+1)
+diffRanges _ _ _ _ = []
+
+-- | Make the box @n@ positions bigger in each direction.
+growBox :: NormedModule a => Int -> AABox a -> AABox a
+growBox n (AABox lo hi) = AABox (lo .-. delta) (hi .+. delta)
+  where
+    delta = n*. foldr1 (.+.) basisVectors
