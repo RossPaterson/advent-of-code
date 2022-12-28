@@ -35,6 +35,7 @@ module Geometry (
     )
     where
 
+import Data.Foldable (toList)
 import Data.Map (Map)
 import qualified Data.Map as Map
 
@@ -379,9 +380,9 @@ instance (NormedModule a) => Semigroup (AABox a) where
 singletonBox :: a -> AABox a
 singletonBox p = AABox p p
 
--- | Minimal axis-aligned box containing a non-empty list of points
-boundingBox :: (NormedModule a) => [a] -> AABox a
-boundingBox = foldr1 (<>) . map singletonBox
+-- | Minimal axis-aligned box containing a non-empty collection of points
+boundingBox :: (Foldable f, NormedModule a) => f a -> AABox a
+boundingBox = foldr1 (<>) . map singletonBox . toList
 
 -- | Is the box empty?
 nullBox :: (NormedModule a) => AABox a -> Bool
