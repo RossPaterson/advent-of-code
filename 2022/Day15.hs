@@ -91,7 +91,7 @@ kite :: Position -> Int -> Region
 kite c r = boundingBox [centre .-. offset, centre .+. offset]
   where
     centre = positionToDiagonal c
-    offset = positionToDiagonal (Position 0 r)
+    offset = positionToDiagonal (Position r 0)
 
 -- All the positions inside a region
 contents :: Region -> [Position]
@@ -105,12 +105,12 @@ sensorRegion (Sensor s b) = kite s (distance s b)
 candidate :: Int -> Region -> Bool
 candidate n region = 0 <= max_x && min_x <= n && 0 <= max_y && min_y <= n
   where
-    Diagonal ta tb = minCorner region
-    Diagonal ba bb = maxCorner region
-    min_x = (ta - bb) `div` 2     -- Diagonal ta bb
-    max_x = (ba - tb + 1) `div` 2 -- Diagonal ba tb
-    min_y = (ta + tb) `div` 2     -- Diagonal ta tb
-    max_y = (ba + bb + 1) `div` 2 -- Diagonal ba bb
+    Diagonal lu ld = minCorner region
+    Diagonal ru rd = maxCorner region
+    min_x = (lu + ld) `div` 2     -- Diagonal lu ld
+    max_x = (ru + rd + 1) `div` 2 -- Diagonal ru rd
+    min_y = (ld - ru) `div` 2     -- Diagonal ru ld
+    max_y = (rd - lu + 1) `div` 2 -- Diagonal lu rd
 
 -- region containing the search area
 boundingRegion :: Int -> Region

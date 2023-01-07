@@ -315,7 +315,7 @@ instance Planar HexCoord where
     HexCoord a b .*. HexCoord c d = HexCoord (a*c - b*d) (a*d + b*c + b*d)
 
 -- | Point in a diagonal grid.
--- The first component is down and right; the second is down and left.
+-- The first component is up and right; the second is down and right.
 data Diagonal = Diagonal !Int !Int
     deriving (Eq, Ord, Show)
 
@@ -341,7 +341,7 @@ instance InnerProduct Diagonal where
 -- | Embedding of 'Position' as the even points of 'Diagonal'.
 -- This preserves the additive and scaling operations but not 'norm'.
 positionToDiagonal :: Position -> Diagonal
-positionToDiagonal (Position x y) = Diagonal (x+y) (y-x)
+positionToDiagonal (Position x y) = Diagonal (x-y) (x+y)
 
 -- | Representation of a 'Position' near the point
 data DiagonalPosition
@@ -351,9 +351,9 @@ data DiagonalPosition
 
 -- | A 'Position' near the point
 diagonalPosition :: Diagonal -> DiagonalPosition
-diagonalPosition (Diagonal r l)
-  | even (r+l) = At (Position ((r-l) `div` 2) ((r+l) `div` 2))
-  | otherwise = DownRight (Position ((r-1-l) `div` 2) ((r-1+l) `div` 2))
+diagonalPosition (Diagonal u d)
+  | even (d+u) = At (Position ((d+u) `div` 2) ((d-u) `div` 2))
+  | otherwise = DownRight (Position ((d+u-1) `div` 2) ((d-u-1) `div` 2))
 
 -- Component-wise lattice on the space
 
