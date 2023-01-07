@@ -1,8 +1,7 @@
 -- | Simple linear algebra
 module Geometry (
     -- * Classes
-    Module(..),
-    NormedModule(..), distance, composeVector,
+    NormedSpace(..), distance, composeVector,
     InnerProduct(..),
     Planar(..), unitVector,
     -- * Particular spaces
@@ -21,12 +20,13 @@ module Geometry (
     DiagonalPosition(..),
     diagonalPosition,
     -- * Axis-aligned boxes
-    AABox(..),
+    AABox,
     -- ** Construction
     singletonBox,
     boundingBox,
     -- ** Queries
-    nullBox, boxSize, boxElements, inBox,
+    boxSize, boxElements, inBox,
+    minCorner, maxCorner,
     showBox,
     -- ** Operations
     intersectBox,
@@ -36,14 +36,15 @@ module Geometry (
     where
 
 import Data.Foldable (toList)
+import Data.List
 import Data.Map (Map)
 import qualified Data.Map as Map
 
 infixr 7  *., .*.
 infixl 6  .+., .-.
 
--- | Module over the integers
-class Module v where
+-- | A finite-dimensional module over the integers with a norm function
+class (Eq v, Ord v) => NormedSpace v where
     -- | The origin
     zero :: v
     -- | Addition, an associative operation with identity 'zero'
@@ -53,12 +54,10 @@ class Module v where
     -- | Scalar multiplication, distributing over 'zero' and addition
     (*.) :: Int -> v -> v
 
-    v1 .-. v2 = v1 .+. (-1) *. v2
-
--- | Module over the integers with a norm function
-class Module v => NormedModule v where
     -- | A nonnegative-valued function satisfying the triangle inequality
     norm :: v -> Int
+
+    v1 .-. v2 = v1 .+. (-1) *. v2
 
     -- | All the vectors with 'norm' of @1@.
     unitVectors :: [v]
@@ -70,15 +69,15 @@ class Module v => NormedModule v where
     vectorComponents :: v -> [Int]
 
 -- | A metric, defined as the 'norm' of the difference between the values.
-distance :: NormedModule v => v -> v -> Int
+distance :: NormedSpace v => v -> v -> Int
 distance v1 v2 = norm (v1 .-. v2)
 
 -- | Compose a vector from its components.
-composeVector :: NormedModule v => [Int] -> v
-composeVector xs = foldr1 (.+.) (zipWith (*.) xs basisVectors)
+composeVector :: NormedSpace v => [Int] -> v
+composeVector xs = foldr (.+.) zero (zipWith (*.) xs basisVectors)
 
--- | Module over the integers with an inner product
-class Module v => InnerProduct v where
+-- | A module over the integers with an inner product
+class (NormedSpace v) => InnerProduct v where
     -- | Inner product
     dot :: v -> v -> Int
 
@@ -86,7 +85,7 @@ class Module v => InnerProduct v where
 -- The 'unitVectors' are the unit vectors at the start of each sector,
 -- beginning with the unit vector to the right and proceeding in
 -- counterclockwise order.
-class NormedModule v => Planar v where
+class (NormedSpace v) => Planar v where
     -- | The sector of a point, counting from 0.
     sector :: v -> Int
 
@@ -109,7 +108,7 @@ class NormedModule v => Planar v where
     (.*.) :: v -> v -> v
 
 -- | Unit vector at the start of sector @n@.
-unitVector :: Planar v => Int -> v
+unitVector :: (Planar v) => Int -> v
 unitVector n = dirs!!(n `mod` length dirs)
   where
     dirs = unitVectors
@@ -119,14 +118,13 @@ unitVector n = dirs!!(n `mod` length dirs)
 data Position = Position !Int !Int
     deriving (Eq, Ord, Show)
 
-instance Module Position where
+-- | `norm` is the Manhattan norm
+instance NormedSpace Position where
     zero = Position 0 0
     Position x1 y1 .+. Position x2 y2 = Position (x1+x2) (y1+y2)
     Position x1 y1 .-. Position x2 y2 = Position (x1-x2) (y1-y2)
     r *. Position x y = Position (r*x) (r*y)
 
--- | `norm` is the Manhattan norm
-instance NormedModule Position where
     norm (Position x y) = abs x + abs y
 
     unitVectors =
@@ -176,14 +174,13 @@ showGrid def m
 data Point2 = Point2 !Int !Int
     deriving (Eq, Ord, Show)
 
-instance Module Point2 where
+-- | `norm` is the Manhattan norm
+instance NormedSpace Point2 where
     zero = Point2 0 0
     Point2 x1 y1 .+. Point2 x2 y2 = Point2 (x1+x2) (y1+y2)
     Point2 x1 y1 .-. Point2 x2 y2 = Point2 (x1-x2) (y1-y2)
     r *. Point2 x y = Point2 (r*x) (r*y)
 
--- | `norm` is the Manhattan norm
-instance NormedModule Point2 where
     norm (Point2 x y) = abs x + abs y
 
     unitVectors =
@@ -217,14 +214,13 @@ instance Planar Point2 where
 data Point3 = Point3 !Int !Int !Int
     deriving (Eq, Ord, Show)
 
-instance Module Point3 where
+-- | `norm` is the Manhattan norm
+instance NormedSpace Point3 where
     zero = Point3 0 0 0
     Point3 x1 y1 z1 .+. Point3 x2 y2 z2 = Point3 (x1+x2) (y1+y2) (z1+z2)
     Point3 x1 y1 z1 .-. Point3 x2 y2 z2 = Point3 (x1-x2) (y1-y2) (z1-z2)
     r *. Point3 x y z = Point3 (r*x) (r*y) (r*z)
 
--- | `norm` is the Manhattan norm
-instance NormedModule Point3 where
     norm (Point3 x y z) = abs x + abs y + abs z
 
     unitVectors =
@@ -247,7 +243,8 @@ cross (Point3 x1 y1 z1) (Point3 x2 y2 z2) =
 data Point4 = Point4 !Int !Int !Int !Int
     deriving (Eq, Ord, Show)
 
-instance Module Point4 where
+-- | `norm` is the Manhattan norm
+instance NormedSpace Point4 where
     zero = Point4 0 0 0 0
     Point4 x1 y1 z1 t1 .+. Point4 x2 y2 z2 t2 =
         Point4 (x1+x2) (y1+y2) (z1+z2) (t1+t2)
@@ -255,8 +252,6 @@ instance Module Point4 where
         Point4 (x1-x2) (y1-y2) (z1-z2) (t1-t2)
     r *. Point4 x y z t = Point4 (r*x) (r*y) (r*z) (r*t)
 
--- | `norm` is the Manhattan norm
-instance NormedModule Point4 where
     norm (Point4 x y z t) = abs x + abs y + abs z + abs t
 
     unitVectors =
@@ -283,13 +278,13 @@ instance InnerProduct Point4 where
 data HexCoord = HexCoord !Int !Int
     deriving (Eq, Ord, Show)
 
-instance Module HexCoord where
+-- | `norm` is distance in the trangular lattice
+instance NormedSpace HexCoord where
     zero = HexCoord 0 0
     HexCoord x1 y1 .+. HexCoord x2 y2 = HexCoord (x1+x2) (y1+y2)
     HexCoord x1 y1 .-. HexCoord x2 y2 = HexCoord (x1-x2) (y1-y2)
     r *. HexCoord x y = HexCoord (r*x) (r*y)
 
-instance NormedModule HexCoord where
     norm (HexCoord x y) = maximum [abs x, abs y, abs (x+y)]
 
     unitVectors =
@@ -324,13 +319,13 @@ instance Planar HexCoord where
 data Diagonal = Diagonal !Int !Int
     deriving (Eq, Ord, Show)
 
-instance Module Diagonal where
+-- | `norm` is distance in the lattice
+instance NormedSpace Diagonal where
     zero = Diagonal 0 0
     Diagonal a1 b1 .+. Diagonal a2 b2 = Diagonal (a1+a2) (b1+b2)
     Diagonal a1 b1 .-. Diagonal a2 b2 = Diagonal (a1-a2) (b1-b2)
     r *. Diagonal a b = Diagonal (r*a) (r*b)
 
-instance NormedModule Diagonal where
     norm (Diagonal a b) = abs a + abs b
 
     unitVectors =
@@ -340,8 +335,11 @@ instance NormedModule Diagonal where
 
     vectorComponents (Diagonal x y) = [x, y]
 
+instance InnerProduct Diagonal where
+    dot (Diagonal a1 b1) (Diagonal a2 b2) = a1*a2 + b1*b2
+
 -- | Embedding of 'Position' as the even points of 'Diagonal'.
--- This preserves the 'Module' operations but not the 'NormedModule' ones.
+-- This preserves the additive and scaling operations but not 'norm'.
 positionToDiagonal :: Position -> Diagonal
 positionToDiagonal (Position x y) = Diagonal (x+y) (y-x)
 
@@ -357,46 +355,50 @@ diagonalPosition (Diagonal r l)
   | even (r+l) = At (Position ((r-l) `div` 2) ((r+l) `div` 2))
   | otherwise = DownRight (Position ((r-1-l) `div` 2) ((r-1+l) `div` 2))
 
--- Axis-aligned boxes
+-- Component-wise lattice on the space
 
--- | Axis-aligned bounding box
-data AABox a = AABox a a
-    deriving (Eq, Ord, Show)
-
-lub :: NormedModule a => a -> a -> a
-lub a b = composeVector (zipWith max (vectorComponents a) (vectorComponents b))
-
-glb :: NormedModule a => a -> a -> a
-glb a b = composeVector (zipWith min (vectorComponents a) (vectorComponents b))
-
-leq :: NormedModule a => a -> a -> Bool
+leq :: (NormedSpace v) => v -> v -> Bool
 leq a b = and (zipWith (<=) (vectorComponents a) (vectorComponents b))
 
+lub :: (NormedSpace v) => v -> v -> v
+lub a b = composeVector (zipWith max (vectorComponents a) (vectorComponents b))
+
+glb :: (NormedSpace v) => v -> v -> v
+glb a b = composeVector (zipWith min (vectorComponents a) (vectorComponents b))
+
+-- Axis-aligned boxes
+
+-- | Non-empty axis-aligned box
+data AABox a = AABox !a !a -- invariant: @lo `leq` hi@
+    deriving (Eq, Ord, Show)
+
 -- | smallest axis-aligned bounding box containing both boxes
-instance (NormedModule a) => Semigroup (AABox a) where
+instance (NormedSpace a) => Semigroup (AABox a) where
     AABox lo1 hi1 <> AABox lo2 hi2 = AABox (glb lo1 lo2) (lub hi1 hi2)
 
 -- | An axis-aligned bounding box containing a single point
-singletonBox :: a -> AABox a
+singletonBox :: v -> AABox v
 singletonBox p = AABox p p
 
 -- | Minimal axis-aligned box containing a non-empty collection of points
-boundingBox :: (Foldable f, NormedModule a) => f a -> AABox a
-boundingBox = foldr1 (<>) . map singletonBox . toList
-
--- | Is the box empty?
-nullBox :: (NormedModule a) => AABox a -> Bool
-nullBox (AABox lo hi) = not (lo `leq` hi)
+boundingBox :: (Foldable f, NormedSpace v) => f v -> AABox v
+boundingBox ps
+  | null xss = error "boundingBox: empty collection"
+  | otherwise = AABox lo hi
+  where
+    xss = transpose (map vectorComponents (toList ps))
+    lo = composeVector (map minimum xss)
+    hi = composeVector (map maximum xss)
 
 -- | The number of elements of the box
-boxSize :: (NormedModule a) => AABox a -> Int
+boxSize :: (NormedSpace v) => AABox v -> Int
 boxSize (AABox lo hi) =
     product $ zipWith range_size (vectorComponents lo) (vectorComponents hi)
   where
     range_size l h = h - l + 1
 
 -- | The elements of the box
-boxElements :: (NormedModule a) => AABox a -> [a]
+boxElements :: (NormedSpace v) => AABox v -> [v]
 boxElements (AABox lo hi) =
     map composeVector $ sequence $
         zipWith range (vectorComponents lo) (vectorComponents hi)
@@ -404,12 +406,20 @@ boxElements (AABox lo hi) =
     range l h = [l..h]
 
 -- | Is the element inside the box?
-inBox :: (NormedModule a) => a -> AABox a -> Bool
+inBox :: (NormedSpace v) => v -> AABox v -> Bool
 inBox p (AABox lo hi) =
     and $ zipWith3 in_range
         (vectorComponents lo) (vectorComponents p) (vectorComponents hi)
   where
     in_range l v h = l <= v && v <= h
+
+-- | Corner of the box with least values for all components
+minCorner :: (NormedSpace v) => AABox v -> v
+minCorner (AABox lo _) = lo
+
+-- | Corner of the box with greatest values for all components
+maxCorner :: (NormedSpace v) => AABox v -> v
+maxCorner (AABox _ hi) = hi
 
 -- | String representation of all the positions in the box
 showBox :: AABox Position -> (Position -> Char) -> String
@@ -417,8 +427,8 @@ showBox (AABox (Position x_min y_min) (Position x_max y_max)) showPos =
     unlines [[showPos (Position x y) | x <- [x_min..x_max]] |
         y <- [y_min..y_max]]
 
--- | The intersection of two axis-aligned bounding boxes, if they overlap
-intersectBox :: (NormedModule a) => AABox a -> AABox a -> Maybe (AABox a)
+-- | The intersection of two axis-aligned bounding boxes, if they overlap.
+intersectBox :: (NormedSpace v) => AABox v -> AABox v -> Maybe (AABox v)
 intersectBox (AABox lo1 hi1) (AABox lo2 hi2)
   | lo `leq` hi = Just (AABox lo hi)
   | otherwise = Nothing
@@ -428,7 +438,7 @@ intersectBox (AABox lo1 hi1) (AABox lo2 hi2)
 
 -- | Subtraction of boxes, producing zero or more boxes.
 -- For an /n/-dimensional space, this may produce up to 2/n/ boxes.
-diffBox :: NormedModule a => AABox a -> AABox a -> [AABox a]
+diffBox :: (NormedSpace v) => AABox v -> AABox v -> [AABox v]
 diffBox (AABox lo1 hi1) (AABox lo2 hi2) =
     [AABox (composeVector los) (composeVector his) |
         (los, his) <- diffRanges
@@ -450,7 +460,7 @@ diffRanges (lo1:lo1s) (hi1:hi1s) (lo2:lo2s) (hi2:hi2s) =
 diffRanges _ _ _ _ = []
 
 -- | Make the box @n@ positions bigger in each direction.
-growBox :: NormedModule a => Int -> AABox a -> AABox a
+growBox :: (NormedSpace v) => Int -> AABox v -> AABox v
 growBox n (AABox lo hi) = AABox (lo .-. delta) (hi .+. delta)
   where
     delta = n*. foldr1 (.+.) basisVectors

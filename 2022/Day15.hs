@@ -88,11 +88,10 @@ type Region = AABox Diagonal
 
 -- the region with the given centre and Manhattan radius
 kite :: Position -> Int -> Region
-kite c r =
-    AABox (positionToDiagonal (c .-. offset))
-         (positionToDiagonal (c .+. offset))
+kite c r = boundingBox [centre .-. offset, centre .+. offset]
   where
-    offset = Position 0 r
+    centre = positionToDiagonal c
+    offset = positionToDiagonal (Position 0 r)
 
 -- All the positions inside a region
 contents :: Region -> [Position]
@@ -104,9 +103,10 @@ sensorRegion (Sensor s b) = kite s (distance s b)
 
 -- is any of the region in the search area [0..n]x[0..n] ?
 candidate :: Int -> Region -> Bool
-candidate n (AABox (Diagonal ta tb) (Diagonal ba bb)) =
-    0 <= max_x && min_x <= n && 0 <= max_y && min_y <= n
+candidate n region = 0 <= max_x && min_x <= n && 0 <= max_y && min_y <= n
   where
+    Diagonal ta tb = minCorner region
+    Diagonal ba bb = maxCorner region
     min_x = (ta - bb) `div` 2     -- Diagonal ta bb
     max_x = (ba - tb + 1) `div` 2 -- Diagonal ba tb
     min_y = (ta + tb) `div` 2     -- Diagonal ta tb
