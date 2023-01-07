@@ -48,9 +48,13 @@ positionAt t (Particle (Position px py) (Position vx vy)) =
 
 -- is the bounding rectangle small enough to be a message?
 compact :: [Position] -> Bool
-compact ps = width rect < 80 && height rect <= 12
+compact ps = width < 80 && height <= 12
   where
-    rect = boundingRect ps
+    rect = boundingBox ps
+    Position xmin ymin = minCorner rect
+    Position xmax ymax = maxCorner rect
+    width = xmax - xmin + 1
+    height = ymax - ymin + 1
 
 -- show a numbered state
 display :: Int -> [Position] -> String
@@ -59,25 +63,6 @@ display n ps = displayPoints ps ++ show n ++ "\n"
 -- display the filled part of a state as a bitmap
 displayPoints :: [Position] -> String
 displayPoints ps = showGrid '.' $ Map.fromList [(p, '#') | p <- ps]
-
--- rectangles, described by a bottom left and top right corner
-data Rect = Rect Position Position
-  deriving Show
-
-width :: Rect -> Int
-width (Rect (Position xmin _ymin) (Position xmax _ymax)) = xmax - xmin + 1
-
-height :: Rect -> Int
-height (Rect (Position _xmin ymin) (Position _xmax ymax)) = ymax - ymin + 1
-
--- smallest rectangle containing all the points
-boundingRect :: [Position] -> Rect
-boundingRect ps = Rect (Position xmin ymin) (Position xmax ymax)
-  where
-    xmin = minimum [x | Position x _ <- ps]
-    xmax = maximum [x | Position x _ <- ps]
-    ymin = minimum [y | Position _ y <- ps]
-    ymax = maximum [y | Position _ y <- ps]
 
 testInput :: String
 testInput =

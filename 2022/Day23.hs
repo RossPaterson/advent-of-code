@@ -85,12 +85,7 @@ states :: Set Position -> [State]
 states ps = iterateWhileJust oneRound (initState ps)
 
 countEmpty :: Set Position -> Int
-countEmpty ps = (max_x - min_x + 1) * (max_y - min_y + 1) - Set.size ps
-  where
-    max_x = maximum [x | Position x _ <- Set.elems ps]
-    min_x = minimum [x | Position x _ <- Set.elems ps]
-    max_y = maximum [y | Position _ y <- Set.elems ps]
-    min_y = minimum [y | Position _ y <- Set.elems ps]
+countEmpty ps = boxSize (boundingBox ps) - Set.size ps
 
 solve1 :: Input -> Int
 solve1 ps = countEmpty (fst (states ps!!10))
