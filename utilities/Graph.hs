@@ -11,7 +11,7 @@ module Graph (
     -- * Single-source shortest paths
     -- | Neighbours of a node are given by a function, so these operations
     -- can be used on infinite graphs.
-    bfs, shortestPaths
+    bfs, bfsPaths, shortestPaths
     ) where
 
 import qualified Data.PrioritySearchQueue as PSQ
@@ -149,6 +149,23 @@ bfs f = takeWhile (not . null) . map fst . iterate step . new_level Set.empty
       | otherwise = (x:ys, seen')
       where
         (ys, seen') = new_level (Set.insert x seen) xs
+
+-- | @'bfsPaths' f xs!!k@ contains paths @[y0, y1, ..., yk]@ such
+-- that @yk@ is a member of @xs@ and every other @yi@ is a member of
+-- @f y{i+1}@.  Each reachable @y0@ is represented by a single path of
+-- minimal length.
+bfsPaths :: Ord a => (a -> [a]) -> [a] -> [[[a]]]
+bfsPaths f =
+    takeWhile (not . null) . map (map (uncurry (:)) . fst) .
+        iterate step . new_level Set.empty . map (flip (,) [])
+  where
+    step (xps, seen) = new_level seen [(x', x:p) | (x, p) <- xps, x' <- f x]
+    new_level seen [] = ([], seen)
+    new_level seen (xp@(x, _):xps)
+      | Set.member x seen = new_level seen xps
+      | otherwise = (xp:ys, seen')
+      where
+        (ys, seen') = new_level (Set.insert x seen) xps
 
 -- | All nodes reachable from the start point, with shortest distances,
 -- in increasing order of distance.  All edge costs must be positive.
