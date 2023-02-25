@@ -3,7 +3,8 @@
 -- /The Fun of Programming/, pp 1-16.
 module Data.MaxPriorityQueue (PQ, singleton, insert, extract) where
 
--- | Maximum priority queue
+-- | Maximum priority queue with priority @p@.
+-- The priority queue may contain multiple values with the same priority.
 data PQ p a = Null | Fork p a (PQ p a) (PQ p a)
 
 instance (Ord p) => Semigroup (PQ p a) where
@@ -12,7 +13,11 @@ instance (Ord p) => Semigroup (PQ p a) where
 instance (Ord p) => Monoid (PQ p a) where
     mempty = empty
 
--- | Extract the element with the greatest key
+instance Functor (PQ p) where
+    fmap _ Null = Null
+    fmap f (Fork p x a b) = Fork p (f x) (fmap f a) (fmap f b)
+
+-- | Extract an element with the greatest key
 extract :: Ord p => PQ p a -> Maybe (p, a, PQ p a)
 extract Null = Nothing
 extract (Fork p x a b) = Just (p, x, merge a b)
