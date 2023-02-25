@@ -227,13 +227,14 @@ The constraints we are given are quite tight, so the search is narrow.
 
 ## [Day 18: Many-Worlds Interpretation](https://adventofcode.com/2019/day/18) \*\*\*\*
 
-Another maze solver, with the complication of keys and doors.  In the
-second part it becomes vital to control the number of states.
+Another maze solver, with the complication of keys and doors.  The second
+part talks about parallelism, but is actually about interleaving moves.
+(A version with the robots moving in parallel would also be interesting.)
+It becomes vital to control the number of states, which can be done by
+using two levels of path finding.
 
-My solution took 15 minutes to solve both parts.  It could be made faster
-by introducing a third level of path finding.
-
-It seems that in all of the supplied inputs the maze is a tree.
+It seems that in all of the supplied inputs the maze is a tree, which
+simplifies things a bit.
 
 ## [Day 19: Tractor Beam](https://adventofcode.com/2019/day/19) \*\*
 

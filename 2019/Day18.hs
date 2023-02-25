@@ -4,7 +4,6 @@ import Geometry
 import qualified Data.CompactSet as CompactSet
 import Graph
 import Utilities
-import Control.Monad
 import Data.Char
 import Data.Maybe
 import Data.Map (Map, (!))
@@ -15,9 +14,6 @@ import qualified Data.Set as Set
 -- Input processing
 
 type Input = (Maze, Position)
-
-neighbours :: Position -> [Position]
-neighbours pos = map (pos .+.) unitVectors
 
 -- identifier of a door and corresponding key
 type DoorId = Int
@@ -36,50 +32,63 @@ parse s = (maze, pos)
     features = [(p, c) | (p, c) <- grid, c /= '.']
     maze = Maze {
         passages = Set.fromList (map fst grid),
-        keys = Map.fromList [(p, ord c - ord 'a') |
-            (p, c) <- features, isLower c],
-        doors = Map.fromList [(p, ord c - ord 'A') |
-            (p, c) <- features, isUpper c]
+        keys = Map.fromList
+            [(p, ord c - ord 'a') | (p, c) <- features, isLower c],
+        doors = Map.fromList
+            [(p, ord c - ord 'A') | (p, c) <- features, isUpper c]
         }
     pos = head [p | (p, c) <- features, c == '@']
 
 -- Part One
 
--- a waypoint is a startpoint, door or key in the original layout
-data Waypoint = Start !Position | Door !DoorId | Key !DoorId
+neighbours :: Position -> [Position]
+neighbours pos = map (pos .+.) unitVectors
+
+-- graph of key locations weighted with distance and keys required to
+-- move from the source to the key location
+-- (A single set is sufficient because there are no islands in the maze,
+-- and thus no alternative routes though other doors.)
+type KeyGraph = Map Waypoint [(Int, KeySet, DoorId)]
+
+-- The source of an edge is either a startpoint or a key in the original
+-- layout.  (Only keys can be targets: we don't care where we started
+-- once we start moving.)
+data Waypoint = Start !Position | Key !DoorId
     deriving (Eq, Ord, Show)
 
--- weighted graph
-type Graph a = Map a [(Int, a)]
+-- a set of keys
+type KeySet = CompactSet.Set DoorId
 
--- graph of distances between waypoints without passing through any door.
-waypointGraph :: Maze -> [Position] -> Graph Waypoint
-waypointGraph m starts = fmap reachable waypointLocs
+-- graph of distances from waypoints to keys without passing over any key.
+keyGraph :: Maze -> [Position] -> KeyGraph
+keyGraph m starts = fmap adjacent_keys waypoint_locs
   where
-    waypointLocs = Map.fromList $
+    -- map from all waypoints to their locations
+    waypoint_locs = Map.fromList $
         [(Start p, p) | p <- starts] ++
-        [(Door k, p) | (p, k) <- Map.assocs (doors m)] ++
         [(Key k, p) | (p, k) <- Map.assocs (keys m)]
-    reachable p = [(depth, wp) |
-        -- first step is special because next won't go past doors
-        (depth, dests) <- (1, ns):zip [2..] (tail (bfs next (p:ns))),
-        dest <- dests,
-        wp <- maybeToList (waypoint dest)]
+    -- keys we can get to from p without going over any other key
+    adjacent_keys p = [(depth, door_keys between, k) |
+        -- For the first step, we move to any neighbouring passage,
+        -- but for subsequent steps we don't move past a key, and we
+        -- don't return to p.
+        (depth, paths) <-
+            zip [1..] ([[n] | n <- ns]:tail (bfsPaths next (p:ns))),
+        -- each path is in reverse order, so the end point is the head
+        dest:between <- paths,
+        -- Is there a key at the end of the path?
+        k <- maybeToList (Map.lookup dest (keys m))]
       where
         ns = open p
-    waypoint p =
-        fmap Door (Map.lookup p (doors m)) `mplus`
-        fmap Key (Map.lookup p (keys m))
     open p = [n | n <- neighbours p, Set.member n (passages m)]
-    next p -- like open, except won't go anywhere from a door
-      | Map.member p (doors m) = []
+    next p -- like open, except won't go anywhere from a key
+      | Map.member p (keys m) = []
       | otherwise = open p
-
--- a set of keys
-type Keyring = CompactSet.Set DoorId
+    door_keys ps = CompactSet.fromList $ Map.elems $
+        Map.restrictKeys (doors m) (Set.fromList ps)
 
 data State = State {
-    collected :: !Keyring,
+    collected :: !KeySet,
     position :: !Waypoint
     }
     deriving (Eq, Ord, Show)
@@ -93,10 +102,9 @@ showState m s = showStateAux m [wpPosition m (position s)] (collected s)
 -- position of the waypoint in a maze
 wpPosition :: Maze -> Waypoint -> Position
 wpPosition _ (Start p) = p
-wpPosition m (Door d) = head [p | (p, k) <- Map.assocs (doors m), k == d]
 wpPosition m (Key d) = head [p | (p, k) <- Map.assocs (keys m), k == d]
 
-showStateAux :: Maze -> [Position] -> Keyring -> String
+showStateAux :: Maze -> [Position] -> KeySet -> String
 showStateAux m ps coll = showGrid '#' $
     Map.fromList [(p, '@') | p <- ps] `Map.union`
     fmap key (Map.filter live (keys m)) `Map.union`
@@ -112,29 +120,19 @@ solve1 (m, p) =
     fst $ head $ dropWhile (not . finished . snd) $
         shortestPaths (nextState graph) $ initState p
   where
-    graph = waypointGraph m [p]
+    graph = keyGraph m [p]
     ks = allKeys m
     finished s = collected s == ks
 
--- Move to either an open door or an uncollected key
-nextState :: Graph Waypoint -> State -> [(Int, State)]
+-- Move to the location of a key
+nextState :: KeyGraph -> State -> [(Int, State)]
 nextState graph (State coll p) =
-    [(dist, State (updateKeyring p' coll) p') |
-        (dist, p') <- graph!p, isTarget coll p']
-
--- update keyring on arriving at the waypoint
-updateKeyring :: Waypoint -> Keyring -> Keyring
-updateKeyring (Key k) ks = CompactSet.insert k ks
-updateKeyring _ ks = ks
-
--- waypoint is an open door or uncollected key
-isTarget :: Keyring -> Waypoint -> Bool
-isTarget ks (Key k) = not (CompactSet.member k ks) -- uncollected key
-isTarget ks (Door k) = CompactSet.member k ks -- open door
-isTarget _ _ = False
+    [(dist, State (CompactSet.insert k coll) (Key k)) |
+        (dist, keys_reqd, k) <- graph!p,
+        CompactSet.isSubsetOf keys_reqd coll]
 
 -- all the keys in the maze
-allKeys :: Maze -> Keyring
+allKeys :: Maze -> KeySet
 allKeys m = CompactSet.fromList (Map.elems (keys m))
 
 testInput1 :: String
@@ -189,7 +187,7 @@ tests1 = [
 
 -- now there are multiple searchers
 data State2 = State2 {
-    collected2 :: !Keyring,
+    collected2 :: !KeySet,
     positions :: ![Waypoint]
     }
     deriving (Eq, Ord, Show)
@@ -216,19 +214,19 @@ solve2 (m0, p) =
   where
     (m, ps) = splitMaze (m0, p)
     s0 = initState2 ps
-    graph = waypointGraph m ps
+    graph = keyGraph m ps
     ks = allKeys m
     finished s = collected2 s == ks
 
--- Move one of the robots to either an open door or an uncollected key
-nextState2 :: Graph Waypoint -> State2 -> [(Int, State2)]
+-- Move one of the robots to the location of a key
+nextState2 :: KeyGraph -> State2 -> [(Int, State2)]
 nextState2 graph (State2 coll ps) =
     [(dist, State2 coll' ps') |
         (front, p:back) <- splits ps,
-        (dist, p') <- graph!p,
-        isTarget coll p',
-        let coll' = updateKeyring p' coll,
-        let ps' = front++(p':back)]
+        (dist, keys_reqd, k) <- graph!p,
+        CompactSet.isSubsetOf keys_reqd coll,
+        let coll' = CompactSet.insert k coll,
+        let ps' = front++(Key k:back)]
 
 testInput6 :: String
 testInput6 =
