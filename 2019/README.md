@@ -212,7 +212,8 @@ The first part focusses our attention on the front of the list, but
 the behaviour at the back is what matters for the second part (for the
 given input), and that turns out to be much simpler than at the front.
 There's even a formula for *n* phases involving binomial coefficients,
-but executing all the phases is fast enough.
+and it might be possible to exploit the repetition in the input and the
+modulo 10 calculation, but a naive implementation is fast enough.
 
 ## [Day 17: Set and Forget](https://adventofcode.com/2019/day/17) \*\*\*\*
 

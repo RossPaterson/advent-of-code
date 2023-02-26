@@ -51,17 +51,16 @@ tests1 = [
 add :: Int -> Int -> Int
 add x y = (x+y) `mod` 10
 
--- On the last half of xs, reverse (phaseR (reverse xs)) agrees with phase xs.
-phaseR :: [Int] -> [Int]
-phaseR = scanl1 add
+-- On the last half of xs, phase2 xs agrees with phase xs.
+phase2 :: [Int] -> [Int]
+phase2 = scanr1 add
 
 solve2 :: Input -> String
 solve2 ns =
-    map intToDigit $ take 8 $
-        reverse $ times 100 phaseR $ take n $ cycle $ reverse ns
+    map intToDigit $ take 8 $ times 100 phase2 $
+        drop offset $ concat $ replicate 10000 ns
   where
     offset = read (map intToDigit (take 7 ns))
-    n = 10000*length ns - offset
 
 tests2 :: [(String, String)]
 tests2 = [
