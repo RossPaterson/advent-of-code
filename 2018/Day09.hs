@@ -2,8 +2,8 @@ module Main where
 
 import Parser
 import Utilities
-import Data.Map (Map)
-import qualified Data.Map as Map
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
 import Data.Sequence (Seq, ViewL(..), ViewR(..), (<|), (|>), (><))
 import qualified Data.Sequence as Seq
 
@@ -19,13 +19,13 @@ parse = runParser parameters
 
 -- Part One
 
-solve1 :: Input -> Integer
+solve1 :: Input -> Int
 solve1 = maximum . map snd . Map.toList . scores . uncurry marbles
 
 -- State of the game
 data State = State {
     circle :: Seq Int, -- circle of marbles unrolled with current at left end
-    scores :: Map Int Integer -- score for each player
+    scores :: Map Int Int -- score for each player
     }
   deriving Show
 
@@ -44,7 +44,7 @@ initState np = State {
 add :: State -> Int -> State
 add (State c ss) n
   | n `mod` 23 /= 0 = State (n <| rotl (rotl c)) ss
-  | otherwise = State c' (Map.adjust (+ toInteger (n+m)) player ss)
+  | otherwise = State c' (Map.adjust (+ (n+m)) player ss)
   where
     player = (n - 1) `mod` Map.size ss + 1
     -- extract the marble 7 places counter-clockwise from current
@@ -59,7 +59,7 @@ rotl c = case Seq.viewl c of
     EmptyL -> Seq.empty
     x :< xs -> xs |> x
 
-tests1 :: [(String, Integer)]
+tests1 :: [(String, Int)]
 tests1 = [
     ("9 players; last marble is worth 25 points\n",  32),
     ("10 players; last marble is worth 1618 points\n", 8317),
@@ -70,7 +70,7 @@ tests1 = [
 
 -- Part Two
 
-solve2 :: Input -> Integer
+solve2 :: Input -> Int
 solve2 (np, nm) = solve1 (np, nm*100)
 
 main :: IO ()
