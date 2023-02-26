@@ -2,8 +2,8 @@ module Main where
 
 import Utilities
 import Data.Char
-import Data.Map (Map, (!))
-import qualified Data.Map as Map
+import Data.Map.Strict (Map, (!))
+import qualified Data.Map.Strict as Map
 
 -- Input processing
 
@@ -38,7 +38,7 @@ prevCup n i = (i - 2) `mod` n + 1
 
 -- one move:
 -- Move the 3 values after the current value to just after the next value
--- below current that this not among those three values, wrapping around
+-- below current that is not among those three values, wrapping around
 -- as required, and then advance to the new next value after current.
 move :: Ring Cup -> Ring Cup
 move (Ring current successor) = Ring after_finish successor'
