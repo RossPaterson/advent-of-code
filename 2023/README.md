@@ -10,3 +10,8 @@ This was a bit more work than the usual starting problem.  The second part
 gives a taste of our initial solution working for the test input but not
 the real input.  The test input does at least suggest (on every second
 line) the question we should be asking, but it also contains a red herring.
+
+## [Day 2: Cube Conundrum](https://adventofcode.com/2023/day/2)
+
+The main work here is parsing the input.  After that, the first part is
+a simple computation and the second part is the inverse.
