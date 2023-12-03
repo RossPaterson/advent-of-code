@@ -34,7 +34,9 @@ initialRing [] = error "empty ring"
 
 -- cup i minus one, wrapping around to the top if required
 prevCup :: Int -> Cup -> Cup
-prevCup n i = (i - 2) `mod` n + 1
+prevCup n i
+  | i == 1 = n
+  | otherwise = i-1
 
 -- one move:
 -- Move the 3 values after the current value to just after the next value
@@ -43,17 +45,24 @@ prevCup n i = (i - 2) `mod` n + 1
 move :: Ring Cup -> Ring Cup
 move (Ring current successor) = Ring after_finish successor'
   where
+    -- ... -> current -> start -> middle -> finish -> after_finish -> ...
     start = successor!current
     middle = successor!start
     finish = successor!middle
     after_finish = successor!finish
     picked_up = [start, middle, finish]
+    -- ... -> dest -> after_dest -> ...
     dest = until (flip notElem picked_up) next_val (next_val current)
-    next_val = prevCup (Map.size successor)
+    next_val = prevCup n
+    n = Map.size successor
+    after_dest = successor!dest
+    -- move [start, middle, finish] to after dest
     successor' =
-        Map.insert current after_finish $
+        -- insert [start, middle, finish] after dest
         Map.insert dest start $
-        Map.insert finish (successor!dest) $
+        Map.insert finish after_dest $
+        -- remove [start, middle, finish]
+        Map.insert current after_finish $
         successor
 
 -- the values in the ring following one
