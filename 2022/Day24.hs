@@ -54,9 +54,17 @@ moves :: Valley -> Position -> [Position]
 moves v p = p:filter (inValley v) (map (p .+.) unitVectors)
 
 inValley :: Valley -> Position -> Bool
-inValley v (Position x y) =
-    x > 0 && x <= w &&
-    (y > 0 || y == 0 && x == 1) && (y <= h || x == w && y == h+1)
+inValley v p = inBox p (valleyBox v) && not (inWall v p)
+
+valleyBox :: Valley -> AABox Position
+valleyBox v = singletonBox zero <> singletonBox (Position (w+1) (h+1))
+  where
+    w = width v
+    h = height v
+
+inWall :: Valley -> Position -> Bool
+inWall v (Position x y) =
+    x == 0 || x == w+1 || y == 0 && x > 1 || y == h+1 && x < w
   where
     w = width v
     h = height v
@@ -74,6 +82,14 @@ startState :: Position -> Blizzards -> State
 startState p0 bs = State { locations = Set.singleton p0, blizzards = bs }
 
 -- Display the state for debugging purposes
+showState' :: Valley -> State -> String
+showState' v s = showBox (valleyBox v) showPos
+  where
+    showPos p
+      | inWall v p = '#'
+      | Set.member p (locations s) = 'E'
+      | otherwise = '.'
+
 showState :: Valley -> State -> String
 showState v s = showGrid '.' $
     Map.unions [
