@@ -15,3 +15,8 @@ line) the question we should be asking, but it also contains a red herring.
 
 The main work here is parsing the input.  After that, the first part is
 a simple computation and the second part is the inverse.
+
+## [Day 3: Gear Ratios](https://adventofcode.com/2023/day/3)
+
+The main effort here is a bit of 2-dimensional parsing, but the rest is
+straightforward if you follow the definitions precisely.
