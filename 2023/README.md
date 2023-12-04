@@ -21,8 +21,9 @@ a simple computation and the second part is the inverse.
 The main effort here is a bit of 2-dimensional parsing, but the rest is
 straightforward if you follow the definitions precisely.
 
-## [Day 4: Gear Ratios](https://adventofcode.com/2023/day/4)
+## [Day 4: Scratchcards](https://adventofcode.com/2023/day/4)
 
 The parsing is much the same as day 2.  The first part is simple, but
 gets us thinking about powers, and in the second part we clearly need
-to change the representation to avoid exponential blowup.
+to change the representation to avoid exponential blowup, but it comes
+out neatly.
