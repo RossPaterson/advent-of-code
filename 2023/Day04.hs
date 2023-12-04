@@ -3,6 +3,7 @@ module Main where
 import Parser
 import Utilities
 import Control.Applicative
+import Data.List
 import qualified Data.Set as Set
 
 -- Input processing
@@ -14,18 +15,18 @@ data Card = Card Int [Int] [Int]
 parse :: String -> Input
 parse = map (runParser card) . lines
   where
-    card = Card <$ string "Card" <* some space <*> nat <* char ':' <*> nats <* string " |" <*> nats
-    nats = some (some space *> nat)
+    card =
+        Card <$ string "Card" <* some space <*> nat <* char ':' <* spaces <*>
+            some (nat <* spaces) <* char '|' <*> some (spaces *> nat)
+    spaces = some space
 
 -- Part One
 
-winning :: Card -> [Int]
-winning (Card _ w ns) = filter (`Set.member` ws) ns
+-- count of numbers in the second group that are in the first
+matches :: Card -> Int
+matches (Card _ w ns) = length (filter (`Set.member` ws) ns)
   where
     ws = Set.fromList w
-
-matches :: Card -> Int
-matches = length . winning
 
 value :: Int -> Int
 value n
@@ -49,26 +50,27 @@ tests1 = [(testInput, 13)]
 
 -- Part Two
 
--- (count, matches)
-type RepeatedCard = (Int, Int)
+-- n copies of a
+data Repeated a = Repeat Int a
+    deriving (Show)
 
--- initially one copy of the card
-oneCard :: Card -> RepeatedCard
-oneCard c = (1, matches c)
+-- one copy
+single :: a -> Repeated a
+single = Repeat 1
 
--- make k copies of the cards
-copy :: Int -> RepeatedCard -> RepeatedCard
-copy k (n, m) = (k+n, m)
+-- add k copies
+add :: Int -> Repeated a -> Repeated a
+add k (Repeat n x) = Repeat (k+n) x
 
--- each card generates copies of the following m cards
-play :: [RepeatedCard] -> [Int]
-play [] = []
-play ((n, m):cs) = n : play (map (copy n) f ++ b)
+-- each card c generates copies of the following (matches c) cards
+play :: [Repeated Card] -> Maybe (Int, [Repeated Card])
+play [] = Nothing
+play (Repeat n c:cs) = Just (n, map (add n) f ++ b)
   where
-    (f, b) = splitAt m cs
+    (f, b) = splitAt (matches c) cs
 
 solve2 :: Input -> Int
-solve2 = sum . play . map oneCard
+solve2 = sum . unfoldr play . map single
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 30)]
