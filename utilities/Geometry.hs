@@ -32,6 +32,7 @@ module Geometry (
     intersectBox,
     diffBox,
     growBox,
+    shiftBox,
     )
     where
 
@@ -474,3 +475,7 @@ growBox :: (NormedSpace v) => Int -> AABox v -> AABox v
 growBox n (AABox lo hi) = AABox (lo .-. delta) (hi .+. delta)
   where
     delta = n*. foldr1 (.+.) basisVectors
+
+-- | Move the box by delta.
+shiftBox :: (NormedSpace v) => v -> AABox v -> AABox v
+shiftBox delta (AABox lo hi) = AABox (lo .+. delta) (hi .+. delta)
