@@ -27,3 +27,8 @@ The parsing is much the same as day 2.  The first part is simple, but
 gets us thinking about powers, and in the second part we clearly need
 to change the representation to avoid exponential blowup, but it comes
 out neatly.
+
+## [Day 5: If You Give A Seed A Fertilizer](https://adventofcode.com/2023/day/5)
+
+This was a step up.  After a bit of parsing, the first part sets the stage,
+while the second part requires a shift to ranges.
