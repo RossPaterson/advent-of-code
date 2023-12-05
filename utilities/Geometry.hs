@@ -113,6 +113,16 @@ unitVector n = dirs!!(n `mod` length dirs)
   where
     dirs = unitVectors
 
+instance NormedSpace Int where
+    zero = 0
+    (.+.) = (+)
+    (.-.) = (-)
+    (*.) = (*)
+    norm = abs
+    unitVectors = [1, -1]
+    basisVectors = [1]
+    vectorComponents n = [n]
+
 -- | Point in 2-dimensional display space: x increases to the right,
 -- y downwards
 data Position = Position !Int !Int
