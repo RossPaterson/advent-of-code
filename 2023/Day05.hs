@@ -1,5 +1,6 @@
 module Main where
 
+import Geometry
 import Parser
 import Utilities
 import Control.Applicative
@@ -34,34 +35,14 @@ parse s = (runParser seeds (head paras), map mkmap (tail paras))
 
 -- Ranges (NB: different representation to the problem statement)
 
-data Range = Range Int Int -- invariant: lo <= hi
-    deriving (Show)
+type Range = AABox Int
 
 range :: Int -> Int -> Range
-range lo size = Range lo (lo + size - 1)
+range lo size = boundingBox [lo, lo + size - 1]
 
 -- the source range of a map entry
 src_range :: MapEntry -> Range
 src_range e = range (src_range_start e) (range_length e)
-
-in_range :: Int -> Range -> Bool
-in_range n (Range lo hi) = lo <= n && n <= hi
-
-overlap :: Range -> Range -> Maybe Range
-overlap (Range lo1 hi1) (Range lo2 hi2)
-  | lo1 <= hi2 && lo2 <= hi1 =
-    Just (Range (max lo1 lo2) (min hi1 hi2))
-  | otherwise = Nothing
-
--- up to two ranges obtained by subtracting r2 from r1
-difference :: Range -> Range -> [Range]
-difference (Range lo1 hi1) (Range lo2 hi2) =
-    [Range lo1 (min hi1 (lo2-1)) | lo1 < lo2] ++
-    [Range (max (hi2+1) lo1) hi1 | hi2 < hi1]
-
--- move the whole range by n
-shift :: Int -> Range -> Range
-shift n (Range src1 src2) = Range (src1+n) (src2+n)
 
 -- Part One
 
@@ -76,7 +57,7 @@ offset e = dst_range_start e - src_range_start e
 -- the number is shifted by the first entry for which it is in range
 map_number :: Int -> [MapEntry] -> Int
 map_number src es =
-    head ([src + offset e | e <- es, in_range src (src_range e)] ++ [src])
+    head ([src + offset e | e <- es, inBox src (src_range e)] ++ [src])
 
 solve1 :: Input -> Int
 solve1 (seeds, maps) =
@@ -128,9 +109,9 @@ map_range :: [Range] -> [MapEntry] -> [Range]
 map_range rs [] = rs -- unmapped ranges
 map_range rs (e:es) =
     -- overlaps are mapped by this entry
-    map (shift (offset e)) (catMaybes [overlap r e_range | r <- rs]) ++
+    map (shiftBox (offset e)) (catMaybes [intersectBox r e_range | r <- rs]) ++
     -- residues may be mapped by later entries
-    map_range [r' | r <- rs, r' <- difference r e_range] es
+    map_range [r' | r <- rs, r' <- diffBox r e_range] es
   where
     e_range = src_range e
 
@@ -140,8 +121,8 @@ ranges ns = [range start size | [start, size] <- takes 2 ns]
 
 solve2 :: Input -> Int
 solve2 (seeds, maps) =
-    minimum [lo |
-        Range lo _ <- foldl map_range (ranges seeds) (map map_entries maps)]
+    minimum $ map minCorner $
+        foldl map_range (ranges seeds) $ map map_entries maps
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 46)]
