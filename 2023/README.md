@@ -39,6 +39,6 @@ stage, while the second part requires a shift to ranges.
 
 ## [Day 6: Wait For It](https://adventofcode.com/2023/day/6)
 
-A much easier puzzle.  The second part requires an analytic solution,
-using an old formula from school.  It was quicker to do it in the
-interpreter.
+A much easier puzzle.  The second part can be done with an analytic
+solution using an old formula from school, but reusing the exhaustive
+search of the first part runs in a fraction of a second.
