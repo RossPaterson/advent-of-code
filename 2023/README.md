@@ -4,12 +4,16 @@
 
 (image by [Jo Wood](https://github.com/jwoLondon))
 
+The early puzzles have an alternating tempo, with the odd days
+significantly tougher than in the last 3 years.
+
 ## [Day 1: Trebuchet?!](https://adventofcode.com/2023/day/1)
 
-This was a bit more work than the usual starting problem.  The second part
-gives a taste of our initial solution working for the test input but not
-the real input.  The test input does at least suggest (on every second
-line) the question we should be asking, but it also contains a red herring.
+This was a bit more work than the usual starting problem.  The second
+part gives a taste of our initial solution working for the test input
+but not the real input.  The test input does at least suggest (on every
+second line) the question we should be asking, but it also contains a
+red herring.
 
 ## [Day 2: Cube Conundrum](https://adventofcode.com/2023/day/2)
 
@@ -30,10 +34,11 @@ out neatly.
 
 ## [Day 5: If You Give A Seed A Fertilizer](https://adventofcode.com/2023/day/5)
 
-This was a step up.  After a bit of parsing, the first part sets the stage,
-while the second part requires a shift to ranges.
+This was a step up.  After a bit of parsing, the first part sets the
+stage, while the second part requires a shift to ranges.
 
 ## [Day 6: Wait For It](https://adventofcode.com/2023/day/6)
 
 A much easier puzzle.  The second part requires an analytic solution,
-using school formula.  It was quicker to do it in the interpreter.
+using an old formula from school.  It was quicker to do it in the
+interpreter.
