@@ -32,3 +32,8 @@ out neatly.
 
 This was a step up.  After a bit of parsing, the first part sets the stage,
 while the second part requires a shift to ranges.
+
+## [Day 6: Wait For It](https://adventofcode.com/2023/day/6)
+
+A much easier puzzle.  The second part requires an analytic solution,
+using school formula.  It was quicker to do it in the interpreter.
