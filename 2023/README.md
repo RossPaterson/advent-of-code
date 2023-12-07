@@ -42,3 +42,10 @@ stage, while the second part requires a shift to ranges.
 A much easier puzzle.  The second part can be done with an analytic
 solution using an old formula from school, but reusing the exhaustive
 search of the first part runs in a fraction of a second.
+
+## [Day 7: Camel Cards](https://adventofcode.com/2023/day/7)
+
+This was about accurately implementing intricate rules.  In the first
+part, I implemented the standard ordering, before noticing that this
+version is simpler.  The second part is trickier, but exhaustive search
+was fast enough.
