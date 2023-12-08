@@ -117,7 +117,9 @@ denominators a b
 -- | Given a list of pairs @(r, m)@ of remainders and moduli, where the
 -- moduli are pairwise coprime, return the smallest @n@ such that
 -- @n `mod` m == r@ for all of these pairs.  (Chinese Remainder Theorem)
-chineseRemainder :: [(Int, Int)] -> Int
+chineseRemainder :: Integral a => [(a, a)] -> a
+{-# SPECIALIZE chineseRemainder :: [(Int, Int)] -> Int #-}
+{-# SPECIALIZE chineseRemainder :: [(Integer, Integer)] -> Integer #-}
 chineseRemainder =
     fromInteger . fst . foldr1 match . map promote . sortBy (compare `on` snd)
   where
