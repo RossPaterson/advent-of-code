@@ -49,3 +49,9 @@ This was about accurately implementing intricate rules.  In the first
 part, I implemented the standard ordering, before noticing that this
 version is simpler.  The second part is trickier, but exhaustive search
 was fast enough.
+
+## [Day 8: Haunted Wasteland](https://adventofcode.com/2023/day/8)
+
+The first part was an easy setup.  The second part will be infeasible
+unless the supplied inputs have some repeating pattern.  A little
+experimentation reveals that the repeat is particularly simple.
