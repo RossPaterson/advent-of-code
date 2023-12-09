@@ -5,7 +5,11 @@
 (image by [Jo Wood](https://github.com/jwoLondon))
 
 The early puzzles have an alternating tempo, with the odd days
-significantly tougher than in the last 3 years.
+significantly tougher than in the last 3 years.  Day 9 was easier,
+though.
+
+The narrative appears to be a descending recursion through the islands,
+through which we will return later.
 
 ## [Day 1: Trebuchet?!](https://adventofcode.com/2023/day/1)
 
@@ -55,3 +59,9 @@ was fast enough.
 The first part was an easy setup.  The second part will be infeasible
 unless the supplied inputs have some repeating pattern.  A little
 experimentation reveals that the repeat is particularly simple.
+
+## [Day 9: Mirage Maintenance](https://adventofcode.com/2023/day/9)
+
+A little problem of integer sequences.  The two parts have very neat
+matching solutions using list functions that directly implement the
+description.
