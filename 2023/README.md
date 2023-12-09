@@ -4,9 +4,8 @@
 
 (image by [Jo Wood](https://github.com/jwoLondon))
 
-The early puzzles have an alternating tempo, with the odd days
-significantly tougher than in the last 3 years.  Day 9 was easier,
-though.
+Some of the early puzzles (days 3, 5 and 7) were significantly tougher
+than in the last 3 years.
 
 The narrative appears to be a descending recursion through the islands,
 through which we will return later.
@@ -64,4 +63,5 @@ experimentation reveals that the repeat is particularly simple.
 
 A little problem of integer sequences.  The two parts have very neat
 matching solutions using list functions that directly implement the
-description.
+description.  The Reddit discussion mentions an even easier way to
+exploit the symmetry.

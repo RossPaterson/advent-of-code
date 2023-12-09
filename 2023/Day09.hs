@@ -41,6 +41,8 @@ tests1 = [(testInput, 114)]
 -- extrapolate the sequence to the left
 extrapolate_backwards :: [Int] -> Int
 extrapolate_backwards = foldr (-) 0 . map head . all_diffs
+-- alternative implementation:
+-- extrapolate_backwards = extrapolate_forwards . reverse
 
 solve2 :: Input -> Int
 solve2 = sum . map extrapolate_backwards
