@@ -65,3 +65,12 @@ A little problem of integer sequences.  The two parts have very neat
 matching solutions using list functions that directly implement the
 description.  The Reddit discussion mentions an even easier way to
 exploit the symmetry.
+
+## [Day 10: Pipe Maze](https://adventofcode.com/2023/day/10)
+
+This was novel and tricky.  To parse the input we need to determine what
+piece lies at the start position, which takes a while, but sets us up
+for following the pipe in the first part.  The second part can be done
+with a standard algorithm, but we have to work out how to fit it to the
+representation used here.  Fortunately there are enough test cases to
+catch errors in the logic.
