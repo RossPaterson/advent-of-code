@@ -144,7 +144,7 @@ tests1 = [(testInput1, 4), (testInput2, 4), (testInput3, 8), (testInput4, 8)]
 
 -- A position is inside the loop if is not on the loop and any path to
 -- the outside crosses the loop an odd number of times.  We use a linear
--- path extending east from the position.
+-- path extending east from just above the position.
 interior :: Map Position Piece -> Int
 interior loop_pieces =
     length $ filter inside $ filter not_on_loop $ boxElements box
@@ -154,23 +154,10 @@ interior loop_pieces =
     not_on_loop p = not (Map.member p loop_pieces)
     -- linear path east from p to the edge of the bounding box
     out_path (Position x y) = [Position x' y | x' <- [x..max_x]]
-    -- pipe pieces on that path, excluding east-west pieces
-    out_pieces p = filter (/= EW) $
-        catMaybes [Map.lookup p' loop_pieces | p' <- out_path p]
-    inside p = odd (crossings (out_pieces p))
-
--- the number of times an east-wards path crosses the loop,
--- given the pices along the path, excluding east-west pieces
-crossings :: [Piece] -> Int
-crossings [] = 0
--- connecting north and south makes one enclosing edge
-crossings (NS:cs) = 1 + crossings cs
-crossings (NE:SW:cs) = 1 + crossings cs
-crossings (SE:NW:cs) = 1 + crossings cs
--- U-bends do not enclose anything
-crossings (NE:NW:cs) = crossings cs
-crossings (SE:SW:cs) = crossings cs
-crossings _ = error "bad loop"
+    -- pipe pieces on that path
+    out_pieces p = catMaybes [Map.lookup p' loop_pieces | p' <- out_path p]
+    -- do we cross an odd number of north edges?
+    inside p = odd $ length $ filter (`elem` [NS, NE, NW]) $ out_pieces p
 
 -- the loop, with the pieces at each position
 loop_with_pieces :: Pipes -> Position -> Map Position Piece
