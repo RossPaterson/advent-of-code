@@ -74,3 +74,9 @@ for following the pipe in the first part.  The second part can be done
 with a standard algorithm, but we have to work out how to fit it to the
 representation used here.  Fortunately there are enough test cases to
 catch errors in the logic.
+
+## [Day 11: Cosmic Expansion](https://adventofcode.com/2023/day/11)
+
+This was a cute little problem of expanding lists.  I went for a
+mapping solution in the first part, and this generalized directly for
+the second part.
