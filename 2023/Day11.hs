@@ -30,7 +30,7 @@ expansion_map factor all_ns =
   where
     ns = Set.elems (Set.fromList all_ns)
 
--- expand the gaps in the list by factor
+-- expand the gaps in an ordered list of numbers by factor
 expand_list :: Int -> [Int] -> [Int]
 expand_list _ [] = []
 expand_list factor (n:ns) =
