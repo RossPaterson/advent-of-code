@@ -3,7 +3,6 @@ module Main where
 import Geometry
 import Utilities
 import Data.Char
-import Data.List
 
 -- Input processing
 
@@ -19,21 +18,12 @@ parse s = Schematic {
     symbols = [(p, c) | (p, c) <- readGrid s, c /= '.', not (isDigit c)],
     numbers = [(box, n) |
         (y, l) <- zip [0..] (lines s),
-        xcs <- genWords (isDigit . snd) (zip [0..] l),
+        xcs <- wordsWith (isDigit . snd) (zip [0..] l),
         let x = fst (head xcs),
         let n = read (map snd xcs),
         let sz = length xcs,
         let box = boundingBox [Position x y, Position (x+sz-1) y]]
     }
-
--- maximax non-empty subsequences of elements satisfying p.
--- words = genWords (not . isSpace)
-genWords :: (a -> Bool) -> [a] -> [[a]]
-genWords p = unfoldr getWord
-  where
-    getWord xs = case dropWhile (not . p) xs  of
-        [] -> Nothing
-        xs' -> Just (span p xs')
 
 -- Part One
 
