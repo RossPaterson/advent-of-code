@@ -15,6 +15,7 @@ module Utilities (
     mostCommon,
     initSets,
     leastBy,
+    wordsWith,
     -- * Iteration
     whileJust,
     iterateWhileJust,
@@ -27,6 +28,8 @@ module Utilities (
     choose,
     chooseBetween,
     bsearch,
+    -- * Memoization
+    memoize,
     -- * Rose trees
     -- | Functions for use with "Data.Tree"
     iterateTree,
@@ -108,6 +111,16 @@ groupSortOn f = groupBy ((==) `on` f) . sortBy (compare `on` f)
 -- Zipping this with the original list gives a way to find repetitions.
 initSets :: Ord a => [a] -> [Set a]
 initSets = scanl (flip Set.insert) Set.empty
+
+-- | Maximal non-empty subsequences of elements satisfying @p@.
+--
+-- @words = wordsWith (not . isSpace)@
+wordsWith :: (a -> Bool) -> [a] -> [[a]]
+wordsWith p = unfoldr getWord
+  where
+    getWord xs = case dropWhile (not . p) xs of
+        [] -> Nothing
+        xs' -> Just (span p xs')
 
 -- | Repeatedly apply the function until it doesn't produce a new value
 whileJust :: (a -> Maybe a) -> a -> a
@@ -201,6 +214,23 @@ searchIntegerRange p l h
   | p m = searchIntegerRange p l (m-1)
   | otherwise = searchIntegerRange p (m+1) h
   where m = (l+h) `div` 2
+
+-- | Memoize a recursive function over a given domain, with a default
+-- value for arguments outside the domain.  If unsure that the domain
+-- is correct, use an 'error' expression for the default.
+--
+-- @memoize domain def rec_f@ is a faster equivalent of
+--
+-- @
+-- f x
+--   | Set.member x domain = rec_f f x
+--   | otherwise = def
+-- @
+memoize :: (Ord a) => Set a -> b -> ((a -> b) -> a -> b) -> a -> b
+memoize domain def rec_f = f
+  where
+    f_table = Map.fromSet (rec_f f) domain
+    f x = Map.findWithDefault def x f_table
 
 -- Utilities on rose trees
 
