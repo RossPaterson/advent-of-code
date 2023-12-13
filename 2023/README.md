@@ -80,3 +80,17 @@ catch errors in the logic.
 This was a cute little problem of expanding lists.  I went for a
 mapping solution in the first part, and this generalized directly for
 the second part.
+
+## [Day 12: Hot Springs](https://adventofcode.com/2023/day/12)
+
+I did the first part by exhausive search, even though it seemed
+likely that the problem would be expanded in the seconrt, as it was.
+This required dynamic programming, which is neatly achieved by memoizing
+the recursive definition.  I used a two-stage approach.  More compact
+keys would have sped things up, but it's fast enough.  Not reading the
+definition of unfolding carefully cost some time.
+
+## [Day 13: Point of Incidence](https://adventofcode.com/2023/day/13)
+
+As often, I started by trying an overengineered solution, but this turns
+out be a neat problem of list manipulation.
