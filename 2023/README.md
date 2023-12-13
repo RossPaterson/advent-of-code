@@ -92,5 +92,9 @@ definition of unfolding carefully cost some time.
 
 ## [Day 13: Point of Incidence](https://adventofcode.com/2023/day/13)
 
-As often, I started by trying an overengineered solution, but this turns
-out be a neat problem of list manipulation.
+As often, I started by trying an overengineered solution, this time using
+arithmetic on indices (and it would have been correct if I hadn't messed
+up the summary function).  However, the problem turned out be a neat
+exercise in list manipulation.  The second part used a variant of the
+first inside an exhaustive search, but linear in the size of the input,
+and thus quite quick.
