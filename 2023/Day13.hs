@@ -29,9 +29,8 @@ reflections p =
 list_reflections :: (Eq a) => [a] -> [Int]
 list_reflections xs =
     [length rev_front |
-        (rev_front, back) <- zip (rev_inits xs) (tails xs),
-        not (null rev_front),
-        not (null back),
+        -- all non-trivial splits of the list
+        (rev_front, back) <- init (tail (zip (rev_inits xs) (tails xs))),
         and (zipWith (==) rev_front back)]
 
 -- map reverse . inits
