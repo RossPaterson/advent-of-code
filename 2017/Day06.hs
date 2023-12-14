@@ -1,7 +1,7 @@
 module Main where
 
 import Utilities
-import qualified Data.RationalList as RL
+import qualified Data.CyclicList as CL
 
 type Input = Banks
 type Banks = [Int]
@@ -21,9 +21,9 @@ redistribute xs = zipWith (+) (front ++ 0:back) (incr_front ++ incr_back)
     (incr_back, incr_front) = splitAt (n - length front - 1) increments
 
 solve1 :: Input -> Int
-solve1 xs = length (RL.prefix rl) + length (RL.repetend rl)
+solve1 xs = length (CL.prefix rl) + length (CL.repetend rl)
   where
-    rl = RL.iterate redistribute xs
+    rl = CL.iterate redistribute xs
 
 testInput :: String
 testInput = "0 2 7 0"
@@ -34,7 +34,7 @@ tests1 = [(testInput, 5)]
 -- Part Two
 
 solve2 :: Input -> Int
-solve2 = length . RL.repetend . RL.iterate redistribute
+solve2 = length . CL.repetend . CL.iterate redistribute
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 4)]

@@ -1,10 +1,9 @@
 module Main where
 
 import Utilities
-import Data.Maybe
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import qualified Data.RationalList as RL
+import qualified Data.CyclicList as CL
 
 -- Input processing
 
@@ -94,10 +93,10 @@ testInput =
 
 -- Part Two
 
--- similar to solve1, but use RationalList to get the larger index
+-- similar to solve1, but use CyclicList to get the larger index
 -- in a reasonable time
 solve2 :: Input -> Int
-solve2 = value . fromJust . RL.elementAt 1000000000 . RL.iterate step
+solve2 = value . CL.elementAt 1000000000 . CL.iterate step
 
 main :: IO ()
 main = do

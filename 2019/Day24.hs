@@ -2,7 +2,7 @@ module Main where
 
 import Utilities
 import Geometry
-import qualified Data.RationalList as RL
+import qualified Data.CyclicList as CL
 import Data.Bits
 import qualified Data.Map as Map
 
@@ -62,7 +62,7 @@ step :: Grid -> Grid
 step g = grid $ filter (rule g) $ allPoints
 
 solve1 :: Input -> Int
-solve1 = rating . head . RL.repetend . RL.iterate step
+solve1 = rating . head . CL.repetend . CL.iterate step
 
 testInput :: String
 testInput =

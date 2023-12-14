@@ -18,10 +18,10 @@ library
   exposed-modules:
     CellularAutomaton
     Data.CompactSet
+    Data.CyclicList
     Data.MaxPriorityQueue
     Data.MinPriorityQueue
     Data.PrioritySearchQueue
-    Data.RationalList
     Data.SmallPermutation
     Geometry
     Graph

@@ -1,11 +1,10 @@
 module Main where
 
 import Parser
-import qualified Data.RationalList as RL
+import qualified Data.CyclicList as CL
 import Utilities
 import Control.Applicative
 import Data.List
-import Data.Maybe
 import Data.Monoid
 import Data.Set (Set)
 import qualified Data.Set as Set
@@ -108,9 +107,9 @@ solve2 = sumPlants . getStateRL 50000000000
 getStateRL :: Int -> (PlantString, Rules) -> Plants
 getStateRL n (bs, gs) = addOffset totalOffset lastState
   where
-    generations = RL.iterate (growPlants gs . present) (mkPlants 0 bs)
-    totalOffset = getSum (RL.foldMapTake (Sum . offset) n generations)
-    lastState = fromJust (RL.elementAt n generations)
+    generations = CL.iterate (growPlants gs . present) (mkPlants 0 bs)
+    totalOffset = getSum (CL.foldMapTake (Sum . offset) n generations)
+    lastState = CL.elementAt n generations
 
 main :: IO ()
 main = do

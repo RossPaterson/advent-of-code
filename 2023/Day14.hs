@@ -2,8 +2,7 @@ module Main where
 
 import Geometry
 import Utilities
-import qualified Data.RationalList as RL
-import Data.Maybe
+import qualified Data.CyclicList as CL
 import Data.Set (Set)
 import qualified Data.Set as Set
 
@@ -99,8 +98,8 @@ spin_cycle platform ps = foldl (tilt platform) ps [N, W, S, E]
 
 solve2 :: Input -> Int
 solve2 (platform, ps) =
-    load platform $ fromJust $
-        RL.elementAt 1000000000 $ RL.iterate (spin_cycle platform) ps
+    load platform $
+        CL.elementAt 1000000000 $ CL.iterate (spin_cycle platform) ps
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 64)]
