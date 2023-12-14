@@ -98,3 +98,11 @@ up the summary function).  However, the problem turned out be a neat
 exercise in list manipulation.  The second part used a variant of the
 first inside an exhaustive search, but linear in the size of the input,
 and thus quite quick.
+
+## [Day 14: Parabolic Reflector Dish](https://adventofcode.com/2023/day/14)
+
+The first part is a novel little 2-dimensional problem.  Though it
+used north, it was neater to generalize to any direction.  The second
+part is clearly infeasible unless there is a cycle.  Having met a few
+of these before, I had already written a cycle finder, which did the
+trick here too.
