@@ -12,7 +12,7 @@ import qualified Data.Map as Map
 type Input1 = [String]
 
 parse1 :: String -> Input1
-parse1 s = words [if c == ',' then ' ' else c | c <- s]
+parse1 s = lines [if c == ',' then '\n' else c | c <- s]
 
 type Instruction = (Label, Operation)
 data Operation = Remove | Assign Int
@@ -22,9 +22,8 @@ type Label = String
 type Input2 = [Instruction]
 
 parse2 :: String -> Input2
-parse2 = runParser instructions . head . lines
+parse2 = map (runParser instruction) . parse1
   where
-    instructions = instruction `sepBy1` char ','
     instruction = (,) <$> label <*> operation
     operation = Assign <$ char '=' <*> nat <|> Remove <$ char '-'
     label = some letter
@@ -72,8 +71,9 @@ hasLabel label (l, _) = l == label
 
 focussingPower :: BoxArray -> Map Label Int
 focussingPower boxes =
-    Map.fromListWith (*) [(l, (box_no+1)*lens_no*n) |
-        (box_no, ls) <- Map.assocs boxes, (lens_no, (l, n)) <- zip [1..] ls]
+    Map.fromListWith (*) [(l, (box_no+1) * lens_no * n) |
+        (box_no, ls) <- Map.assocs boxes,
+        (lens_no, (l, n)) <- zip [1..] ls]
 
 solve2 :: Input2 -> Int
 solve2 = sum . Map.elems . focussingPower . foldl step initBoxArray
