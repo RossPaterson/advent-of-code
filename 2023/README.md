@@ -106,3 +106,9 @@ used north, it was neater to generalize to any direction.  The second
 part is clearly infeasible unless there is a cycle.  Having met a few
 of these before, I had already written a cycle finder, which did the
 trick here too.
+
+## [Day 15: Lens Library](https://adventofcode.com/2023/day/15)
+
+The first part was almost trivial.  The second was a fairly tedious
+exercise in implementing a detailed specification using list and map
+manipulation.
