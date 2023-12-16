@@ -3,32 +3,37 @@ module Main where
 import Geometry
 import Graph
 import Utilities
-import Data.Maybe
 import Data.Map (Map)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 
 -- Input processing
 
-data Device = LeftMirror | RightMirror | HorizSplitter | VertSplitter
-    deriving (Show)
+data Element =
+    Empty | SW_NE_Mirror | NW_SE_Mirror | EW_Splitter | NS_Splitter
+    deriving (Eq, Show)
+type Elements = Map Position Element
 
-type Input = (AABox Position, Map Position Device)
+getElement :: Position -> Elements -> Element
+getElement = Map.findWithDefault Empty
+
+type Input = (AABox Position, Elements)
 
 parse :: String -> Input
-parse s = (box, devices)
+parse s = (box, elements)
   where
     pcs = readGrid s
     box = boundingBox (map fst pcs)
-    devices =
-        Map.fromList [(p, d) | (p, c) <- pcs, d <- maybeToList (getDevice c)]
+    elements = Map.fromList
+        [(p, e) | (p, c) <- pcs, let e = charToElement c, e /= Empty]
 
-getDevice :: Char -> Maybe Device
-getDevice '/' = Just LeftMirror
-getDevice '\\' = Just RightMirror
-getDevice '-' = Just HorizSplitter
-getDevice '|' = Just VertSplitter
-getDevice _ = Nothing
+charToElement :: Char -> Element
+charToElement '.' = Empty
+charToElement '/' = SW_NE_Mirror
+charToElement '\\' = NW_SE_Mirror
+charToElement '-' = EW_Splitter
+charToElement '|' = NS_Splitter
+charToElement _ = error "unexpected character"
 
 -- Part One
 
@@ -51,37 +56,36 @@ startBeam :: Beam
 startBeam = (zero, E)
 
 -- one step in moving a beam
-move :: AABox Position -> Map Position Device -> Beam -> [Beam]
-move box devices (p, d) =
-    filter ((`inBox` box) . fst) $ map advance $
-    [(p, d') | d' <- maybe [d] (bounce d) (Map.lookup p devices)]
+move :: AABox Position -> Elements -> Beam -> [Beam]
+move box elements (p, d) =
+    [(p', d') |
+        d' <- deflect d (getElement p elements),
+        let p' = p .+. oneStep d',
+        inBox p' box]
 
--- bounce a beam direction off a mirror or splitter
-bounce :: Direction -> Device -> [Direction]
-bounce N LeftMirror = [E]
-bounce S LeftMirror = [W]
-bounce E LeftMirror = [N]
-bounce W LeftMirror = [S]
-bounce N RightMirror = [W]
-bounce S RightMirror = [E]
-bounce E RightMirror = [S]
-bounce W RightMirror = [N]
-bounce N HorizSplitter = [E, W]
-bounce S HorizSplitter = [E, W]
-bounce E VertSplitter = [N, S]
-bounce W VertSplitter = [N, S]
-bounce d _ = [d]
-
-advance :: Beam -> Beam
-advance (p, d) = (p .+. oneStep d, d)
+-- deflect a beam direction off a mirror or splitter
+deflect :: Direction -> Element -> [Direction]
+deflect N SW_NE_Mirror = [E]
+deflect S SW_NE_Mirror = [W]
+deflect E SW_NE_Mirror = [N]
+deflect W SW_NE_Mirror = [S]
+deflect N NW_SE_Mirror = [W]
+deflect S NW_SE_Mirror = [E]
+deflect E NW_SE_Mirror = [S]
+deflect W NW_SE_Mirror = [N]
+deflect N EW_Splitter = [E, W]
+deflect S EW_Splitter = [E, W]
+deflect E NS_Splitter = [N, S]
+deflect W NS_Splitter = [N, S]
+deflect d _ = [d] -- empty or end-on to a splitter
 
 -- number of energized positions from starting beam
-energized :: AABox Position -> Map Position Device -> Beam -> Int
-energized box devices beam =
-    Set.size $ Set.fromList $ map fst $ concat $ bfs (move box devices) [beam]
+energized :: AABox Position -> Elements -> Beam -> Int
+energized box elements beam =
+    Set.size $ Set.fromList $ map fst $ concat $ bfs (move box elements) [beam]
 
 solve1 :: Input -> Int
-solve1 (box, devices) = energized box devices startBeam
+solve1 (box, elements) = energized box elements startBeam
 
 testInput :: String
 testInput = "\
@@ -112,8 +116,8 @@ startBeams box =
     Position max_x max_y = maxCorner box
 
 solve2 :: Input -> Int
-solve2 (box, devices) =
-    maximum [energized box devices beam | beam <- startBeams box]
+solve2 (box, elements) =
+    maximum $ map (energized box elements) $ startBeams box
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 51)]
