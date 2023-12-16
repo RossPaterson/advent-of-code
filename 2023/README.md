@@ -112,3 +112,10 @@ trick here too.
 The first part was almost trivial.  The second was a fairly tedious
 exercise in implementing a detailed specification using list and map
 manipulation.
+
+## [Day 16: The Floor Will Be Lava](https://adventofcode.com/2023/day/16)
+
+This was a novel variation.  There's a bit of detail in getting the
+actions of the mirrors and splitters right, but after that this is
+another state search.  An exhaustive search repeating the first part
+was fast enough for the second part.
