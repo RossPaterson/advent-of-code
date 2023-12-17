@@ -129,9 +129,11 @@ testState2 :: State
 testState2 = startState 10 250 14 8
 
 solve :: Int -> State -> Int
-solve level =
-    fst . head . filter (success . snd) . shortestPaths (step level) .
-    mod_player_hit_points (subtract level)
+solve level s0 =
+    head [t |
+        (t, s) <- shortestPaths (step level)
+            [mod_player_hit_points (subtract level) s0],
+        success s]
 
 solve1 :: Int -> Int -> Int
 solve1 h d = solve 0 (initState h d)

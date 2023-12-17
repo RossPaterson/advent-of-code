@@ -96,7 +96,7 @@ moves room_size conf = move_out room_size conf ++ move_in room_size conf
 solve1 :: Rooms -> Int
 solve1 rooms =
     fst $ head $ dropWhile (not . finished . snd) $
-        shortestPaths (moves room_size) $ Configuration Map.empty rooms
+        shortestPaths (moves room_size) [Configuration Map.empty rooms]
   where
     room_size = length $ head $ Map.elems rooms
 

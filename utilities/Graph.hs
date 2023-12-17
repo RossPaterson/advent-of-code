@@ -167,11 +167,13 @@ bfsPaths f =
       where
         (ys, seen') = new_level (Set.insert x seen) xps
 
--- | All nodes reachable from the start point, with shortest distances,
--- in increasing order of distance.  All edge costs must be positive.
-shortestPaths :: Ord a => (a -> [(Int, a)]) -> a -> [(Int, a)]
-shortestPaths adjacent start = dijkstra Set.empty (PSQ.singleton start 0)
+-- | All nodes reachable from any of the start points, with shortest
+-- distances, in increasing order of distance.  All edge costs must
+-- be positive.
+shortestPaths :: Ord a => (a -> [(Int, a)]) -> [a] -> [(Int, a)]
+shortestPaths adjacent starts = dijkstra Set.empty start_q
   where
+    start_q = foldr (\ s -> PSQ.insert s 0) PSQ.empty starts
     dijkstra done psq = case PSQ.extract psq of
         Nothing -> []
         Just (n, dist_n, psq') ->

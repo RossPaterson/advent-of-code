@@ -84,7 +84,7 @@ showStateAux m ps coll = showGrid '#' $
 solve1 :: Input -> Int
 solve1 (m, p) =
     fst $ head $ dropWhile (not . finished . snd) $
-        shortestPaths (getKey m) $ initState p
+        shortestPaths (getKey m) [initState p]
   where
     ks = allKeys m
     finished (State _ coll) = coll == ks
@@ -186,7 +186,8 @@ splitMaze (m, State p coll) = (m', State2 new_ps coll)
 
 solve2 :: Input -> Int
 solve2 (m0, p) =
-    fst $ head $ dropWhile (not . finished . snd) $ shortestPaths (getKey2 m) s
+    fst $ head $ dropWhile (not . finished . snd) $
+        shortestPaths (getKey2 m) [s]
   where
     (m, s) = splitMaze (m0, initState p)
     ks = allKeys m

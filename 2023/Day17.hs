@@ -5,7 +5,7 @@ import Graph
 import Utilities
 import Data.Maybe
 import Data.Char
-import Data.Map (Map, (!))
+import Data.Map (Map)
 import qualified Data.Map as Map
 
 -- Input processing
@@ -46,7 +46,7 @@ data State = State {
 
 -- start by moving from the top left corner
 startStates :: [State]
-startStates = [State (Position 1 0) E 1, State (Position 0 1) S 1]
+startStates = [State zero E 0, State zero S 0]
 
 -- possible moves, without considering bounds
 moves :: Int -> Int -> State -> [State]
@@ -62,13 +62,12 @@ nextStates max_straight min_turn blocks s =
         s' <- moves max_straight min_turn s,
         c <- maybeToList (Map.lookup (position s') blocks)]
 
--- minimum cost from a start state to a finish state
+-- minimum cost from any start state to a finish state
 minCost :: Int -> Int -> Map Position Int -> Int
 minCost max_straight min_turn blocks =
-    minimum [blocks!position s +
-        fst (head (dropWhile (not . at_end . snd)
-            (shortestPaths (nextStates max_straight min_turn blocks) s))) |
-        s <- startStates]
+    head [cost |
+        (cost, s) <- shortestPaths (nextStates max_straight min_turn blocks) startStates,
+        at_end s]
   where
     finish = fst (Map.findMax blocks)
     at_end (State p _ n) = p == finish && n >= min_turn

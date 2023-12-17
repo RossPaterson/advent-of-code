@@ -30,7 +30,7 @@ neighbours g p = [(v, p') |
 
 solve1 :: Input -> Int
 solve1 g =
-    head [d | (d, p) <- shortestPaths (neighbours g) (start g), p == finish]
+    head [d | (d, p) <- shortestPaths (neighbours g) [start g], p == finish]
   where
     finish = goal g
 
