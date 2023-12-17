@@ -119,3 +119,9 @@ This was a novel variation.  There's a bit of detail in getting the
 actions of the mirrors and splitters right, but after that this is
 another state search.  An exhaustive search repeating the first part
 was fast enough for the second part.
+
+## [Day 17: Clumsy Crucible](https://adventofcode.com/2023/day/17)
+
+It took a while to realize what this was, but then it is easy if you
+have the necessary library function to hand.  The second part is easily
+done by generalizing the first.
