@@ -226,6 +226,17 @@ searchIntegerRange p l h
 --   | Set.member x domain = rec_f f x
 --   | otherwise = def
 -- @
+--
+-- If this function is to be applied to more than one argument, all the
+-- applications should share the value of @memoize domain def rec_f@,
+-- for example by defining
+--
+-- @
+-- f = memoize domain def rec_f
+-- @
+--
+-- with no class constraints in the type, so that all applications of @f@
+-- share the same memo table.
 memoize :: (Ord a) => Set a -> b -> ((a -> b) -> a -> b) -> a -> b
 memoize domain def rec_f = f
   where
