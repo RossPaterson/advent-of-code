@@ -9,7 +9,7 @@ module Geometry (
     Position(..), corners,
     readGrid, showGrid,
     -- ** Cartesian spaces of various dimensions
-    Point2(..),
+    Point2(..), polygonArea2,
     Point3(..), cross,
     Point4(..),
     -- ** Hexagonal tiling
@@ -220,6 +220,15 @@ instance Planar Point2 where
       | otherwise = 0
 
     Point2 a b .*. Point2 c d = Point2 (a*c - b*d) (a*d + b*c)
+
+-- | Double the area of the polygon marked out with a cyclic path.
+polygonArea2 :: [Point2] -> Int
+polygonArea2 [] = 0
+polygonArea2 (p:ps) = -- shoelace formula
+    fromInteger $ abs $ sum $ zipWith determinant (p:ps) (ps ++ [p])
+  where
+    determinant (Point2 x1 y1) (Point2 x2 y2) =
+        toInteger x1*toInteger y2 - toInteger x2*toInteger y1
 
 -- | Cartesian coordinate in 3-dimensional space
 data Point3 = Point3 !Int !Int !Int
