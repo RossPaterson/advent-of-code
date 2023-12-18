@@ -13,6 +13,8 @@ module Parser (
     count, sepBy1,
     -- * Basic values
     nat, int, enumValue,
+    octNumber,
+    hexNumber,
     -- * Literals
     string, char,
     -- * Single characters
@@ -22,6 +24,7 @@ module Parser (
 import Control.Applicative
 import Data.Char
 import Data.List
+import Numeric
 
 -- | Simple applicative parser
 newtype Parser a = Parser (ReadS a)
@@ -86,6 +89,14 @@ nat = (fromInteger . read) <$> some digit
 -- | Parse an integer.
 int :: Num a => Parser a
 int = negate <$ char '-' <*> nat <|> nat
+
+-- | Parse an octal integer.
+octNumber :: (Eq a, Num a) => Parser a
+octNumber = Parser readOct
+
+-- | Parse a hexadecimal integer.
+hexNumber :: (Eq a, Num a) => Parser a
+hexNumber = Parser readHex
 
 -- | Literal match of the given string.
 string :: String -> Parser String
