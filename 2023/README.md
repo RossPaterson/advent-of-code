@@ -4,11 +4,15 @@
 
 (image by [Jo Wood](https://github.com/jwoLondon))
 
-Some of the early puzzles (days 3, 5 and 7) were significantly tougher
-than in the last 3 years.
+This year started off a little tougher than the last 3 years, but there
+were still several easy ones.  Some puzzles required, or were much easier
+with, prior knowledge of algorithms (days 12, 14 and 17) or mathematics
+(days 10 and 18).  These things are good to know, but this means the
+leaderboard times for these days underestimate the relative difficulty
+for less expert solvers.
 
-The narrative appears to be a descending recursion through the islands,
-through which we will return later.
+The narrative was a recursion through five islands (looking like baubles),
+through which we returned later.
 
 ## [Day 1: Trebuchet?!](https://adventofcode.com/2023/day/1)
 
@@ -125,3 +129,13 @@ was fast enough for the second part.
 It took a while to realize what this was, but then it is easy if you
 have the necessary library function to hand.  The second part is easily
 done by generalizing the first.
+
+## [Day 18: Lavaduct Lagoon](https://adventofcode.com/2023/day/18)
+
+This was novel and difficult.  The first part was similar to day 10, but
+the second scaled things up so that discrete approaches no longer worked.
+I first solved it by cutting the zone into strips, as in
+[this Reddit post](https://www.reddit.com/r/adventofcode/comments/18l6tlj/2023_day_18_developed_my_own_algorithm/),
+but this was very ugly.  As seen in the
+[Reddit discussion](https://www.reddit.com/r/adventofcode/comments/18l0qtr/2023_day_18_solutions/),
+it is much simpler to use a bit of maths that was new to me.
