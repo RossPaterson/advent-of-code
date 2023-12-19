@@ -86,8 +86,8 @@ the second part.
 
 ## [Day 12: Hot Springs](https://adventofcode.com/2023/day/12) \*\*\*
 
-I did the first part by exhausive search, even though it seemed
-likely that the problem would be expanded in the seconrt, as it was.
+I did the first part by exhaustive search, even though it seemed
+likely that the problem would be expanded in the second, as it was.
 This required dynamic programming, which is neatly achieved by memoizing
 the recursive definition.  I used a two-stage approach.  More compact
 keys would have sped things up, but it's fast enough.  Not reading the
@@ -95,12 +95,12 @@ definition of unfolding carefully cost some time.
 
 ## [Day 13: Point of Incidence](https://adventofcode.com/2023/day/13) \*\*
 
-As often, I started by trying an overengineered solution, this time using
-arithmetic on indices (and it would have been correct if I hadn't messed
-up the summary function).  However, the problem turned out be a neat
-exercise in list manipulation.  The second part used a variant of the
-first inside an exhaustive search, but linear in the size of the input,
-and thus quite quick.
+As often, I started by trying an over-engineered solution, this time
+using arithmetic on indices (and it would have been correct if I hadn't
+messed up the summary function).  However, the problem turned out be
+a neat exercise in list manipulation.  The second part used a variant
+of the first inside an exhaustive search, but linear in the size of the
+input, and thus quite quick.
 
 ## [Day 14: Parabolic Reflector Dish](https://adventofcode.com/2023/day/14) \*\*
 
