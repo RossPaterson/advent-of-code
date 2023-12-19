@@ -11,10 +11,9 @@ with, prior knowledge of algorithms (days 12, 14 and 17) or mathematics
 leaderboard times for these days underestimate the relative difficulty
 for less expert solvers.
 
-The narrative was a recursion through five islands (looking like baubles),
-through which we returned later.
+I have added difficulty ratings based on how long I took to solve each puzzle.
 
-## [Day 1: Trebuchet?!](https://adventofcode.com/2023/day/1)
+## [Day 1: Trebuchet?!](https://adventofcode.com/2023/day/1) \*
 
 This was a bit more work than the usual starting problem.  The second
 part gives a taste of our initial solution working for the test input
@@ -22,48 +21,48 @@ but not the real input.  The test input does at least suggest (on every
 second line) the question we should be asking, but it also contains a
 red herring.
 
-## [Day 2: Cube Conundrum](https://adventofcode.com/2023/day/2)
+## [Day 2: Cube Conundrum](https://adventofcode.com/2023/day/2) \*
 
 The main work here is parsing the input.  After that, the first part is
 a simple computation and the second part is the inverse.
 
-## [Day 3: Gear Ratios](https://adventofcode.com/2023/day/3)
+## [Day 3: Gear Ratios](https://adventofcode.com/2023/day/3) \*
 
 The main effort here is a bit of 2-dimensional parsing, but the rest is
 straightforward if you follow the definitions precisely.
 
-## [Day 4: Scratchcards](https://adventofcode.com/2023/day/4)
+## [Day 4: Scratchcards](https://adventofcode.com/2023/day/4) \*
 
 The parsing is much the same as day 2.  The first part is simple, but
 gets us thinking about powers, and in the second part we clearly need
 to change the representation to avoid exponential blowup, but it comes
 out neatly.
 
-## [Day 5: If You Give A Seed A Fertilizer](https://adventofcode.com/2023/day/5)
+## [Day 5: If You Give A Seed A Fertilizer](https://adventofcode.com/2023/day/5) \*\*
 
 This was a step up.  After a bit of parsing, the first part sets the
 stage, while the second part requires a shift to ranges.
 
-## [Day 6: Wait For It](https://adventofcode.com/2023/day/6)
+## [Day 6: Wait For It](https://adventofcode.com/2023/day/6) \*
 
 A much easier puzzle.  The second part can be done with an analytic
 solution using an old formula from school, but reusing the exhaustive
 search of the first part runs in a fraction of a second.
 
-## [Day 7: Camel Cards](https://adventofcode.com/2023/day/7)
+## [Day 7: Camel Cards](https://adventofcode.com/2023/day/7) \*\*
 
 This was about accurately implementing intricate rules.  In the first
 part, I implemented the standard ordering, before noticing that this
 version is simpler.  The second part is trickier, but exhaustive search
 was fast enough.
 
-## [Day 8: Haunted Wasteland](https://adventofcode.com/2023/day/8)
+## [Day 8: Haunted Wasteland](https://adventofcode.com/2023/day/8) \*
 
 The first part was an easy setup.  The second part will be infeasible
 unless the supplied inputs have some repeating pattern.  A little
 experimentation reveals that the repeat is particularly simple.
 
-## [Day 9: Mirage Maintenance](https://adventofcode.com/2023/day/9)
+## [Day 9: Mirage Maintenance](https://adventofcode.com/2023/day/9) \*
 
 A little problem of integer sequences.  The two parts have very neat
 matching solutions using list functions that directly implement the
@@ -79,13 +78,13 @@ with a standard algorithm, but we have to work out how to fit it to the
 representation used here.  Fortunately there are enough test cases to
 catch errors in the logic.
 
-## [Day 11: Cosmic Expansion](https://adventofcode.com/2023/day/11)
+## [Day 11: Cosmic Expansion](https://adventofcode.com/2023/day/11) \*
 
 This was a cute little problem of expanding lists.  I went for a
 mapping solution in the first part, and this generalized directly for
 the second part.
 
-## [Day 12: Hot Springs](https://adventofcode.com/2023/day/12)
+## [Day 12: Hot Springs](https://adventofcode.com/2023/day/12) \*\*\*
 
 I did the first part by exhausive search, even though it seemed
 likely that the problem would be expanded in the seconrt, as it was.
@@ -94,7 +93,7 @@ the recursive definition.  I used a two-stage approach.  More compact
 keys would have sped things up, but it's fast enough.  Not reading the
 definition of unfolding carefully cost some time.
 
-## [Day 13: Point of Incidence](https://adventofcode.com/2023/day/13)
+## [Day 13: Point of Incidence](https://adventofcode.com/2023/day/13) \*\*
 
 As often, I started by trying an overengineered solution, this time using
 arithmetic on indices (and it would have been correct if I hadn't messed
@@ -103,7 +102,7 @@ exercise in list manipulation.  The second part used a variant of the
 first inside an exhaustive search, but linear in the size of the input,
 and thus quite quick.
 
-## [Day 14: Parabolic Reflector Dish](https://adventofcode.com/2023/day/14)
+## [Day 14: Parabolic Reflector Dish](https://adventofcode.com/2023/day/14) \*\*
 
 The first part is a novel little 2-dimensional problem.  Though it
 used north, it was neater to generalize to any direction.  The second
@@ -111,26 +110,26 @@ part is clearly infeasible unless there is a cycle.  Having met a few
 of these before, I had already written a cycle finder, which did the
 trick here too.
 
-## [Day 15: Lens Library](https://adventofcode.com/2023/day/15)
+## [Day 15: Lens Library](https://adventofcode.com/2023/day/15) \*\*
 
 The first part was almost trivial.  The second was a fairly tedious
 exercise in implementing a detailed specification using list and map
 manipulation.
 
-## [Day 16: The Floor Will Be Lava](https://adventofcode.com/2023/day/16)
+## [Day 16: The Floor Will Be Lava](https://adventofcode.com/2023/day/16) \*
 
 This was a novel variation.  There's a bit of detail in getting the
 actions of the mirrors and splitters right, but after that this is
 another state search.  An exhaustive search repeating the first part
 was fast enough for the second part.
 
-## [Day 17: Clumsy Crucible](https://adventofcode.com/2023/day/17)
+## [Day 17: Clumsy Crucible](https://adventofcode.com/2023/day/17) \*\*\*
 
 It took a while to realize what this was, but then it is easy if you
 have the necessary library function to hand.  The second part is easily
 done by generalizing the first.
 
-## [Day 18: Lavaduct Lagoon](https://adventofcode.com/2023/day/18)
+## [Day 18: Lavaduct Lagoon](https://adventofcode.com/2023/day/18) \*\*\*
 
 This was novel and difficult.  The first part was similar to day 10, but
 the second scaled things up so that discrete approaches no longer worked.
@@ -139,3 +138,8 @@ I first solved it by cutting the zone into strips, as in
 but this was very ugly.  As seen in the
 [Reddit discussion](https://www.reddit.com/r/adventofcode/comments/18l0qtr/2023_day_18_solutions/),
 it is much simpler to use a bit of maths that was new to me.
+
+## [Day 19: Aplenty](https://adventofcode.com/2023/day/19) \*\*
+
+This was the first assembly-like problem this year.  As on day 5, the
+second part required a shift to collections of ranges.
