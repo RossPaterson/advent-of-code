@@ -171,6 +171,11 @@ the naive implementation, test it with the examples given, and then
 compare our faster version with this one on small inputs that have the
 simplifying property.
 
+From the [Reddit thread](https://www.reddit.com/r/adventofcode/comments/18nevo3/2023_day_21_solutions/),
+the input and the given number of steps are even sneakier, so that there
+is a simple formula for the answer.  So that's why the input had that
+big diamond shape in it.
+
 ## [Day 22: Sand Slabs](https://adventofcode.com/2023/day/22) \*\*
 
 A nice little exercise in universal and existential quantifiers.
