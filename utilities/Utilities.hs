@@ -16,6 +16,7 @@ module Utilities (
     initSets,
     leastBy,
     wordsWith,
+    longZipWith,
     -- * Iteration
     whileJust,
     iterateWhileJust,
@@ -121,6 +122,13 @@ wordsWith p = unfoldr getWord
     getWord xs = case dropWhile (not . p) xs of
         [] -> Nothing
         xs' -> Just (span p xs')
+
+-- | Like 'zipWith', except that when one list is exhausted it keeps
+-- going with the other one.
+longZipWith :: (a -> a -> a) -> [a] -> [a] -> [a]
+longZipWith _ [] ys = ys
+longZipWith _ xs [] = xs
+longZipWith f (x:xs) (y:ys) = f x y:longZipWith f xs ys
 
 -- | Repeatedly apply the function until it doesn't produce a new value
 whileJust :: (a -> Maybe a) -> a -> a
