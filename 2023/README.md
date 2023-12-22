@@ -5,8 +5,9 @@
 (image by [Jo Wood](https://github.com/jwoLondon))
 
 This year started off a little tougher than the last 3 years, but there
-were still several easy ones.  There was some foreshadowing in the early
-puzzles (e.g between days 5 and 16, days 8 and 20, and days 10 and 18).
+were still several easy ones.  There was some foreshadowing in the
+early puzzles (e.g between days 5 and 16, days 8 and 20, days 10 and 18,
+and days 9 and 21).
 
 Some puzzles required, or were much easier with, prior knowledge
 of algorithms (days 12, 14 and 17) or mathematics (days 10 and 18).
@@ -66,10 +67,10 @@ experimentation reveals that the repeat is particularly simple.
 
 ## [Day 9: Mirage Maintenance](https://adventofcode.com/2023/day/9) \*
 
-A little problem of integer sequences.  The two parts have very neat
-matching solutions using list functions that directly implement the
-description.  The Reddit discussion mentions an even easier way to
-exploit the symmetry.
+A little problem of integer sequences, based on the method of finite
+differences.  The two parts have very neat matching solutions using list
+functions that directly implement the description.  The Reddit discussion
+mentions an even easier way to exploit the symmetry.
 
 ## [Day 10: Pipe Maze](https://adventofcode.com/2023/day/10) \*\*\*
 
@@ -173,8 +174,8 @@ simplifying property.
 
 From the [Reddit thread](https://www.reddit.com/r/adventofcode/comments/18nevo3/2023_day_21_solutions/),
 the input and the given number of steps are even sneakier, so that there
-is a simple formula for the answer.  So that's why the input had that
-big diamond shape in it.
+is a simple formula for the answer (recalling day 9).  So that's why
+the input had that big diamond shape in it.
 
 ## [Day 22: Sand Slabs](https://adventofcode.com/2023/day/22) \*\*
 
