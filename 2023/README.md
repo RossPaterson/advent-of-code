@@ -5,11 +5,13 @@
 (image by [Jo Wood](https://github.com/jwoLondon))
 
 This year started off a little tougher than the last 3 years, but there
-were still several easy ones.  Some puzzles required, or were much easier
-with, prior knowledge of algorithms (days 12, 14 and 17) or mathematics
-(days 10 and 18).  These things are good to know, but this means the
-leaderboard times for these days underestimate the relative difficulty
-for less expert solvers.
+were still several easy ones.  There was some foreshadowing in the early
+puzzles (e.g between days 5 and 16, days 8 and 20, and days 10 and 18).
+
+Some puzzles required, or were much easier with, prior knowledge
+of algorithms (days 12, 14 and 17) or mathematics (days 10 and 18).
+These things are good to know, but this means the leaderboard times for
+these days underestimate the relative difficulty for less expert solvers.
 
 I have added difficulty ratings based on how long I took to solve each puzzle.
 
@@ -69,7 +71,7 @@ matching solutions using list functions that directly implement the
 description.  The Reddit discussion mentions an even easier way to
 exploit the symmetry.
 
-## [Day 10: Pipe Maze](https://adventofcode.com/2023/day/10)
+## [Day 10: Pipe Maze](https://adventofcode.com/2023/day/10) \*\*\*
 
 This was novel and tricky.  To parse the input we need to determine what
 piece lies at the start position, which takes a while, but sets us up
@@ -143,3 +145,34 @@ it is much simpler to use a bit of maths that was new to me.
 
 This was the first assembly-like problem this year.  As on day 5, the
 second part required a shift to collections of ranges.
+
+## [Day 20: Pulse Propagation](https://adventofcode.com/2023/day/20) \*\*\*\*
+
+This was the most difficult so far.  For the first part we need to
+simulate a network of flipflops and NAND gates, with curious sequential
+behaviour.  For the second part, simulation is infeasible, and we need
+to find a repeat (similar to day 8).  The network appears to be designed
+so that the key nodes are reset before the end of the iteration, so I
+was unable to see the repetition, and disassembled the network by hand.
+Generating a display of the network would have have helped.  It turns
+out to be a group of modular counters, which is interesting.
+
+## [Day 21: Step Counter](https://adventofcode.com/2023/day/21) \*\*\*\*
+
+This one was even harder (and very novel).  The first part is fairly
+easy, and introduces the idea of parity.  In the second part, with
+infinite repetitions, the naive implementation is too slow.  I spent
+a while thinking about general solutions, which seem very difficult,
+before looking at the actual input.  This has a special property
+that greatly simplifies the problem.  The sample input lacks this
+property, which is sneaky.  Still, the examples are useful, because
+the efficient implementation is hard to get right, so we have to do
+the naive implementation, test it with the examples given, and then
+compare our faster version with this one on small inputs that have the
+simplifying property.
+
+## [Day 22: Sand Slabs](https://adventofcode.com/2023/day/22) \*\*
+
+A nice little exercise in universal and existential quantifiers.
+My first version, using lists, was a little slow, but got the answer.
+It can be sped up neatly using containers.
