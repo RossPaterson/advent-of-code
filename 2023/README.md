@@ -9,8 +9,8 @@ were still several easy ones.  There was some foreshadowing in the
 early puzzles (e.g between days 5 and 16, days 8 and 20, days 10 and 18,
 and days 9 and 21).
 
-Some puzzles required, or were much easier with, prior knowledge
-of algorithms (days 12, 14 and 17) or mathematics (days 10 and 18).
+Some puzzles required, or were much easier with, prior knowledge of
+algorithms (days 12, 14, 17 and 23) or mathematics (days 10 and 18).
 These things are good to know, but this means the leaderboard times for
 these days underestimate the relative difficulty for less expert solvers.
 
@@ -182,3 +182,10 @@ the input had that big diamond shape in it.
 A nice little exercise in universal and existential quantifiers.
 My first version, using lists, was a little slow, but got the answer.
 It can be sped up neatly using containers.
+
+## [Day 23: A Long Walk](https://adventofcode.com/2023/day/23) \*\*\*
+
+The first part is easy enough with exhaustive search, but removing the
+one-way gates in the second part yields a longest path problem, which
+is NP-hard in general.  However, it can be solved by converting it to
+a weighted graph and using a branch-and-bound search on that.
