@@ -274,8 +274,11 @@ takeWhileTree :: (a -> Bool) -> Tree a -> Tree a
 takeWhileTree p (Node x ts) =
     Node x [takeWhileTree p t | t <- ts, p (rootLabel t)]
 
--- | Faster version of @'maximum' . 'fmap' score@ using a depth-first
--- traversal, provided @bound ('rootLabel' t) >= score x@ for any @x@ in @t@.
+-- | Provided @bound ('rootLabel' t) >= score x@ for any @x@ in @t@,
+--
+-- @'maximumDF' score bound = 'maximum' . 'fmap' score@
+--
+-- but faster, especially if the bound is reasonably tight.
 maximumDF :: (Ord v) => (a -> v) -> (a -> v) -> Tree a -> v
 maximumDF score bound (Node root subts) = maximumForestDF (score root) subts
   where
