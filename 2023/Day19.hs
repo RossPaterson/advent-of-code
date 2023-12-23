@@ -167,7 +167,7 @@ successRange GreaterThan y = range (y+1) maxValue
 -- The combination sets in each branch are disjoint subsets of the set
 -- in the parent branch.
 stateTree :: System -> Tree State
-stateTree system = unfoldTree (\ s -> (s, nextStates system s)) startState
+stateTree system = iterateTree (nextStates system) startState
 
 -- disjoint sets of combinations that lead to Accept
 acceptable :: System -> [PartSet]
