@@ -269,7 +269,7 @@ takeTree n (Node x ts)
   | n == 0 = Node x []
   | otherwise = Node x (map (takeTree (n-1)) ts)
 
--- | The subtree including the root and all paths along while @p@ is 'True'.
+-- | The subtree including the root and all paths along which @p@ is 'True'.
 takeWhileTree :: (a -> Bool) -> Tree a -> Tree a
 takeWhileTree p (Node x ts) =
     Node x [takeWhileTree p t | t <- ts, p (rootLabel t)]
