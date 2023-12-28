@@ -2,6 +2,7 @@
 module Graph (
     -- * Relations
     Relation,
+    relation,
     uniquePerfectMatching,
     -- * Finite graphs
     FiniteGraph,
@@ -11,7 +12,9 @@ module Graph (
     -- * Single-source shortest paths
     -- | Neighbours of a node are given by a function, so these operations
     -- can be used on infinite graphs.
-    bfs, bfsPaths, shortestPaths
+    bfs, bfsPaths, shortestPaths,
+    -- * Drawing graphs with Graphviz
+    directedGV, undirectedGV,
     ) where
 
 import qualified Data.PrioritySearchQueue as PSQ
@@ -31,6 +34,7 @@ import qualified Data.Set as Set
 -- | A binary relation, or equivalently a bipartite graph
 type Relation a b = Map a (Set b)
 
+-- | Make a relation from a list of pairs
 relation :: (Ord a, Ord b) => [(a, b)] -> Relation a b
 relation xys =
     Map.fromListWith Set.union [(x, Set.singleton y) | (x, y) <- xys]
@@ -125,7 +129,7 @@ tsort = reverse . postorder . dff
 undirected :: Ord a => FiniteGraph a -> FiniteGraph a
 undirected g = Map.unionWith Set.union g (inverse g)
 
--- | Connected components of the graph
+-- | Connected components of the graph, ignoring the direction of edges
 components :: Ord a => FiniteGraph a -> [Set a]
 components = map treeToSet . dff . undirected
 
@@ -183,3 +187,26 @@ shortestPaths adjacent starts = dijkstra Set.empty start_q
                     (d, child) <- adjacent n, not (Set.member child done')]
             in (dist_n, n):dijkstra done' (foldr adjust psq' children)
     adjust (p, n) psq = PSQ.insert n p psq
+
+-- | Convert graph to Graphviz directed graph format for drawing.
+-- Each pair of node names, representing a directed edge, has an attached
+-- list of attribute-value pairs.
+directedGV :: [(String, String, [(String, String)])] -> String
+directedGV = graphviz "digraph" "->"
+
+-- | Convert graph to Graphviz undirected graph format for drawing.
+-- Each pair of node names, representing an undirected edge, has an
+-- attached list of attribute-value pairs.
+undirectedGV :: [(String, String, [(String, String)])] -> String
+undirectedGV = graphviz "graph" "--"
+
+graphviz ::
+    String -> String -> [(String, String, [(String, String)])] -> String
+graphviz gtype edge es =
+    unlines ((gtype ++ " aoc {") : map showEdge es ++ ["}"])
+  where
+    showEdge (c, c', as) =
+        "    " ++ c ++ " " ++ edge ++ " " ++ c' ++ showAttrs as ++ ";"
+    showAttrs [] = ""
+    showAttrs as =
+        " [" ++ intercalate "," [n ++ "=" ++ v | (n, v) <- as] ++ "]"
