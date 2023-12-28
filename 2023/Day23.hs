@@ -152,14 +152,11 @@ waypoints m =
     Set.fromList [p | p <- Map.keys m,
         p == startPos m || p == finishPos m || length (nextStepsAll m p) > 2]
 
--- Convert graph to input to neatto, to draw the graph
+-- Convert graph to Graphviz undirected graph format for rendering
 graphToGV :: Map Position [(Int, Position)] -> String
-graphToGV m = unlines $
-    "graph test {" :
-    ["\t" ++ showPos p1 ++ " -- " ++ showPos p2 ++
-        " [label=\"" ++ show n ++ "\",len=1.5];" |
-        (p1, nps) <- Map.assocs m, (n, p2) <- nps, p1 < p2] ++
-    ["}"]
+graphToGV m = undirectedGV
+    [(showPos p1, showPos p2, [("label", show n)]) |
+        (p1, nps) <- Map.assocs m, (n, p2) <- nps, p1 < p2]
   where
     showPos (Position x y) = "P" ++ show x ++ "_" ++ show y
 
@@ -194,7 +191,7 @@ score goal (total, x, _)
   | otherwise = 0
 
 -- upper bound on total lengths of extensions of the current path to the goal
--- All the remaining edges must be from p or an unvisited node to an
+-- All the remaining edges must be from x or an unvisited node to an
 -- unvisited node.
 bound :: (Ord a) => WeightedGraph a -> State a -> Int
 bound g (total, x, not_visited) =
