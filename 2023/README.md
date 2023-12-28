@@ -10,7 +10,7 @@ early puzzles (e.g between days 5 and 16, days 8 and 20, days 10 and 18,
 and days 9 and 21).
 
 Some puzzles required, or were much easier with, prior knowledge of
-algorithms (days 12, 14, 17 and 23) or mathematics (days 10 and 18).
+algorithms (days 12, 14, 17 and 23) or mathematics (days 10, 18 and 24).
 These things are good to know, but this means the leaderboard times for
 these days underestimate the relative difficulty for less expert solvers.
 
@@ -189,3 +189,14 @@ The first part is easy enough with exhaustive search, but removing the
 one-way gates in the second part yields a longest path problem, which
 is NP-hard in general.  However, it can be solved by converting it to
 a weighted graph and using a branch-and-bound search on that.
+
+## [Day 24: Never Tell Me The Odds](https://adventofcode.com/2024/day/24) \*\*\*\*
+
+The first part requires some simple linear algebra, but uses rays rather
+than lines.  The second part involves quadratic terms, but they can be
+eliminated, leaving a system of linear equations.
+
+## [Day 25: Snowverload](https://adventofcode.com/2025/day/25) \*
+
+This was an easy one to finish with, if we use a tool to visualize
+the graph.
