@@ -30,4 +30,4 @@ case $d in
 	exit 1 ;;
 esac
 
-exec curl -b $cookies $site/$year/day/$d/input
+exec curl -b $cookies -o ../$year/input/$day.txt $site/$year/day/$d/input

@@ -129,4 +129,4 @@ Day25: Day25.hs $(UTILITIES) input/25.txt
 	@touch Day25
 
 input/%.txt:
-	../scripts/getinput $(YEAR) $* >$@
+	../scripts/getinput $(YEAR) $*
