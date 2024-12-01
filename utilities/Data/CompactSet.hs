@@ -94,7 +94,7 @@ difference (BitSet xs) (BitSet ys) = BitSet (xs .&. complement ys)
 lookupMin :: Enum a => Set a -> Maybe a
 lookupMin (BitSet xs)
   | xs == zeroBits = Nothing
-  | otherwise = Just (toEnum (head [i | i <- [0..], testBit xs i]))
+  | otherwise = Just (toEnum (until (testBit xs) (+1) 0))
 
 -- | Delete the minimal element. Returns an empty set if the set is empty
 deleteMin :: Enum a => Set a -> Set a
@@ -113,7 +113,7 @@ minView xs = do
 lookupMax :: Enum a => Set a -> Maybe a
 lookupMax (BitSet xs)
   | xs == zeroBits = Nothing
-  | otherwise = Just (toEnum (last (takeWhile (\ i -> bit i <= xs) [0..])))
+  | otherwise = Just (toEnum (until (\ i -> bit i > xs) (+1) 1 - 1))
 
 -- | Delete the maximal element. Returns an empty set if the set is empty
 deleteMax :: Enum a => Set a -> Set a

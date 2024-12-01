@@ -151,7 +151,10 @@ iterateWhileRight f x = x : either (const []) (iterateWhileRight f) (f x)
 -- | @'convergeBy' p xs@ returns the first element of @xs@ related to
 -- the previous one by @p@.
 convergeBy :: (a -> a -> Bool) -> [a] -> a
-convergeBy p xs = head [x2 | (x1, x2) <- zip xs (tail xs), p x1 x2]
+convergeBy _ [] = error "convergeBy: empty list"
+convergeBy p (x:xs) = case [x2 | (x1, x2) <- zip (x:xs) xs, p x1 x2] of
+    [] -> error "convergeBy: does not converge"
+    y:_ -> y
 
 -- | Apply a function @n@ times
 times :: Int -> (a -> a) -> a -> a
@@ -184,7 +187,9 @@ chooseBetween m n (x:xs) =
 -- | Select all the elements of xs that have the least value of f
 -- (f is evaluated once for each element of the list.)
 leastBy :: (Ord v) => (a -> v) -> [a] -> [a]
-leastBy f = map fst . head . groupSortOn snd . map add_f
+leastBy f xs = case groupSortOn snd (map add_f xs) of
+    [] -> error "leastBy: empty list"
+    ys:_ -> map fst ys
   where
     add_f x = (x, f x)
 
