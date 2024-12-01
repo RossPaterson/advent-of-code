@@ -10,25 +10,25 @@ data Tree = Tree [Tree] [Int]
   deriving Show
 
 parse :: String -> Input
-parse = fst . takeTree . map read . words
+parse = fst . parseTree . map read . words
 
 -- Scan one tree from the list
 -- First two numbers are number of subtrees and number of data values
-takeTree :: [Int] -> (Tree, [Int])
-takeTree (nc:nd:xs) = (Tree children vs, rest)
+parseTree :: [Int] -> (Tree, [Int])
+parseTree (nc:nd:xs) = (Tree children vs, rest)
   where
-    (children, xs') = takeTrees nc xs
+    (children, xs') = parseTrees nc xs
     (vs, rest) = splitAt nd xs'
-takeTree _ = error "list does not describe a tree"
+parseTree _ = error "list does not describe a tree"
 
 -- Scan n trees from the list
-takeTrees :: Int -> [Int] -> ([Tree], [Int])
-takeTrees n xs
+parseTrees :: Int -> [Int] -> ([Tree], [Int])
+parseTrees n xs
   | n == 0 = ([], xs)
   | otherwise = (t:ts, rest)
   where
-    (t, xs') = takeTree xs
-    (ts, rest) = takeTrees (n-1) xs'
+    (t, xs') = parseTree xs
+    (ts, rest) = parseTrees (n-1) xs'
 
 -- Part One
 
