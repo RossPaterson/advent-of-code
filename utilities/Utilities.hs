@@ -11,6 +11,7 @@ module Utilities (
     pairWith,
     fastNub,
     frequency,
+    frequencyMap,
     groupSortOn,
     mostCommon,
     initSets,
@@ -46,6 +47,7 @@ module Utilities (
 import Data.Char
 import Data.Function
 import Data.List
+import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
@@ -98,7 +100,11 @@ pairWith _ xs = xs
 
 -- | Unique elements of the input list, paired with their number of occurrences
 frequency :: Ord a => [a] -> [(a, Int)]
-frequency xs = Map.assocs (Map.fromListWith (+) [(x, 1) | x <- xs])
+frequency = Map.assocs . frequencyMap
+
+-- | Unique elements of the input list, with their number of occurrences
+frequencyMap :: Ord a => [a] -> Map a Int
+frequencyMap xs = Map.fromListWith (+) [(x, 1) | x <- xs]
 
 -- | Unique elements of the input list, in decreasing order of frequency
 mostCommon :: Ord a => [a] -> [a]
