@@ -40,50 +40,58 @@ isPrime n = and [n `mod` p /= 0 | p <- takeWhile small primes]
 --
 -- where the @p@'s are primes in ascending order, and each @k@ is positive
 -- (Fundamental Theorem of Arithmetic).
-primeFactors :: Int -> [(Int, Int)]
+primeFactors :: (Integral a) => a -> [(Int, Int)]
+{-# SPECIALIZE primeFactors :: Int -> [(Int, Int)] #-}
+{-# SPECIALIZE primeFactors :: Integer -> [(Int, Int)] #-}
 primeFactors = factorize primes
   where
     factorize [] _ = error "run out of primes"
-    factorize (p:ps) n
+    factorize (int_p:ps) n
       | n == 1 = []
       | n `mod` p == 0 = primePower 1 (n `div` p)
-      | p*p > n = [(n, 1)]
+      | p*p > n = [(fromIntegral n, 1)]
       | otherwise = factorize ps n
       where
+        p = fromIntegral int_p
         primePower k m
           | m `mod` p == 0 = primePower (k+1) (m `div` p)
-          | otherwise = (p, k):factorize ps m
+          | otherwise = (int_p, k):factorize ps m
 
 -- A multiplicative function, specified by its action on @p^k@
-multiplicative :: Num a => (Int -> Int -> a) -> Int -> a
+{-# SPECIALIZE multiplicative :: Num b => (Int -> Int -> b) -> Int -> b #-}
+{-# SPECIALIZE multiplicative :: Num b => (Int -> Int -> b) -> Integer -> b #-}
+multiplicative :: (Integral a, Num b) => (Int -> Int -> b) -> a -> b
 multiplicative f n = product [f p k | (p, k) <- primeFactors n]
 
 -- | The number of divisors of @n@
 -- (OEIS Sequence <http://oeis.org/A000005 A000005>)
-numberOfDivisors :: Int -> Int
+numberOfDivisors :: (Integral a) => a -> Int
 numberOfDivisors = multiplicative (const (+1))
 
 -- | The sum of all the divisors of @n@
 -- (OEIS Sequence <http://oeis.org/A000203 A000203>)
-sumOfDivisors :: Int -> Integer
+sumOfDivisors :: (Integral a) => a -> Integer
 sumOfDivisors = sumOfDivisorPowers 1
 
 -- | @'sumOfDivisorPowers' m n@ is the sum of @m@th powers all the
 -- divisors of @n@.
-sumOfDivisorPowers :: Int -> Int -> Integer
+sumOfDivisorPowers :: (Integral a) => Int -> a -> Integer
 sumOfDivisorPowers m
   | m <= 0 = toInteger . numberOfDivisors
   | otherwise = multiplicative $ \ p k -> sumPowers (toInteger p^m) k
 
 -- @'sumPowers' x k = x^k + ... + x + 1@
 sumPowers :: Integer -> Int -> Integer
-sumPowers x k = fromInteger ((x^(k+1) - 1) `div` (x-1))
+sumPowers x k = (x^(k+1) - 1) `div` (x-1)
 
 -- | @'totient' n@ is the number of numbers between @1@ and @n@ that
 -- are coprime with @n@ (Euler's totient function,
 -- OEIS Sequence <http://oeis.org/A000010 A000010>).
-totient :: Int -> Int
-totient = multiplicative $ \ p k -> p^(k-1)*(p - 1)
+totient :: (Integral a) => a -> a
+{-# SPECIALIZE totient :: Int -> Int #-}
+{-# SPECIALIZE totient :: Integer -> Integer #-}
+totient = multiplicative $ \ int_p k ->
+    let p = fromIntegral int_p in p^(k-1)*(p - 1)
 
 -- | @'bezout' a b = (x, y)@ such that @a*x + b*y = 'gcd' a b@
 -- (Bézout's identity).
@@ -132,7 +140,7 @@ chineseRemainder =
         mn = m*n
 
 -- | @'modularPower' n a k = a^k `mod` n@
-modularPower :: Integral a => a -> a -> Int -> a
+modularPower :: (Integral a, Integral b) => a -> a -> b -> a
 {-# SPECIALIZE modularPower :: Int -> Int -> Int -> Int #-}
 {-# SPECIALIZE modularPower :: Integer -> Integer -> Int -> Integer #-}
 modularPower n a = power_mod
@@ -190,7 +198,9 @@ modularLogarithm n a b = find_log 0 1
 -- | @'universalExponent' n@ is the smallest @k@ such that @a^k@ &#x2261;
 -- @1@ (mod @n@) for each @a@ between @1@ and @n@ that is coprime with @n@
 -- (Carmichael function, OEIS Sequence <http://oeis.org/A002322 A002322>).
-universalExponent :: Int -> Int
+universalExponent :: Integral a => a -> Int
+{-# SPECIALIZE universalExponent :: Int -> Int #-}
+{-# SPECIALIZE universalExponent :: Integer -> Int #-}
 universalExponent = foldr lcm 1 . map carmichael . primeFactors
   where
     carmichael (p, k)
@@ -201,10 +211,12 @@ universalExponent = foldr lcm 1 . map carmichael . primeFactors
 
 -- | @'isPrimitiveRootOf' a n@ is 'True' if all the numbers less than @n@
 -- coprime with @n@ are powers of @a@.
-isPrimitiveRootOf :: Int -> Int -> Bool
+isPrimitiveRootOf :: (Integral a) => a -> a -> Bool
+{-# SPECIALIZE isPrimitiveRootOf :: Int -> Int -> Bool #-}
+{-# SPECIALIZE isPrimitiveRootOf :: Integer -> Integer -> Bool #-}
 isPrimitiveRootOf a n =
     gcd a n == 1 &&
     and [modularPower n a k /= 1 |
-        k <- [phi `div` p | (p, _) <- primeFactors phi]]
+        k <- [phi `div` fromIntegral p | (p, _) <- primeFactors phi]]
   where
     phi = totient n
