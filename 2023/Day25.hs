@@ -53,6 +53,7 @@ indirectPathLength g (c1, c2) =
 removeEdge :: [Edge] -> Edge -> [Edge]
 removeEdge es e = filter (/= e) $ filter (/= (swap e)) es
 
+test :: [Edge] -> [(Int, Edge)]
 test es = sortOn (Down . fst) [(indirectPathLength g e, e) | e <- es]
   where
     g = undirectedGraph es
