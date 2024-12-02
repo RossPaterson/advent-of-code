@@ -6,3 +6,8 @@ This was quite a bit easier than last year's usual starting problem, but
 a tad more than previous years.  The two parts are specified elementwise,
 but have neat implementations using bulk operations on lists and maps
 respectively.
+
+## [Day 2: Red-Nosed Reports](https://adventofcode.com/2024/day/2)
+
+This was simple list manipulation.  The second part looks more
+complicated, but yields to a simple exhaustive search.
