@@ -1,5 +1,9 @@
 # Notes on each day's solutions
 
+![Completion times 2024](https://raw.githubusercontent.com/jwoLondon/adventOfCode/master/images/completionTimes2024.png)
+
+(image by [Jo Wood](https://github.com/jwoLondon))
+
 ## [Day 1: Historian Hysteria](https://adventofcode.com/2024/day/1)
 
 This was quite a bit easier than last year's usual starting problem, but
