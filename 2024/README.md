@@ -15,3 +15,14 @@ respectively.
 
 This was simple list manipulation.  The second part looks more
 complicated, but yields to a simple exhaustive search.
+
+## [Day 3: Mull It Over](https://adventofcode.com/2024/day/3)
+
+This was a job for regular expressions, with the second part also needing
+a little list manipulation.
+
+## [Day 4: Ceres Search](https://adventofcode.com/2024/day/4)
+
+I initially treated this as a list manipulation, which was adequate for
+the first part, but not for the twist in the second.  Both parts are
+easily done using positions  in a grid.
