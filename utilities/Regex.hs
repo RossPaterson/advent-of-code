@@ -16,14 +16,10 @@ import Foreign.C.String
 import Foreign.C.Types
 import System.IO.Unsafe
 
--- | A compiled regular expression
-newtype Regex = Regex (ForeignPtr CRegex)
+-- Counterparts of POSIX regex types
 
 -- counterpart of regex_t
 data CRegex
-
-regexSize :: Int
-regexSize = 64
 
 -- counterpart of regmatch_t
 data CRegmatch = CRegmatch {
@@ -31,30 +27,50 @@ data CRegmatch = CRegmatch {
     regEnd :: CRegoff
 } deriving Show
 
--- counterpart of regoff_t
-type CRegoff = CInt
-
-sizeOfCRegoff :: Int
-sizeOfCRegoff = sizeOf (undefined :: CRegoff)
-
 instance Storable CRegmatch where
-    sizeOf _ = 2 * sizeOfCRegoff
-    alignment _ = alignment (undefined :: CRegoff)
+    sizeOf _ = sizeOfCRegmatch
+    alignment _ = alignOfCRegmatch
 
     peek ptr = do
-        start <- peek (castPtr ptr)
-        end <- peek (ptr `plusPtr` sizeOfCRegoff)
+        start <- peek (ptr `plusPtr` offsetOfRegStart)
+        end <- peek (ptr `plusPtr` offsetOfRegEnd)
         return (CRegmatch start end)
 
     poke ptr (CRegmatch start end) = do
-        poke (castPtr ptr) start
-        poke (ptr `plusPtr` sizeOfCRegoff) end
+        poke (ptr `plusPtr` offsetOfRegStart) start
+        poke (ptr `plusPtr` offsetOfRegEnd) end
 
--- POSIX regex constants
+-- counterpart of regoff_t
+type CRegoff = CInt
+
+-- Constants from regex.h: may differ between systems
+
+-- REG_EXTENDED: Support extended regular expressions
 regExtended :: CInt
 regExtended = 1
 
+-- sizeof(regex_t)
+sizeOfCRegex :: Int
+sizeOfCRegex = 64
+
+-- sizeof(regmatch_t)
+sizeOfCRegmatch :: Int
+sizeOfCRegmatch = 2 * sizeOf (undefined :: CRegoff)
+
+-- alignof(regmatch_t)
+alignOfCRegmatch :: Int
+alignOfCRegmatch = alignment (undefined :: CRegoff)
+
+-- offsetof(regmatch_t, rm_so)
+offsetOfRegStart :: Int
+offsetOfRegStart = 0
+
+-- offsetof(regmatch_t, rm_eo)
+offsetOfRegEnd :: Int
+offsetOfRegEnd = sizeOf (undefined :: CRegoff)
+
 -- POSIX regex functions
+
 foreign import ccall "regex.h regcomp"
     c_regcomp :: Ptr CRegex -> CString -> CInt -> IO CInt
 foreign import ccall "regex.h regexec"
@@ -63,6 +79,9 @@ foreign import ccall "regex.h regexec"
 foreign import ccall "regex.h &regfree"
     c_regfree :: FunPtr (Ptr CRegex -> IO ())
 
+
+-- | A compiled regular expression
+newtype Regex = Regex (ForeignPtr CRegex)
 
 -- | Create a regex object from a string using POSIX Basic Regular Syntax.
 basicRegex :: String -> Maybe Regex
@@ -75,7 +94,7 @@ extendedRegex = makeRegex True
 -- Create a regex object from a string
 makeRegex :: Bool -> String -> Maybe Regex
 makeRegex extended pattern = unsafePerformIO $ do
-    fp <- mallocForeignPtrBytes regexSize
+    fp <- mallocForeignPtrBytes sizeOfCRegex
     withForeignPtr fp $ \ regex ->
         withCString pattern $ \ cstr -> do
             result <- c_regcomp regex cstr flag
@@ -93,7 +112,7 @@ makeRegex extended pattern = unsafePerformIO $ do
 
 -- Maximum number of captures
 maxMatches :: Int
-maxMatches = 10
+maxMatches = 20
 
 -- | A list containing the whole text matched plus any subexpression matches.
 type Matches = [String]
