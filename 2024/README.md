@@ -25,4 +25,13 @@ a little list manipulation.
 
 I initially treated this as a list manipulation, which was adequate for
 the first part, but not for the twist in the second.  Both parts are
-easily done using positions  in a grid.
+easily done using positions in a grid.
+
+## [Day 5: Print Queue](https://adventofcode.com/2024/day/5)
+
+The first part is an easy list manipulation that can be done without
+relying on any properties of the input.  The second part is sneaky.
+The test input has two properties that could make this easier, but the
+second is not shared by the puzzle input, even though the wording seems
+to implicitly assume that it does.  Once you get past that, the actual
+implementation is simple.
