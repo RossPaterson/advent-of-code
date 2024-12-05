@@ -3,6 +3,7 @@ module Graph (
     -- * Relations
     Relation,
     relation,
+    testRelation,
     uniquePerfectMatching,
     -- * Finite graphs
     FiniteGraph,
@@ -38,6 +39,10 @@ type Relation a b = Map a (Set b)
 relation :: (Ord a, Ord b) => [(a, b)] -> Relation a b
 relation xys =
     Map.fromListWith Set.union [(x, Set.singleton y) | (x, y) <- xys]
+
+-- | Does the relation relate x and y?
+testRelation :: (Ord a, Ord b) => Relation a b -> a -> b -> Bool
+testRelation r x y = Set.member y (Map.findWithDefault Set.empty x r)
 
 assocs :: Relation a b -> [(a, b)]
 assocs r = [(x, y) | (x, ys) <- Map.assocs r, y <- Set.elems ys]
