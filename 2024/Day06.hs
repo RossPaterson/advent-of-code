@@ -2,6 +2,7 @@ module Main where
 
 import Geometry
 import Utilities
+import Data.Maybe
 import Data.Set (Set)
 import qualified Data.Set as Set
 
@@ -19,17 +20,20 @@ parse :: String -> Input
 parse s =
     (boundingBox (map fst pcs),
      Set.fromList [p | (p, c) <- pcs, c == '#'],
-     State { loc = guard_loc, dir = direction dir_c })
+     start)
   where
     pcs = readGrid s
-    (guard_loc, dir_c) = head [(p, c) | (p, c) <- pcs, c /= '.' && c /= '#']
+    start =
+        fromMaybe (error "no guard position") $
+        listToMaybe $
+        [State p dir | (p, c) <- pcs, dir <- maybeToList (direction c)]
 
-direction :: Char -> Position
-direction 'v' = Position 0 1
-direction '^' = Position 0 (-1)
-direction '>' = Position 1 0
-direction '<' = Position (-1) 0
-direction _ = error "bad guard"
+direction :: Char -> Maybe Position
+direction 'v' = Just (Position 0 1)
+direction '^' = Just (Position 0 (-1))
+direction '>' = Just (Position 1 0)
+direction '<' = Just (Position (-1) 0)
+direction _ = Nothing
 
 -- Part One
 
@@ -80,7 +84,7 @@ tests1 = [(testInput, 41)]
 solve2 :: Input -> Int
 solve2 (area, obstructions, start) =
     length [p |
-        p <- tail (Set.elems (visited area obstructions start)),
+        p <- drop 1 (Set.elems (visited area obstructions start)),
         hasRepeat (path area (Set.insert p obstructions) start)]
 
 -- the list has a repeated element
