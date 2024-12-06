@@ -35,7 +35,11 @@ direction _ = error "bad guard"
 
 solve1 :: Input -> Int
 solve1 (area, obstructions, start) =
-    Set.size $ Set.fromList $ map loc $ path area obstructions start
+    Set.size (visited area obstructions start)
+
+visited :: AABox Position -> Set Position -> State -> Set Position
+visited area obstructions =
+    Set.fromList . map loc . path area obstructions
 
 -- path taken by the guard until they leave the area
 path :: AABox Position -> Set Position -> State -> [State]
@@ -70,12 +74,13 @@ tests1 = [(testInput, 41)]
 
 -- Part Two
 
+-- The number of ways we can create a cycle by placing one block.
+-- We need only consider positions along the original path, as others
+-- will have no effect.
 solve2 :: Input -> Int
 solve2 (area, obstructions, start) =
     length [p |
-        p <- boxElements area,
-        p /= loc start,
-        not (Set.member p obstructions),
+        p <- tail (Set.elems (visited area obstructions start)),
         hasRepeat (path area (Set.insert p obstructions) start)]
 
 -- the list has a repeated element
