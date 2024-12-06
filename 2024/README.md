@@ -35,3 +35,8 @@ The test input has two properties that could make this easier, but the
 second is not shared by the puzzle input, even though the wording seems
 to implicitly assume that it does.  Once you get past that, the actual
 implementation is simple.
+
+## [Day 6: Guard Gallivant](https://adventofcode.com/2024/day/6)
+
+This was a neat little exercise with lists and sets, with most of the
+first part reusable for an exhaustive search in the second.
