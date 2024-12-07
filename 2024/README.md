@@ -39,4 +39,11 @@ implementation is simple.
 ## [Day 6: Guard Gallivant](https://adventofcode.com/2024/day/6)
 
 This was a neat little exercise with lists and sets, with most of the
-first part reusable for an exhaustive search in the second.
+first part reusable for an exhaustive search in the second.  My first
+version was completely naive, but still obtained the answer in 36 seconds.
+
+## [Day 7: Bridge Repair](https://adventofcode.com/2024/day/7)
+
+The first part is a straightforward exhaustive search, with the second a
+small extension.  I misread the second part, solved a much more difficult
+problem, and then wondered why the examples were "wrong".
