@@ -47,3 +47,8 @@ version was completely naive, but still obtained the answer in 36 seconds.
 The first part is a straightforward exhaustive search, with the second a
 small extension.  I misread the second part, solved a much more difficult
 problem, and then wondered why the examples were "wrong".
+
+## [Day 8: Resonant Collinearity](https://adventofcode.com/2024/day/8)
+
+A fairly simple little exercise in lists and sets.  The second part is
+iteration of the first.
