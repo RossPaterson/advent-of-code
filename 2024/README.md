@@ -44,11 +44,26 @@ version was completely naive, but still obtained the answer in 36 seconds.
 
 ## [Day 7: Bridge Repair](https://adventofcode.com/2024/day/7)
 
-The first part is a straightforward exhaustive search, with the second a
-small extension.  I misread the second part, solved a much more difficult
-problem, and then wondered why the examples were "wrong".
+The first part is a straightforward exhaustive search, with the second
+a small extension.  Doing the calculations in reverse would produce
+a substantian speedup, but the simpler forwards approach handles both
+parts in well under a second.
+
+I misread the second part, solved a much more difficult problem, and
+then wondered why the examples were "wrong".
 
 ## [Day 8: Resonant Collinearity](https://adventofcode.com/2024/day/8)
 
-A fairly simple little exercise in lists and sets.  The second part is
-iteration of the first.
+A fairly simple little exercise in decomposition using lists and sets.
+The second part is an iterative variant of the first.
+
+## [Day 9: Disk Fragmenter](https://adventofcode.com/2024/day/9)
+
+The silliness of the compaction algorithm specified is quite distracting,
+but this was a more difficult list manipulation, traversing from both
+ends and meeting in the middle.  This can be done with a deque, but it
+is cleaner to split the list into two lists, which are each processed
+sequentially (but differently).  The second part changes the processing,
+but has a similar structure.  The naive quadratic approach is fast
+enough in this input, but could be sped up using a priority queue.
+Both parts involve multiple cases with fiddly details.
