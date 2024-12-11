@@ -77,3 +77,11 @@ Both parts involve multiple cases with fiddly details.
 
 This was an easier exercise involving searching in a directed acyclic
 graph.  The second part is a minor variant of the first.
+
+## [Day 11: Plutonian Pebbles](https://adventofcode.com/2024/day/11) \*
+
+The first part establishes a simple repetitive process, while the second
+scales the number of repetitions well beyond the point where a naive
+implementation of the description becomes infeasible.  A small insight
+into the nature of the process is required to produce a neat and fast
+implementation using Map.
