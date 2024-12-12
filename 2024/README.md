@@ -85,3 +85,14 @@ scales the number of repetitions well beyond the point where a naive
 implementation of the description becomes infeasible.  A small insight
 into the nature of the process is required to produce a neat and fast
 implementation using Map.
+
+## [Day 12: Garden Groups](https://adventofcode.com/2024/day/12) \*\*
+
+This was a larger problem, with a spatial flavour and the two parts
+exploring different aspects.  Several examples are provided.
+
+For the second part, my original solution, following the description and
+the lead of the first part, was quite heavy-weight.  However, as pointed
+out on
+[this Reddit thread](https://www.reddit.com/r/adventofcode/comments/1hcf16m/2024_day_12_everyone_must_be_hating_today_so_here/),
+an elementary combinatorial observation leads to a much simpler solution.
