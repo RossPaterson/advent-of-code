@@ -96,3 +96,10 @@ the lead of the first part, was quite heavy-weight.  However, as pointed
 out on
 [this Reddit thread](https://www.reddit.com/r/adventofcode/comments/1hcf16m/2024_day_12_everyone_must_be_hating_today_so_here/),
 an elementary combinatorial observation leads to a much simpler solution.
+
+## [Day 13: Claw Contraption](https://adventofcode.com/2024/day/13) \*\*
+
+This puzzle is numerical, with no data structures involved.  Again the
+second part scales up the first so that a direct implementation of the
+description is infeasible.  It took me a while to realize how simple
+it was.
