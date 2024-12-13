@@ -171,7 +171,7 @@ modularRoots n b i
         nab = na*nb
         (x, y) = bezout na nb
     components = [(naiveModularRoots pk b i, pk) |
-        (p, k) <- primeFactors (fromIntegral n), let pk = fromIntegral (p^k)]
+        (p, k) <- primeFactors n, let pk = fromIntegral (p^k)]
 
 naiveModularRoots :: Integral a => a -> a -> Int -> [a]
 {-# SPECIALIZE naiveModularRoots :: Int -> Int -> Int -> [Int] #-}
@@ -193,7 +193,7 @@ modularLogarithm n a b = find_log 0 1
       | otherwise = find_log (k+1) (ak*a_mod_n `mod` n)
     a_mod_n = a `mod` n
     b_mod_n = b `mod` n
-    limit = universalExponent (fromIntegral n)
+    limit = universalExponent n
 
 -- | @'universalExponent' n@ is the smallest @k@ such that @a^k@ &#x2261;
 -- @1@ (mod @n@) for each @a@ between @1@ and @n@ that is coprime with @n@
