@@ -3,7 +3,7 @@ module Main where
 import Parser
 import Utilities
 import Data.Maybe
-import Data.Ratio ((%))
+import Data.Ratio
 
 -- Input processing
 
@@ -18,9 +18,11 @@ type Prize = (Integer, Integer)
 parse :: String -> Input
 parse = map (runParser machine) . paragraphs
   where
-    machine = Machine <$> button <*> button <*> prize
-    button = (,) <$ string "Button " <* letter <* string ": X+" <*> nat <* string ", Y+" <*> nat <* char '\n'
-    prize = (,) <$ string "Prize: X=" <*> nat <* string ", Y=" <*> nat <* char '\n'
+    machine = Machine <$> button 'A' <*> button 'B' <*> prize
+    button c = (,) <$ string "Button " <* char c <* string ": X+" <*>
+        nat <* string ", Y+" <*> nat <* char '\n'
+    prize = (,) <$ string "Prize: X=" <*> nat <* string ", Y=" <*>
+        nat <* char '\n'
 
 -- Part One
 
@@ -45,10 +47,8 @@ integralSolution (Machine (xa, ya) (xb, yb) (x, y))
 -- Convert to Integer, if possible
 asInteger :: Rational -> Maybe Integer
 asInteger x
-  | fromIntegral floor_x == x = Just floor_x
+  | denominator x == 1 = Just (numerator x)
   | otherwise = Nothing
-  where
-    floor_x = floor x
 
 testInput :: String
 testInput = "\
