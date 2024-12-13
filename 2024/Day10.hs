@@ -26,7 +26,7 @@ starts m = [p | p <- Map.keys m, Map.lookup p m == Just 0]
 finish :: TopoMap -> Position -> Bool
 finish m p = Map.lookup p m == Just 9
 
--- each step on a trail goes up by at most 1
+-- each step on a trail goes up by 1
 step :: TopoMap -> Position -> [Position]
 step m p =
     [p' | d <- unitVectors, let p' = p .+. d, Map.lookup p' m == Just h]
