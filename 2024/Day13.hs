@@ -38,16 +38,16 @@ cost (a, b) = 3*a + b
 integralSolution :: Machine -> Maybe Plan
 integralSolution (Machine (xa, ya) (xb, yb) (x, y))
   | d == 0 = Nothing
-  | otherwise = (,) <$> asInteger a <*> asInteger b
+  | otherwise = (,) <$> asNatural a <*> asNatural b
   where
     d = xb*ya - xa*yb
     b = (x*ya - xa*y) % d
     a = (xb*y - x*yb) % d
 
--- Convert to Integer, if possible
-asInteger :: Rational -> Maybe Integer
-asInteger x
-  | denominator x == 1 = Just (numerator x)
+-- Convert to nonnegative integer, if possible
+asNatural :: Rational -> Maybe Integer
+asNatural x
+  | denominator x == 1 && numerator x >= 0 = Just (numerator x)
   | otherwise = Nothing
 
 testInput :: String
