@@ -17,6 +17,7 @@ library
   default-language: Haskell2010
   exposed-modules:
     CellularAutomaton
+    Data.Bag
     Data.CompactSet
     Data.CyclicList
     Data.MaxPriorityQueue
