@@ -1,8 +1,8 @@
 module Main where
 
 import Utilities
-import Data.Map (Map)
-import qualified Data.Map as Map
+import Data.Bag (Bag)
+import qualified Data.Bag as Bag
 
 -- Input processing
 
@@ -15,23 +15,11 @@ parse = map read . words
 
 -- All that matters is how many of each stone we have, so use bags.
 
-type Bag a = Map a Int
-
-bagFromList :: Ord a => [a] -> Bag a
-bagFromList xs = Map.fromListWith (+) [(x, 1) | x <- xs]
-
-sizeBag :: Bag a -> Int
-sizeBag = sum . Map.elems
-
-concatMapBag :: (Ord a, Ord b) => (a -> [b]) -> Bag a -> Bag b
-concatMapBag f xs =
-    Map.fromListWith (+) [(y, n) | (x, n) <- Map.assocs xs, y <- f x]
-
 solve1 :: Input -> Int
-solve1 = sizeBag . times 25 step . bagFromList
+solve1 = Bag.size . times 25 step . Bag.fromList
 
 step :: Bag Integer -> Bag Integer
-step = concatMapBag change
+step = Bag.concatMap change
 
 change :: Integer -> [Integer]
 change n
@@ -53,7 +41,7 @@ tests1 = [(testInput, 55312)]
 -- Part Two
 
 solve2 :: Input -> Int
-solve2 = sizeBag . times 75 step . bagFromList
+solve2 = Bag.size . times 75 step . Bag.fromList
 
 main :: IO ()
 main = do

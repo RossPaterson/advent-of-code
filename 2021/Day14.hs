@@ -2,6 +2,8 @@ module Main where
 
 import Utilities
 import Parser
+import Data.Bag (Bag)
+import qualified Data.Bag as Bag
 import Data.Maybe
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
@@ -15,9 +17,11 @@ type Rule = (Pair, Element)
 type Input = (Polymer, [Rule])
 
 parse :: String -> Input
-parse s = (head (lines template), map (runParser rule) (lines rules))
+parse s = case paragraphs s of
+    [template, rules] ->
+        (head (lines template), map (runParser rule) (lines rules))
+    _ -> error "bad input"
   where
-    [template, rules] = paragraphs s
     rule = (,) <$> pair <* string " -> " <*> element
     pair = (,) <$> element <*> element
     element = letter
@@ -26,7 +30,8 @@ parse s = (head (lines template), map (runParser rule) (lines rules))
 
 -- pairs of adjacent elements
 pairs :: [a] -> [(a, a)]
-pairs xs = zip xs (tail xs)
+pairs [] = []
+pairs (x:xs) = zip (x:xs) xs
 
 -- naive string expansion
 -- After n steps, an initial string of length k grows to (k-1)*2^n + 1.
@@ -36,12 +41,14 @@ expand m es =
   where
     ins = Nothing : [Map.lookup pair m | pair <- pairs es]
 
-summarize :: [Int] -> Int
-summarize ns = maximum ns - minimum ns
+summarize :: Bag a -> Int
+summarize b = maximum ns - minimum ns
+  where
+    ns = map snd (Bag.counts b)
 
 solve1 :: Input -> Int
 solve1 (template, rules) =
-    summarize $ map snd $ frequency $ times 10 (expand m) template
+    summarize $ Bag.fromList $ times 10 (expand m) template
   where
     m = Map.fromList rules
 
@@ -75,7 +82,6 @@ tests1 = [(testInput, 1588)]
 -- Faster version (which would also work for part one, of course)
 -- Instead of the whole string, it suffices to record the frequency of
 -- each element.  Missing elements have an implicit count of zero.
-type Bag a = Map a Int
 
 -- number of each kind of element in between each pair after n iterations
 type Expansion = Map Pair (Bag Element)
@@ -86,25 +92,23 @@ elements es rs = fastNub (es ++ concat [[l, r, e] | ((l, r), e) <- rs])
 
 -- initially no elements between each pair
 initExpansion :: [Element] -> Expansion
-initExpansion es = Map.fromList [((e1, e2), Map.empty) | e1 <- es, e2 <- es]
+initExpansion es = Map.fromList [((e1, e2), Bag.empty) | e1 <- es, e2 <- es]
 
 expand2 :: Map Pair Element -> Expansion -> Expansion
 expand2 m ems = Map.mapWithKey expandPair ems
   where
     expandPair :: Pair -> Bag Element -> Bag Element
     expandPair (e1, e2) _ = case Map.lookup (e1, e2) m of
-        Nothing -> Map.empty
-        Just e ->
-            Map.unionsWith (+) [Map.singleton e 1, ems!(e1, e), ems!(e, e2)]
+        Nothing -> Bag.empty
+        Just e -> Bag.unions [Bag.singleton e, ems!(e1, e), ems!(e, e2)]
 
 -- add the numbers of elements inserted between each pair in n steps
 fullExpansion :: Polymer -> Expansion -> Bag Element
 fullExpansion es em =
-    Map.unionsWith (+)
-        (Map.fromList (frequency es) : [em!pair | pair <- pairs es])
+    Bag.unions (Bag.fromList es : [em!pair | pair <- pairs es])
 
 solve2 :: Input -> Int
-solve2 (template, rules) = summarize $ Map.elems $ fullExpansion template em
+solve2 (template, rules) = summarize $ fullExpansion template em
   where
     m = Map.fromList rules
     em = times 40 (expand2 m) (initExpansion (elements template rules))
