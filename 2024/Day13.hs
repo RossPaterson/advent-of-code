@@ -3,7 +3,6 @@ module Main where
 import Parser
 import Utilities
 import Data.Maybe
-import Data.Ratio
 
 -- Input processing
 
@@ -36,19 +35,22 @@ cost (a, b) = 3*a + b
 
 -- Find the integral solution to the pair of equations, if any
 integralSolution :: Machine -> Maybe Plan
-integralSolution (Machine (xa, ya) (xb, yb) (x, y))
-  | d == 0 = Nothing
-  | otherwise = (,) <$> asNatural a <*> asNatural b
+integralSolution (Machine (xa, ya) (xb, yb) (x, y)) =
+  (,) <$> maybeDiv a d <*> maybeDiv b d
   where
+    a = xb*y - x*yb
+    b = x*ya - xa*y
     d = xb*ya - xa*yb
-    b = (x*ya - xa*y) % d
-    a = (xb*y - x*yb) % d
 
--- Convert to nonnegative integer, if possible
-asNatural :: Rational -> Maybe Integer
-asNatural x
-  | denominator x == 1 && numerator x >= 0 = Just (numerator x)
-  | otherwise = Nothing
+-- d divides evenly into n, producing a natural number
+maybeDiv :: Integer -> Integer -> Maybe Integer
+maybeDiv n d
+  | d == 0 = Nothing
+  | r /= 0 = Nothing
+  | q < 0 = Nothing
+  | otherwise = Just q
+  where
+    (q, r) = divMod n d
 
 testInput :: String
 testInput = "\
