@@ -103,3 +103,18 @@ This puzzle is numerical, with no data structures involved.  Again the
 second part scales up the first so that a direct implementation of the
 description is infeasible.  It took me a while to realize how simple
 it was.
+
+## [Day 14: Restroom Redoubt](https://adventofcode.com/2024/day/14) \*\*
+
+This is a pretty puzzle using a simple particle system (a variation
+on 2018 day 10).  The measure in the first part is a bit silly, but
+checks correct implementation of the system, as well as suggesting the
+idea of applying a metric to the image.  The loose specification of the
+second part turns this into a data science challenge.  A wide variety
+of approaches can be used.
+
+My first guess at what the shape would look like was wrong, but it
+did drastically narrow down the number of images to visually inspect.
+Then I reused some code from day 12 to identify the unusual frame.
+There are also approaches making use of the independent periodicity of
+the x and y coordinates.
