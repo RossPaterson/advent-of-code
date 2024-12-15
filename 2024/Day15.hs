@@ -48,20 +48,24 @@ solve1 (free_space, boxes, start, dirs) =
 -- try to move in the given direction, pushing any boxes that are in the way
 move :: Set Position -> State -> Direction -> State
 move free_space (pos, boxes) dir
-  | Set.member pos' free_space && Set.isSubsetOf load' free_space =
-    (pos', boxes')
+  | pos' `Set.member` free_space &&
+    load' `Set.isSubsetOf` free_space = (pos', boxes')
   | otherwise = (pos, boxes)
   where
     dp = oneStep dir
     pos' = pos .+. dp
     load = boxesInTheWay pos boxes dir
-    load' = Set.mapMonotonic (.+. dp) load
+    load' = shift dp load
     boxes' = (boxes `Set.difference` load) `Set.union` load'
+
+-- shift a set of positions by the given vector
+shift :: Position -> Set Position -> Set Position
+shift dp ps = Set.mapMonotonic (.+. dp) ps
 
 -- boxes that are in the way of a move in the given direction
 boxesInTheWay :: Position -> Set Position -> Direction -> Set Position
 boxesInTheWay pos boxes dir =
-    Set.fromList (takeWhile (flip Set.member boxes) (iterate (.+. dp) pos'))
+    Set.fromList (takeWhile (`Set.member` boxes) (iterate (.+. dp) pos'))
   where
     dp = oneStep dir
     pos' = pos .+. dp
@@ -118,9 +122,9 @@ scaleUp :: Input -> Input
 scaleUp (free_space, boxes, start, dirs) =
     (free_space', Set.mapMonotonic stretch boxes, stretch start, dirs)
   where
+    stretch_free_space = Set.mapMonotonic stretch free_space
     free_space' =
-       Set.fromList [stretch p .+. dp | p <- Set.elems free_space,
-           dp <- [Position 0 0, Position 1 0]]
+        stretch_free_space `Set.union` shift (Position 1 0) stretch_free_space
 
 stretch :: Position -> Position
 stretch (Position x y) = Position (2*x) y
@@ -136,16 +140,15 @@ solve2 input = case scaleUp input of
 -- that are in the way
 move2 :: Set Position -> State -> Direction -> State
 move2 free_space (pos, boxes) dir
-  | Set.member pos' free_space &&
-    Set.isSubsetOf load' free_space &&
-    Set.isSubsetOf (Set.mapMonotonic (.+. Position 1 0) load') free_space =
-    (pos', boxes')
+  | pos' `Set.member` free_space &&
+    load' `Set.isSubsetOf` free_space &&
+    shift (Position 1 0) load' `Set.isSubsetOf` free_space = (pos', boxes')
   | otherwise = (pos, boxes)
   where
     dp = oneStep dir
     pos' = pos .+. dp
     load = boxesInTheWay2 pos boxes dir
-    load' = Set.mapMonotonic (.+. dp) load
+    load' = shift dp load
     boxes' = (boxes `Set.difference` load) `Set.union` load'
 
 -- double-width boxes that are in the way of a move in the given direction
@@ -159,7 +162,7 @@ boxesInTheWay2 pos boxes dir = case oneStep dir of
 -- double-width boxes that are in the way of a move to the left
 boxesInTheWayLeft :: Position -> Set Position -> Set Position
 boxesInTheWayLeft pos boxes =
-    Set.fromList (takeWhile (flip Set.member boxes) (iterate (.+. dp) pos'))
+    Set.fromList (takeWhile (`Set.member` boxes) (iterate (.+. dp) pos'))
   where
     pos' = pos .+. dp
     dp = Position (-2) 0
@@ -167,7 +170,7 @@ boxesInTheWayLeft pos boxes =
 -- double-width boxes that are in the way of a move to the right
 boxesInTheWayRight :: Position -> Set Position -> Set Position
 boxesInTheWayRight pos boxes =
-    Set.fromList (takeWhile (flip Set.member boxes) (iterate (.+. dp) pos'))
+    Set.fromList (takeWhile (`Set.member` boxes) (iterate (.+. dp) pos'))
   where
     pos' = pos .+. Position 1 0
     dp = Position 2 0
@@ -182,19 +185,14 @@ boxesInTheWayVertical pos boxes dy =
 -- double-width box that p is pushing against (if any)
 bvStart :: Set Position -> Int -> Position -> Set Position
 bvStart boxes dy p =
-    Set.fromList [p' |
-        dx <- [-1, 0],
-        let p' = p .+. Position dx dy,
-        Set.member p' boxes]
+    Set.fromList $ filter (`Set.member` boxes) $
+        [p .+. Position dx dy | dx <- [-1, 0]]
 
 -- double-width boxes that a double-width box in ps is pushing against
 bvStep :: Set Position -> Int -> Set Position -> Set Position
 bvStep boxes dy ps =
-    Set.fromList [p' |
-        p <- Set.elems ps,
-        dx <- [-1, 0, 1],
-        let p' = p .+. Position dx dy,
-        Set.member p' boxes]
+    boxes `Set.intersection`
+        Set.unions [shift (Position dx dy) ps | dx <- [-1, 0, 1]]
 
 -- Debug output
 
@@ -217,9 +215,9 @@ showWarehouse2 free_space (pos, boxes) = showBox box showPos
     box = boundingBox [Position 0 0, maxCorner box0 .+. Position 2 1]
     showPos p
       | p == pos = '@'
-      | Set.member p boxes = '['
-      | Set.member (p .-. Position 1 0) boxes = ']'
-      | Set.member p free_space = '.'
+      | p `Set.member` boxes = '['
+      | (p .-. Position 1 0) `Set.member` boxes = ']'
+      | p `Set.member` free_space = '.'
       | otherwise = '#'
 
 testInputTiny :: String
