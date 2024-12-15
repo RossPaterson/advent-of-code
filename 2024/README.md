@@ -121,6 +121,7 @@ the x and y coordinates.
 
 ## [Day 15: Warehouse Woes](https://adventofcode.com/2024/day/15) \*\*\*
 
-This problem did not involve any tricks, just painstaking attention to
+This task was an implementation of two elaborations of the Sokoban game.
+It did not require any special insights, just painstaking attention to
 implementing the instructions while covering all cases, especially in the
 second part.  The test input provided was large enough to find my bugs.
