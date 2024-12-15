@@ -118,3 +118,9 @@ did drastically narrow down the number of images to visually inspect.
 Then I reused some code from day 12 to identify the unusual frame.
 There are also approaches making use of the independent periodicity of
 the x and y coordinates.
+
+## [Day 15: Warehouse Woes](https://adventofcode.com/2024/day/15) \*\*\*
+
+This problem did not involve any tricks, just painstaking attention to
+implementing the instructions while covering all cases, especially in the
+second part.  The test input provided was large enough to find my bugs.
