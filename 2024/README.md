@@ -125,3 +125,10 @@ This task was an implementation of two elaborations of the Sokoban game.
 It did not require any special insights, just painstaking attention to
 implementing the instructions while covering all cases, especially in the
 second part.  The test input provided was large enough to find my bugs.
+
+## [Day 16: Reindeer Maze](https://adventofcode.com/2024/day/16) \*\*\*
+
+The first part is a straightforward shortest path problem, requiring
+only the length, while the second requires a statistic on all the
+shortest paths.  As with many AoC puzzles, once you find the key
+optimization, all the smaller optimizations are unnecessary.
