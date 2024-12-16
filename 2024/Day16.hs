@@ -3,6 +3,7 @@ module Main where
 import Graph
 import Geometry
 import Utilities
+import Data.Maybe
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Set (Set)
@@ -97,25 +98,6 @@ tests1 = [(testInput1, 7036), (testInput2, 11048)]
 
 -- Part Two
 
--- set of states on shortest paths from the start state to the finish
-allShortestPaths :: Set Position -> Position -> State -> Set Position
-allShortestPaths points finish = shortest_paths_from
-  where
-    -- cost of shortest path from each state
-    cost = shortest points finish
-    -- memoized set of states on shortest paths from each state
-    shortest_paths_from =
-        flip (Map.findWithDefault (error "bad state"))
-            (Map.mapWithKey shortest_paths_from_aux cost)
-    -- set of states on shortest paths from s, given cost!s
-    shortest_paths_from_aux s@(p, _) cost_s
-      | cost_s == 0 = Set.singleton p
-      | otherwise =
-        Set.unions [Set.insert p (shortest_paths_from s') |
-            (len, s') <- moves points s,
-            -- Is this edge in an optimal path?
-            Map.lookup s' cost == Just (cost_s - len)]
-
 -- shortest distance from each state to the finish
 shortest :: Set Position -> Position -> Map State Int
 shortest points finish =
@@ -124,9 +106,21 @@ shortest points finish =
   where
     finishes = [(finish, d) | d <- allValues]
 
+-- moves that are on an optimal path to the finish
+optimalMoves :: Map State Int -> State -> [State]
+optimalMoves cost = optimal_moves
+  where
+    optimal_moves s = [s' |
+        cost_s <- maybeToList (Map.lookup s cost),
+        (len, s') <- moves points s,
+        cost_s' <- maybeToList (Map.lookup s' cost),
+        cost_s == cost_s' + len]
+    points = Set.map fst (Map.keysSet cost)
+
 solve2 :: Input -> Int
 solve2 (start, finish, points) =
-    Set.size $ allShortestPaths points finish (start, E)
+    Set.size $ Set.fromList $ map fst $ concat $
+        bfs (optimalMoves (shortest points finish)) [(start, E)]
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput1, 45), (testInput2, 64)]
