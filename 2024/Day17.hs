@@ -124,54 +124,52 @@ solve1 (regs, prog) = intercalate "," $ map show $ runProgram prog regs
 
 -- Tracing the program execution
 
-trace :: Program -> State -> [(Int, Instruction, Registers)]
-trace prog = unfoldr (traceStep prog)
+-- snapshot just before executing instruction
+type TraceEntry = (Registers, Int, Instruction)
 
-traceStep :: Program -> State -> Maybe ((Int, Instruction, Registers), State)
+trace :: Program -> Registers -> [TraceEntry]
+trace prog = unfoldr (traceStep prog) . initState
+
+traceStep :: Program -> State -> Maybe (TraceEntry, State)
 traceStep prog (State regs ip) = do
     (instr, ip') <- fetch prog ip
     let s' = State regs ip'
-    return $ case execute instr s' of
-        Left _ -> ((ip, instr, regs), s')
-        Right s''@(State regs' _) -> ((ip, instr, regs'), s'')
+    return ((regs, ip, instr), either (const s') id (execute instr s'))
 
 -- Debug output
 
-showTrace :: Program -> State -> String
-showTrace prog s@(State regs _) =
-    unlines (showRegisters regs : map showStep (trace prog s))
+showTrace :: Program -> Registers -> String
+showTrace prog = unlines . map showStep . trace prog
 
-showStep :: (Int, Instruction, Registers) -> String
-showStep (n, instr, regs) =
-    show n ++ ": " ++ showInstruction instr ++ "\n" ++ showRegisters regs
+showStep :: TraceEntry -> String
+showStep (regs, n, instr) =
+    intercalate "\t" (showRegisters regs ++ show n : showInstruction instr)
 
-showInstruction :: Instruction -> String
+showInstruction :: Instruction -> [String]
 showInstruction (ADV arg) =
-    "adv " ++ showOperand arg ++ "\tA = A >> " ++ showOperand arg
+    ["adv " ++ showOperand arg, "A = A >> " ++ showOperand arg]
 showInstruction (BXL n) =
-    "bxl " ++ show n ++ "\tB = B ^ " ++ show n
+    ["bxl " ++ show n, "B = B ^ " ++ show n]
 showInstruction (BST arg) =
-    "bst " ++ showOperand arg ++ "\tB = " ++ showOperand arg ++ " % 8"
+    ["bst " ++ showOperand arg, "B = " ++ showOperand arg ++ " % 8"]
 showInstruction (JNZ n) =
-    "jnz " ++ show n ++ "\tif (A != 0) goto " ++ show n
+    ["jnz " ++ show n, "if (A != 0) goto " ++ show n]
 showInstruction (BXC n) =
-    "bxc " ++ show n ++ "\tB = B ^ C"
+    ["bxc " ++ show n, "B = B ^ C"]
 showInstruction (OUT arg) =
-    "out " ++ showOperand arg ++ "\tprint B%8"
+    ["out " ++ showOperand arg, "print B%8"]
 showInstruction (BDV arg) =
-    "bdv " ++ showOperand arg ++ "\tB = A >> " ++ showOperand arg
+    ["bdv " ++ showOperand arg, "B = A >> " ++ showOperand arg]
 showInstruction (CDV arg) =
-    "cdv " ++ showOperand arg ++ "\tC = A >> " ++ showOperand arg
+    ["cdv " ++ showOperand arg, "C = A >> " ++ showOperand arg]
 
 showOperand :: Operand -> String
 showOperand (Literal n) = show n
 showOperand (Reg r) = show r
 showOperand Reserved = "*"
 
-showRegisters :: Registers -> String
-showRegisters regs =
-    unlines ["Register " ++ show r ++ ": " ++ show v |
-        (r, v) <- Map.assocs regs]
+showRegisters :: Registers -> [String]
+showRegisters regs = map show (Map.elems regs)
 
 testInput :: String
 testInput = "\
