@@ -4,8 +4,8 @@
 
 (image by [Jo Wood](https://github.com/jwoLondon))
 
-The graphs are not as representative this year, as the global leaderboard
-is infested with LLM users.
+The early graphs are not as representative this year, as the global
+leaderboard is infested with LLM users.
 
 I have added difficulty ratings based on how long I took to solve each puzzle.
 
@@ -132,3 +132,10 @@ The first part is a straightforward shortest path problem, requiring
 only the length, while the second requires a statistic on all the
 shortest paths.  As with many AoC puzzles, once you find the key
 optimization, all the smaller optimizations are unnecessary.
+
+## [Day 17: Chronospatial Computer](https://adventofcode.com/2024/day/17) \*\*\*
+
+The first part is implementing a small abstract machine and checking
+that it works.  The second part requires us to determine the start
+state from the output.  This involves some disassembly and analysis of
+the computation that the program is performing.
