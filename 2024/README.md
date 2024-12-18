@@ -139,3 +139,9 @@ The first part is implementing a small abstract machine and checking
 that it works.  The second part requires us to determine the start
 state from the output.  This involves some disassembly and analysis of
 the computation that the program is performing.
+
+## [Day 18: RAM Run](https://adventofcode.com/2024/day/18) \*
+
+A simple maze search was a relief after a few tough days.  For the second
+part, iteratively repeating the first part was slow, but fast enough.
+A binary search is much faster.
