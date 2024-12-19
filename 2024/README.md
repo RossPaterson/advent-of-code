@@ -145,3 +145,9 @@ the computation that the program is performing.
 A simple maze search was a relief after a few tough days.  For the second
 part, iteratively repeating the first part was slow, but fast enough.
 A binary search is much faster.
+
+## [Day 19: Linen Layout](https://adventofcode.com/2024/day/19) \*\*
+
+The naive approach to the first part is two slow.  There are two
+approaches to speeding it up, only one of which generalizes to the
+second part.
