@@ -151,3 +151,10 @@ A binary search is much faster.
 The naive approach to the first part is two slow.  There are two
 approaches to speeding it up, only one of which generalizes to the
 second part.
+
+## [Day 20: Race Condition](https://adventofcode.com/2024/day/20) \*\*
+
+Another maze, with a second part a fairly straightforward generalization
+of the first.  The puzzle states that there is a single path from start
+to finish, and the inputs have no forks, but handling a general maze
+isn't much more difficult.
