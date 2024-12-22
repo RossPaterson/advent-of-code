@@ -158,3 +158,18 @@ Another maze, with a second part a fairly straightforward generalization
 of the first.  The puzzle states that there is a single path from start
 to finish, and the inputs have no forks, but handling a general maze
 isn't much more difficult.
+
+## [Day 21: Keypad Conundrum](https://adventofcode.com/2024/day/21) \*\*\*\*
+
+This was a considerable conceptual challenge.  The first part can be
+done with an exhaustive search, but the second part scales it up so much
+that one must derive an inductive definition.  once the appropriate
+inductive structure is identified, the solution comes out neatly, but
+it took quite a while to get that understanding.
+
+## [Day 22: Monkey Market](https://adventofcode.com/2024/day/22) \*\*
+
+This was a bit of a rest after the previous day.  The first part was
+easy, and the second involved some straightforward bulk operations.
+This puzzle was unusual in that local optimizations are needed to get
+a reasonable runtime.
