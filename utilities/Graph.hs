@@ -8,8 +8,9 @@ module Graph (
     -- * Finite graphs
     FiniteGraph,
     tsort,
-    components,
     scc,
+    components,
+    maximalCliques,
     -- * Single-source shortest paths
     -- | Neighbours of a node are given by a function, so these operations
     -- can be used on infinite graphs.
@@ -131,6 +132,10 @@ dff g = dfs g (Set.elems (vertices g))
 tsort :: Ord a => FiniteGraph a -> [a]
 tsort = reverse . postorder . dff
 
+-- | Strongly connected components in topological order
+scc :: Ord a => FiniteGraph a -> [Set a]
+scc g = map treeToSet (dfs (inverse g) (tsort g))
+
 undirected :: Ord a => FiniteGraph a -> FiniteGraph a
 undirected g = Map.unionWith Set.union g (inverse g)
 
@@ -138,9 +143,33 @@ undirected g = Map.unionWith Set.union g (inverse g)
 components :: Ord a => FiniteGraph a -> [Set a]
 components = map treeToSet . dff . undirected
 
--- | Strongly connected components in topological order
-scc :: Ord a => FiniteGraph a -> [Set a]
-scc g = map treeToSet (dfs (inverse g) (tsort g))
+-- | Maximal cliques of the graph, ignoring the direction of edges
+maximalCliques :: Ord a => FiniteGraph a -> [Set a]
+maximalCliques = maximalCliquesAux . undirected
+
+-- algorithm of Tsukiyama et al (1977)
+maximalCliquesAux :: Ord a => FiniteGraph a -> [Set a]
+maximalCliquesAux g = case Map.lookupMin g of
+    Nothing -> [Set.empty]
+    Just (n, neighbours) ->
+        let subcliques = maximalCliquesAux (remove n g) in
+        -- maximal cliques that contain n
+        (map (Set.insert n) $ maximalSets $
+            map (Set.intersection neighbours) subcliques) ++
+        -- maximal cliques that don't contain n
+        filter (not . (`Set.isSubsetOf` neighbours)) subcliques
+
+-- remove edges connected to the node
+remove :: Ord a => a -> FiniteGraph a -> FiniteGraph a
+remove n = Map.delete n . Map.map (Set.delete n)
+
+-- select maximal sets from the list
+maximalSets :: Ord a => [Set a] -> [Set a]
+maximalSets = foldr add_new [] . sortOn Set.size
+  where
+    add_new s ss
+      | any (s `Set.isSubsetOf`) ss = ss
+      | otherwise = s : ss
 
 -- Single-source shortest paths
 

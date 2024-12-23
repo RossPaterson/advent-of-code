@@ -88,31 +88,6 @@ solve2 = password . maximumBy (compare `on` Set.size) . maximalCliques
 password :: Set Node -> String
 password = intercalate "," . Set.elems
 
--- Maximal cliques of the graph
--- algorithm of Tsukiyama et al (1977)
-maximalCliques :: Ord a => FiniteGraph a -> [Set a]
-maximalCliques g = case Map.lookupMin g of
-    Nothing -> [Set.empty]
-    Just (n, neighbours) ->
-        let subcliques = maximalCliques (remove n g) in
-        -- maximal cliques that contain n
-        (map (Set.insert n) $ maximalSets $
-            map (Set.intersection neighbours) subcliques) ++
-        -- maximal cliques that don't contain n
-        filter (not . (`Set.isSubsetOf` neighbours)) subcliques
-
--- remove edges connected to the node
-remove :: Ord a => a -> FiniteGraph a -> FiniteGraph a
-remove n = Map.delete n . Map.map (Set.delete n)
-
--- select maximal sets from the list
-maximalSets :: Ord a => [Set a] -> [Set a]
-maximalSets = foldr add_new [] . sortOn Set.size
-  where
-    add_new s ss
-      | any (s `Set.isSubsetOf`) ss = ss
-      | otherwise = s : ss
-
 tests2 :: [(String, String)]
 tests2 = [(testInput, "co,de,ka,ta")]
 
