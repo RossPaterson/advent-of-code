@@ -180,3 +180,15 @@ The maximum clique problem is NP-complete in the general case, but
 this input yields to a wide variety of approaches.  I learned and used
 a general algorithm, but the input graph has several properties that
 could be exploited to find solutions quickly.
+
+## [Day 24: Crossed Wires](https://adventofcode.com/2024/day/24) \*\*\*
+
+The puzzle is to execute and then find errors in a gate-level circuit
+(a ripple-carry adder).  Although the description talks about finding
+4 pairs of interchanged labels, the requested answer requires only the
+8 labels involved.
+
+Drawing the grath with Graphviz helped map out the intended circuit.
+Comparison of the input data with the expected local connections of
+each gate yielded 7 clear errors and a few candidates for the 8th.
+My second guess succeeded.
