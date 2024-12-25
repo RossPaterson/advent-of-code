@@ -192,3 +192,7 @@ Drawing the grath with Graphviz helped map out the intended circuit.
 Comparison of the input data with the expected local connections of
 each gate yielded 7 clear errors and a few candidates for the 8th.
 My second guess succeeded.
+
+## [Day 25: Code Chronicle](https://adventofcode.com/2024/day/25) \*
+
+The last puzzle was an easy bulk list manipulation.
