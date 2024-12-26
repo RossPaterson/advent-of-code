@@ -21,14 +21,16 @@ data Input = Input { startState :: State, stopAfter :: Int, tm :: Machine }
     deriving Show
 
 parse :: String -> Input
-parse s = Input start steps machine
+parse s = case paragraphs s of
+    (s_intro:s_states) -> Input start steps machine
+      where
+        (start, steps) = runParser intro s_intro
+        machine = Map.fromList (map (runParser transitions) s_states)
+    _ -> error "bad input"
   where
-    (s_intro:s_states) = paragraphs s
-    (start, steps) = runParser intro s_intro
     intro = (,) <$
         string "Begin in state " <*> state <* string ".\n" <*
         string "Perform a diagnostic checksum after " <*> nat <* string " steps.\n"
-    machine = Map.fromList (map (runParser transitions) s_states)
     transitions =
         (,) <$ string "In state " <*> state <* string ":\n" <*>
             ((,) <$> transition <*> transition)

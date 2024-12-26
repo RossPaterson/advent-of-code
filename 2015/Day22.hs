@@ -5,6 +5,17 @@ import Graph
 import Data.Map (Map)
 import qualified Data.Map as Map
 
+-- Input processing
+
+type Input = (Int, Int)
+
+parse :: String -> Input
+parse s = case readNumbers s of
+    [hp, d] -> (hp, d)
+    _ -> error "bad input"
+
+-- Part One
+
 type Mana = Int
 type HitPoints = Int
 data State = State {
@@ -135,17 +146,17 @@ solve level s0 =
             [mod_player_hit_points (subtract level) s0],
         success s]
 
-solve1 :: Int -> Int -> Int
-solve1 h d = solve 0 (initState h d)
+solve1 :: Input -> Int
+solve1 (h, d) = solve 0 (initState h d)
 
 -- Part Two --
 
-solve2 :: Int -> Int -> Int
-solve2 h d = solve 1 (initState h d)
+solve2 :: Input -> Int
+solve2 (h, d) = solve 1 (initState h d)
 
 main :: IO ()
 main = do
     s <- readFile "input/22.txt"
-    let [hp, d] = readNumbers s
-    print (solve1 hp d)
-    print (solve2 hp d)
+    let input = parse s
+    print (solve1 input)
+    print (solve2 input)

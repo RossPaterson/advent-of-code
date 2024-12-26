@@ -12,11 +12,9 @@ type Board = [[Int]]
 type Input = ([Int], [Board])
 
 parse :: String -> Input
-parse s = (numbers, boards)
-  where
-    (p:ps) = paragraphs s
-    numbers = readNumbers p
-    boards = map (map (map read . words) . lines) ps
+parse s = case paragraphs s of
+    (p:ps) -> (readNumbers p, map (map (map read . words) . lines) ps)
+    _ -> error "bad input"
 
 -- Part One
 

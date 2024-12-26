@@ -2,6 +2,17 @@ module Main where
 
 import Utilities
 
+-- Input processing
+
+type Input = (Int, Int)
+
+parse :: String -> Input
+parse s = case readNumbers s of
+    [row, col] -> (row, col)
+    _ -> error "bad input"
+
+-- Part One
+
 -- position in an infinite sequence of (row, column) coordinates in the
 -- diagonalization
 index :: Int -> Int -> Int
@@ -19,11 +30,13 @@ numbers = iterate' step 20151125
   where
     step n = n * 252533 `mod` 33554393::Integer
 
-getNumber :: Int -> Int -> Integer
-getNumber r c = numbers !! (index r c - 1)
+solve1 :: (Int, Int) -> Integer
+solve1 (r, c) = numbers !! (index r c - 1)
+
+-- no Part Two on day 25
 
 main :: IO ()
 main = do
     s <- readFile "input/25.txt"
-    let [row, col] = readNumbers s
-    print (getNumber row col)
+    let input = parse s
+    print (solve1 input)
