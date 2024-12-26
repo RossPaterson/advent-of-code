@@ -5,9 +5,15 @@
 (image by [Jo Wood](https://github.com/jwoLondon))
 
 The early graphs are not as representative this year, as the global
-leaderboard is infested with LLM users.
+leaderboard is infested with LLM users.  Some puzzles required, or were
+much easier with, prior knowledge of algorithms (days 16, 19 and 23)
+or mathematics (day 13), which means the leaderboard times for these
+days underestimate the relative difficulty for less expert solvers.
+I have added difficulty ratings based on how long I took to solve
+each puzzle.
 
-I have added difficulty ratings based on how long I took to solve each puzzle.
+Day 14 was a fun hunt, and day 21 a real mindbender.
+Days 6, 9, 12 and 15 were also particularly neat ideas.
 
 ## [Day 1: Historian Hysteria](https://adventofcode.com/2024/day/1) \*
 
@@ -188,7 +194,7 @@ The puzzle is to execute and then find errors in a gate-level circuit
 4 pairs of interchanged labels, the requested answer requires only the
 8 labels involved.
 
-Drawing the grath with Graphviz helped map out the intended circuit.
+Drawing the graph with Graphviz helped map out the intended circuit.
 Comparison of the input data with the expected local connections of
 each gate yielded 7 clear errors and a few candidates for the 8th.
 My second guess succeeded.
