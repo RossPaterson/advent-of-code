@@ -136,28 +136,28 @@ visualize ws =
 {-
 The circuit is supposed to be a ripple-carry adder:
 
-     x0  y0    x1  y1
+    x00  y0   x01  y01
      | \/ |    | \/ |
      | /\ |    | /\ |
     XOR  AND  XOR  AND
      |    | \/ |    |
      |    | /\ |    |
-     z0  XOR  AND   |    x2  y2
+    z00  XOR  AND   |   x02  y02
           |      \  |    | \/ |
           |       \ |    | /\ |
-          z1       OR   XOR  AND
+         z01       OR   XOR  AND
                     | \/ |    |
                     | /\ |    |
-                   XOR  AND   |    x3  y3
+                   XOR  AND   |   x03  y03
                     |      \  |    | \/ |
                     |       \ |    | /\ |
-                    z2       OR   XOR  AND
+                   z02       OR   XOR  AND
                               | \/ |    |
                               | /\ |    |
                              XOR  AND   |
                               |      \  |
                               |       \ |
-                              z3       OR
+                             z03       OR
                                         ...
                                                 x44  y44
                                           \ |    | \/ |
@@ -181,44 +181,29 @@ solve2 (_, ws) = intercalate "," $ sort $ badLabels ws
 
 badLabels :: Map Wire Gate -> [Wire]
 badLabels ws =
-    [w | (w, Gate _ op _) <- Map.assocs ws, bad_label w op]
+    [w | (w, gate) <- Map.assocs ws, targets!w /= expected_targets w gate]
   where
-    (final_output, final_gate) = Map.findMax ws
+    -- ordered list of actual operators of nodes consuming each wire
+    targets :: Map Wire [Op]
+    targets =
+        compose [Map.adjust (insert op) w |
+            Gate w1 op w2 <- Map.elems ws, w <- [w1, w2]] $
+        Map.map (const []) ws
 
-    bad_label w@('z':_) op
-      | w == final_output = op /= OR
-      | otherwise = op /= XOR
-    bad_label w XOR
-      | misplaced_xor w = True
-    bad_label w op =
-        outdegree ws w /= expected_outdegree w op
+    -- ordered list of expected operators of nodes consuming this wire
+    expected_targets :: Wire -> Gate -> [Op]
+    expected_targets _ (Gate w1 AND w2)
+      | sort [w1, w2] == ["x00", "y00"] = [AND, XOR]
+      | otherwise = [OR]
+    expected_targets w (Gate _ OR _)
+      | w == final_output = []
+      | otherwise = [AND, XOR]
+    expected_targets _ (Gate w1 XOR w2)
+      | sort [w1, w2] == ["x00", "y00"] = []
+      | sort [head w1, head w2] == "xy" = [AND, XOR]
+      | otherwise = []
 
-    expected_outdegree ('z':_) _ = 0
-    expected_outdegree w AND
-      | uses "x00" gate && uses "y00" gate = 2
-      | otherwise = 1
-      where
-        gate = ws!w
-    expected_outdegree w OR
-      | uses w final_gate = 1
-      | otherwise = 2
-    expected_outdegree _ XOR = 2
-
-    -- hack: an XOR that should be an output, but isn't
-    misplaced_xor w = case ws!w of
-        Gate w1 XOR w2 ->
-            sort [liftA getOp (Map.lookup w1 ws),
-                liftA getOp (Map.lookup w2 ws)] == [Just OR, Just XOR]
-        _ -> False
-
-outdegree :: Map Wire Gate -> Wire -> Int
-outdegree ws w = length (filter (uses w) (Map.elems ws))
-
-uses :: Wire -> Gate -> Bool
-uses w (Gate w1 _ w2) = w == w1 || w == w2
-
-getOp :: Gate -> Op
-getOp (Gate _ op _) = op
+    (final_output, _) = Map.findMax ws
 
 main :: IO ()
 main = do
