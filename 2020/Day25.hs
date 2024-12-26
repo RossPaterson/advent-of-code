@@ -8,9 +8,9 @@ import Number
 type Input = (Int, Int)
 
 parse :: String -> Input
-parse s = (x, y)
-  where
-    x:y:_ = map read (lines s)
+parse s = case map read (lines s) of
+    [x, y] -> (x, y)
+    _ -> error "bad input"
 
 -- Part One
 
@@ -28,9 +28,9 @@ base = 7
 --
 -- find the value c ^ log_d = base ^ (log_d*log_c) = d ^ log_c.
 solve1 :: Input -> Int
-solve1 (d, c) = modularPower modulus c log_d
-  where
-    Just log_d = modularLogarithm modulus base d
+solve1 (d, c) = case modularLogarithm modulus base d of
+    Just log_d -> modularPower modulus c log_d
+    Nothing -> error "no solution"
 
 testInput :: String
 testInput = "\

@@ -11,9 +11,10 @@ import qualified Data.Map as Map
 type Input = (Int, Int)
 
 parse :: String -> Input
-parse s = (runParser startPos l1, runParser startPos l2)
+parse s = case lines s of
+    [l1, l2] -> (runParser startPos l1, runParser startPos l2)
+    _ -> error "bad input"
   where
-    [l1, l2] = lines s
     startPos = string "Player " *> digit *> string " starting position: " *> nat
 
 -- Part One

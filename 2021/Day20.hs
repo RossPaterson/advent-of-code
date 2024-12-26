@@ -13,12 +13,13 @@ type Pixels = Set Position
 type Input = (Algorithm, Pixels)
 
 parse :: String -> Input
-parse s = (algo, pixels)
-  where
-    [p1, p2] = paragraphs s
-    algo = Set.fromList
-        [n | (n, c) <- zip [0..] (filter (/= '\n') p1), c == '#']
-    pixels = Set.fromList [p | (p, c) <- readGrid p2, c == '#']
+parse s = case paragraphs s of
+    [p1, p2] -> (algo, pixels)
+      where
+        algo = Set.fromList
+            [n | (n, c) <- zip [0..] (filter (/= '\n') p1), c == '#']
+        pixels = Set.fromList [p | (p, c) <- readGrid p2, c == '#']
+    _ -> error "bad input"
 
 -- Part One
 

@@ -27,17 +27,19 @@ data Range = Range Int Int
 type Ticket = [Int]
 
 parse :: String -> Input
-parse s = Input {
-    field_rules = map (runParser rule) p1,
-    your_ticket = runParser ticket (p2!!1),
-    others = map (runParser ticket) (tail p3)
-    }
+parse s = case map lines (paragraphs s) of
+    [p1, p2, p3] ->
+        Input {
+            field_rules = map (runParser rule) p1,
+            your_ticket = runParser ticket (p2!!1),
+            others = map (runParser ticket) (tail p3)
+        }
+    _ -> error "bad input"
   where
     rule = (,) <$> some (satisfy (/= ':')) <* string ": " <*> ranges
     ranges = (,) <$> range <* string " or " <*> range
     range = Range <$> nat <* char '-' <*> nat
     ticket = sepBy1 nat (char ',')
-    [p1, p2, p3] = map lines (paragraphs s)
 
 -- Part One
 

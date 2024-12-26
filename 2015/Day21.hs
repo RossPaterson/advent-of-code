@@ -2,16 +2,22 @@ module Main where
 
 import Utilities
 
+-- Input processing
+
+type Input = PlayerState
+
 data PlayerState = Player {
     hit_points :: Int,
     damage_score :: Int,
     armor_score :: Int
     }
 
-parse :: String -> PlayerState
-parse s = Player h d a
-  where
-    [h, d, a] = readNumbers s
+parse :: String -> Input
+parse s = case readNumbers s of
+    [h, d, a] -> Player h d a
+    _ -> error "bad input"
+
+-- Part One
 
 data Item = Item {
     name :: String,

@@ -10,11 +10,12 @@ import Data.Array
 type Input = (Int, Position)
 
 parse :: String -> Input
-parse s = (runParser depth ld, runParser target lt)
+parse s = case lines s of
+    [ld, lt] -> (runParser depth ld, runParser target lt)
+    _ -> error "bad input"
   where
     depth = string "depth: " *> nat
     target = (,) <$ string "target: " <*> nat <* char ',' <*> nat
-    [ld, lt] = lines s
 
 type Position = (Int, Int)
 

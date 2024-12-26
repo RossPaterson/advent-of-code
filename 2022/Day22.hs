@@ -26,15 +26,17 @@ data FieldMap = FieldMap {
     deriving (Show)
 
 parse :: String -> Input
-parse s = (field_map, runParser path path_line)
+parse s = case paragraphs s of
+    [map_text, path_text] -> (field_map, runParser path path_line)
+      where
+        field_map = FieldMap {
+            open = Set.fromList [p | (p, c) <- pcs, c == '.'],
+            walls = Set.fromList [p | (p, c) <- pcs, c == '#']
+            }
+        pcs = readGrid map_text
+        path_line = head (lines path_text)
+    _ -> error "bad input"
   where
-    field_map = FieldMap {
-        open = Set.fromList [p | (p, c) <- pcs, c == '.'],
-        walls = Set.fromList [p | (p, c) <- pcs, c == '#']
-        }
-    pcs = readGrid map_text
-    [map_text, path_text] = paragraphs s
-    path_line = head (lines path_text)
     path = (,) <$> nat <*> many ((,) <$> enumValue <*> nat)
 
 -- Part One

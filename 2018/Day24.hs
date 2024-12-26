@@ -46,16 +46,16 @@ data AttackType = Fire | Cold | Slashing | Bludgeoning | Radiation
   deriving (Show, Eq, Enum, Bounded)
 
 parse :: String -> Input
-parse s =
-    State {
-        immuneSystem =
-            makeArmy (map (runParser unit_group) (tail immune_system_lines)),
-        infection =
-            makeArmy (map (runParser unit_group) (tail infection_lines))
-    }
+parse s = case paragraphs s of
+    [p1, p2] ->
+        State {
+            immuneSystem =
+                makeArmy (map (runParser unit_group) (tail (lines p1))),
+            infection =
+                makeArmy (map (runParser unit_group) (tail (lines p2)))
+        }
+    _ -> error "bad input"
   where
-    ls = lines s
-    (immune_system_lines, "":infection_lines) = span (not . null) ls
     unit_group =
         Group <$> nat <* string " units each with " <*> unit_type
     unit_type =

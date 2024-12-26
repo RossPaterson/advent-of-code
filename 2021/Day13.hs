@@ -14,14 +14,15 @@ data Fold = FoldX Int | FoldY Int
 type Input = ([Position], [Fold])
 
 parse :: String -> Input
-parse s =
-    (map (runParser pos) (lines sp), map (runParser fold_instr) (lines sf))
+parse s = case paragraphs s of
+    [sp, sf] ->
+        (map (runParser pos) (lines sp), map (runParser fold_instr) (lines sf))
+    _ -> error "bad input"
   where
     pos = Position <$> nat <* char ',' <*> nat
     fold_instr =
         FoldX <$ string "fold along x="  <*> nat <|>
         FoldY <$ string "fold along y="  <*> nat
-    [sp, sf] = paragraphs s
 
 -- Part One
 

@@ -14,10 +14,11 @@ type Decks = (Deck, Deck)
 type Deck = Seq Int
 
 parse :: String -> Input
-parse s = (numbers p1, numbers p2)
+parse s = case paragraphs s of
+    [p1, p2] -> (numbers p1, numbers p2)
+    _ -> error "bad input"
   where
     numbers = Seq.fromList . map read . tail . lines
-    [p1, p2] = paragraphs s
 
 -- Part One
 

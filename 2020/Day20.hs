@@ -21,9 +21,10 @@ parse :: String -> Input
 parse = Map.fromList . map parseCamera . paragraphs
 
 parseCamera :: String -> (Int, Tile)
-parseCamera s = (runParser tileno header, parseTile rest)
+parseCamera s = case lines s of
+    header:rest -> (runParser tileno header, parseTile rest)
+    _ -> error "bad input"
   where
-    header:rest = lines s
     tileno = string "Tile " *> nat <* char ':'
 
 parseTile :: [String] -> Tile

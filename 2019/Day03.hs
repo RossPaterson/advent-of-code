@@ -19,9 +19,10 @@ data Direction = R | U | L | D
     deriving (Bounded, Enum, Show)
 
 parse :: String -> Input
-parse s = (w1, w2)
+parse s = case lines s of
+    [l1, l2] -> (runParser wire l1, runParser wire l2)
+    _ -> error "bad input"
   where
-    [w1, w2] = map (runParser wire) (lines s)
     wire = sepBy1 segment (char ',')
     segment = Segment <$> enumValue <*> nat
 
