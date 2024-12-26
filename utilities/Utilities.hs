@@ -25,6 +25,7 @@ module Utilities (
     iterateWhileRight,
     convergeBy,
     times,
+    compose,
     -- * Searching
     splits,
     choose,

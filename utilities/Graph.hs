@@ -20,6 +20,7 @@ module Graph (
     ) where
 
 import qualified Data.PrioritySearchQueue as PSQ
+import Utilities (compose)
 
 import Data.Foldable (fold, toList)
 import Data.List
@@ -97,9 +98,6 @@ postorder ts = foldr (foldTree postorderNode) [] ts
 
 postorderNode :: a -> [[a] -> [a]] -> [a] -> [a]
 postorderNode x fs = compose fs . (x:)
-
-compose :: [a -> a] -> a -> a
-compose fs x = foldr id x fs
 
 treeToSet :: Ord a => Tree a -> Set a
 treeToSet = Set.fromList . toList
