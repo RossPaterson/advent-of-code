@@ -18,9 +18,9 @@ data Rule n t = Single t | Expansions [[n]]
 type Letter = Char
 
 parse :: String -> Input
-parse s = (parseGrammar p1, lines p2)
-  where
-    [p1, p2] = paragraphs s
+parse s = case paragraphs s of
+    [p1, p2] -> (parseGrammar p1, lines p2)
+    _ -> error "bad input"
 
 parseGrammar :: String -> Grammar Int Letter
 parseGrammar = Map.fromList . map (runParser production) . lines

@@ -14,12 +14,15 @@ data Move = Move Int Int Int
     deriving (Show)
 
 parse :: String -> Input
-parse s = (conf, moves)
+parse s = case paragraphs s of
+    [conf_s, moves_s] -> (conf, moves)
+      where
+        conf = map (dropWhile (== ' ')) $
+            transpose $ map row $ init $ lines conf_s
+        moves = map (runParser move) (lines moves_s)
+    _ -> error "bad input"
   where
-    conf = map (dropWhile (== ' ')) $ transpose $ map row $ init $ lines conf_s
     row = map head . takes 4 . tail
-    [conf_s, moves_s] = paragraphs s
-    moves = map (runParser move) (lines moves_s)
     move =
         Move <$ string "move " <*> nat <* string " from " <*>
             nat <* string " to " <*> nat
