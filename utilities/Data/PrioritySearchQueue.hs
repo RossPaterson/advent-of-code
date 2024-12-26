@@ -21,9 +21,9 @@ empty = PSQ Map.empty Set.empty
 singleton :: (Ord p, Ord k) => k -> p -> PSQ k p
 singleton k p = PSQ (Map.singleton k p) (Set.singleton (p, k))
 
--- | Insert a new key and priority into the queue.  If the key is already
--- in the queue with a greater priority, the associated priority is
--- replaced with the supplied value.
+-- | Insert a new key and priority into the queue.  If the key is
+-- already in the queue, its priority is set to the lower of the old
+-- and new priorities.
 insert :: (Ord k, Ord p) => k -> p -> PSQ k p -> PSQ k p
 insert k p pq@(PSQ priority queue) =
     case Map.lookup k priority of
