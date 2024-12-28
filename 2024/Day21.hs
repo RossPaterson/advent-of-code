@@ -60,8 +60,7 @@ readKeypad read_key s = Keypad keys start (invertKeys keys)
 invertKeys :: Ord a => Keys a -> Map a Position
 invertKeys keys = Map.fromList [(v, pos) | (pos, v) <- Map.assocs keys]
 
--- Numeric keypad
-
+-- There will be a single numeric keypad used at the end.
 numericKeypad :: Keypad Char
 numericKeypad = readKeypad id "\
     \789\n\
@@ -70,8 +69,8 @@ numericKeypad = readKeypad id "\
     \ 0A\n\
     \"
 
--- Directional keypad
-
+-- There will be many copied of the directional keypad, each controlling
+-- a robot.
 directionalKeypad :: Keypad Command
 directionalKeypad = readKeypad readCommand "\
     \ ^A\n\
@@ -98,23 +97,36 @@ tests1 = [(testInput, 126384)]
 -- Part Two
 
 -- For long chains of indirection, we need to memoize the costs for
--- shorter chains.
+-- shorter chains.  We will do this starting with the human controller
+-- and moving through the robots controlled by directional keypads until
+-- we reach the numeric keypad.
 
 -- Cost of pressing a key at p2 if the previously pushed one was at p1.
--- The otherwise-unused type parameter indicates which keypad the
--- positions are on.
+-- The otherwise-unused type parameter indicates the type of the labels
+-- on the keys the positions refer to, which vary between keypads.
 type Costs a = Map (Position, Position) Int
 
--- When operating a keypad directly, moving is free and we make only
--- the required keypress.
+-- Base case: when we are operating a keypad directly, moving is free
+-- and we make only the required keypress.
 baseCosts :: Keypad a -> Costs a
 baseCosts (Keypad keys _ _) =
     Map.fromList [((p1, p2), 1) | p1 <- Map.keys keys, p2 <- Map.keys keys]
 
--- Cost of moving the next robot from p1 to p2 on the given keypad
--- (assumed convex), given the costs of moving between positions on the
--- directional keypad controlling this robot.
--- Key point: this robot starts and ends at the activation key.
+-- For a given keypad (assumed convex), the cost of moving the next robot
+-- from p1 to p2 and pressing the key there, given the costs of moving
+-- between positions on the directional keypad controlling this robot.
+--
+-- A path from p1 to p2 will be expressed as a sequence of directional
+-- commands.  To send these commands to the next robot, the controller
+-- starts from the Activate key, moves to each of the required direction
+-- keys in turn, pressing them, and then moves back to the Activate key
+-- and presses that.  There may be more than one such path: we choose the
+-- one that minimizes the costs of the above moves for the controller.
+--
+-- This version does some repeated work, computing the paths each time
+-- and not using the fact that parallel paths have identical costs.
+-- However, doing it this way is simpler, not much slower and handles
+-- the numeric keypad as well.
 stepCosts :: Keypad a -> Costs Direction -> Costs a
 stepCosts (Keypad keys _ _) costs =
     Map.fromListWith min
@@ -129,18 +141,20 @@ stepCosts (Keypad keys _ _) costs =
 directedWalk :: Keys a -> Position -> Position -> [[Direction]]
 directedWalk keys p1 p2
   | p1 == p2 = [[]]
-  | otherwise = [d:ds |
+  | otherwise =
+    [d:ds |
         d <- allValues,
         let p1' = p1 .+. oneStep d,
         Map.member p1' keys,
         distance p1' p2 < distance p1 p2,
         ds <- directedWalk keys p1' p2]
 
--- Cost of moving from the start through all the positions of vs
--- and back to the start again.
+-- The cost of moving through the keypad from the start through all
+-- the positions of the keys with the given labels and back to the
+-- start again.
 costWalk :: Ord a => Keypad a -> Costs a -> [a] -> Int
-costWalk (Keypad _ start positions) costs vs =
-    sum $ map (costs!) $ steps start $ map (positions!) vs
+costWalk (Keypad _ start positions) costs labels =
+    sum $ map (costs!) $ steps start $ map (positions!) labels
 
 -- Steps from the start through all the xs and back to the start.
 -- steps start [x1,...,xn] = [(start, x1), (x1, x2), ... (xn, start)]
@@ -155,7 +169,8 @@ genSolve n codes =
     sum [complexity code (costWalk numericKeypad costs (init code)) |
         code <- codes]
   where
-    costs = stepCosts numericKeypad $
+    costs =
+        stepCosts numericKeypad $
         times n (stepCosts directionalKeypad) $
         baseCosts directionalKeypad
 
