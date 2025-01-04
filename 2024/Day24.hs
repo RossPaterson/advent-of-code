@@ -123,7 +123,7 @@ tests1 = [(testInput1, 4), (testInput2, 2024)]
 
 -- Part Two
 
--- instructions to Graphviz to display a circuit
+-- exploratory visualization of a circuit using Graphviz
 visualize :: Map Wire Gate -> String
 visualize ws =
     directedGV [(expand w', expand w, []) |
@@ -134,7 +134,7 @@ visualize ws =
         Just (Gate _ op _) -> show op ++ w
 
 {-
-The circuit is supposed to be a ripple-carry adder:
+The circuit is intended to be a ripple-carry adder:
 
     x00  y0   x01  y01
      | \/ |    | \/ |
@@ -173,7 +173,14 @@ The circuit is supposed to be a ripple-carry adder:
                                                       |
                                                      z45
 
-but 8 gates are mislabelled.
+but we are told that the labels on 4 pairs of gates have been swapped.
+We are not asked to identify the pairs, just the 8 mislabelled gates.
+
+We flag a gate as mislabelled if the number and types of gates that
+consume the output of this gate in the supplied differ from what we
+would expect from the correct ripple-adder circuit above.  This test
+would not detect all possible mislabelled gates, but it detects the ones
+that occur in the puzzle input.
 -}
 
 solve2 :: Input -> String
