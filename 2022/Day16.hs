@@ -8,6 +8,7 @@ import Data.Map (Map, (!))
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
+import Data.List
 import Data.Tree
 
 -- Input processing
@@ -121,7 +122,7 @@ maxFlows flow g time_limit =
 solve2 :: Input -> Int
 solve2 vs =
     maximum [f1 + f2 |
-        (ns1, f1) <- flows, (ns2, f2) <- flows, Set.disjoint ns1 ns2]
+        (s1, f1):rest <- tails flows, (s2, f2) <- rest, Set.disjoint s1 s2]
   where
     time_limit = 26
     flows = maxFlows (flowRates vs) (valveGraph vs) time_limit
