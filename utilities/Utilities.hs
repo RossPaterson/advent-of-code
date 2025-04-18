@@ -40,6 +40,11 @@ module Utilities (
     takeTree,
     takeWhileTree,
     maximumDF,
+    -- ** Forests
+    permutationForest,
+    scanForest,
+    takeForest,
+    takeWhileForest,
     
     -- * Testing
     failures,
@@ -269,22 +274,39 @@ memoize domain def rec_f = f
 iterateTree :: (a -> [a]) -> a -> Tree a
 iterateTree f x = Node x (map (iterateTree f) (f x))
 
+-- | Forest in which paths to the leaves are permutations of the list.
+permutationForest :: [a] -> Forest a
+permutationForest xs =
+    [Node x (permutationForest (front++back)) | (front, x:back) <- splits xs]
+
 -- | Downwards accumulation with the specified binary operation.
 scanTree :: (s -> a -> s) -> s -> Tree a -> Tree s
-scanTree f s (Node x ts) = Node s' (map (scanTree f s') ts)
+scanTree f s (Node x ts) = Node s' (scanForest f s' ts)
   where
     s' = f s x
 
+-- | Downwards accumulation with the specified binary operation.
+scanForest :: (s -> a -> s) -> s -> Forest a -> Forest s
+scanForest f s = map (scanTree f s)
+
 -- | Prune a tree at depth @n@. The root is always included.
 takeTree :: Int -> Tree a -> Tree a
-takeTree n (Node x ts)
-  | n == 0 = Node x []
-  | otherwise = Node x (map (takeTree (n-1)) ts)
+takeTree n (Node x ts) = Node x (takeForest n ts)
+
+-- | Prune a forest at depth @n@.
+takeForest :: Int -> Forest a -> Forest a
+takeForest n ts
+  | n == 0 = []
+  | otherwise = map (takeTree (n-1)) ts
 
 -- | The subtree including the root and all paths along which @p@ is 'True'.
 takeWhileTree :: (a -> Bool) -> Tree a -> Tree a
-takeWhileTree p (Node x ts) =
-    Node x [takeWhileTree p t | t <- ts, p (rootLabel t)]
+takeWhileTree p (Node x ts) = Node x (takeWhileForest p ts)
+
+-- | The subforest including all paths along which @p@ is 'True'.
+takeWhileForest :: (a -> Bool) -> Forest a -> Forest a
+takeWhileForest p ts =
+    [Node x (takeWhileForest p ts') | Node x ts' <- ts, p x]
 
 -- | Provided @bound ('rootLabel' t) >= score x@ for any @x@ in @t@,
 --
