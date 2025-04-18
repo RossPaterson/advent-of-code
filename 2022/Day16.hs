@@ -4,9 +4,11 @@ import Utilities
 import Graph
 import Parser
 import Control.Applicative
-import Data.Maybe
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
+import Data.Set (Set)
+import qualified Data.Set as Set
+import Data.Tree
 
 -- Input processing
 
@@ -33,11 +35,9 @@ parse = Map.fromList . map (runParser named_valve) . lines
 start :: ValveName
 start = "AA"
 
-workingValves :: Valves -> [ValveName]
-workingValves vs = [n | (n, v) <- Map.assocs vs, flow_rate v > 0]
-
-workingValve :: Valves -> ValveName -> Bool
-workingValve vs n = flow_rate (vs ! n) > 0
+-- flow rates of working valves
+flowRates :: Valves -> Map ValveName Int
+flowRates vs = Map.filter (> 0) (Map.map flow_rate vs)
 
 -- Weighted graph of working valves
 
@@ -49,45 +49,41 @@ valveGraph :: Valves -> WeightedGraph ValveName
 valveGraph vs =
     Map.fromList [(source, out_edges source) | source <- sources]
   where
-    sources = start : workingValves vs
+    flow = flowRates vs
+    sources = start : Map.keys flow
     out_edges source = Map.fromList [(target, dist) |
         (dist, targets) <- tail $ zip [1..] $ bfs (exits . (vs !)) [source],
-        target <- targets, workingValve vs target]
+        target <- targets, Map.member target flow]
 
--- Visit a list of working valves in all possible orders
-
-data State = State {
-    location :: ValveName,
-    time_left :: Int,
-    valves_left :: [ValveName]
-    }
-    deriving (Show)
-
-explore :: WeightedGraph ValveName -> State -> [State]
-explore g s =
-    [State {
-        location = target,
-        time_left = time_left s - dist,
-        valves_left = front++back
-        } |
-        (front, target:back) <- splits (valves_left s),
-        dist <- maybeToList (Map.lookup target exit_map),
-        dist < time_left s]
+-- The maximum flow of all possible tours of working valves within
+-- the time limit
+maxFlow :: Map ValveName Int -> WeightedGraph ValveName -> Int -> Int
+maxFlow flow g time_limit =
+    foldr max 0 $
+        concat $
+        map (flatten . scanTree (+) 0 . fmap valve_flow) $
+        reachableValves g time_limit $
+        Map.keys flow
   where
-    exit_map = g ! location s
+    valve_flow (t, n) = t * flow!n
 
-valve_flow :: Valves -> State -> Int
-valve_flow vs s = time_left s * flow_rate (vs ! location s)
-
-max_flow :: Valves -> WeightedGraph ValveName -> Int -> [ValveName] -> Int
-max_flow vs g time ns =
-    maximum $ scanTree (+) 0 $ fmap (valve_flow vs) $
-        iterateTree (explore g) s0
+-- forest of valves that can be opened within the time limit,
+-- with how long they will be open
+reachableValves :: WeightedGraph ValveName -> Int -> [ValveName] ->
+    Forest (Int, ValveName)
+reachableValves g time_limit ns =
+    takeWhileForest (\ (t, _) -> t > 0) $
+            -- forest of valve opening times and locations
+        scanForest advance (time_limit, start) $
+            -- forest of nodes
+        permutationForest ns
   where
-    s0 = State { location = start, time_left = time, valves_left = ns }
+    advance (t, n1) n2 = (t - g!n1!n2, n2)
 
 solve1 :: Input -> Int
-solve1 vs = max_flow vs (valveGraph vs) 30 (workingValves vs)
+solve1 vs = maxFlow (flowRates vs) (valveGraph vs) time_limit
+  where
+    time_limit = 30
 
 testInput :: String
 testInput = "\
@@ -107,22 +103,28 @@ tests1 = [(testInput, 1651)]
 
 -- Part Two
 
--- ways of sharing a list
-shares :: [a] -> [([a], [a])]
-shares [] = [([], [])]
-shares (x:xs) = [p | (ys, zs) <- shares xs, p <- [(x:ys, zs), (ys, x:zs)]]
+-- For each set of valves that can be reached within the time limit,
+-- the maximum flow they can produce
+maxFlows :: Map ValveName Int -> WeightedGraph ValveName -> Int ->
+    [(Set ValveName, Int)]
+maxFlows flow g time_limit =
+    Map.assocs $
+        Map.fromListWith max $
+        concat $
+        map (flatten . scanTree add (Set.empty, 0)) $
+        reachableValves g time_limit (Map.keys flow)
+  where
+    add (ns, f) (t, n) = (Set.insert n ns, f + t*flow!n)
 
--- same, except always put the first element in the first list
-shares' :: [a] -> [([a], [a])]
-shares' [] = [([], [])]
-shares' (x:xs) = [(x:ys, zs) | (ys, zs) <- shares xs]
-
+-- In this part, we have two independent actors turning on disjoint sets
+-- of valves.
 solve2 :: Input -> Int
 solve2 vs =
-    maximum [max_flow vs g 26 xs + max_flow vs g 26 ys |
-        (xs, ys) <- shares' (workingValves vs)]
+    maximum [f1 + f2 |
+        (ns1, f1) <- flows, (ns2, f2) <- flows, Set.disjoint ns1 ns2]
   where
-    g = valveGraph vs
+    time_limit = 26
+    flows = maxFlows (flowRates vs) (valveGraph vs) time_limit
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 1707)]
