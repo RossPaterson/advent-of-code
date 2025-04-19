@@ -25,6 +25,29 @@ parse = parseProgram
 --
 -- so it suffices to look at values compared with register 0.
 
+-- The above gives the answer, but is very slow.  The expensive part of
+-- the hash function is an inner loop of the form
+--
+--     i = 0;
+--     while ((i+1)*256 <= k)
+--         i++;
+--     k = i;
+--
+-- We can replace this with the equivalent
+--
+--     k = k/256;
+--
+speedup :: Program -> Program
+speedup p = p { instructions = code' }
+  where
+    code = instructions p
+    code' =
+       Map.insert 17 (Instruction DIVI r c r) $
+       Map.insert 18 (code!27) $
+       code
+    Instruction _ _ c _ = code!19
+    Instruction _ _ _ r = code!26
+
 solve1 :: Input -> Int
 solve1 = head . values
 
@@ -55,6 +78,6 @@ uniq xs =
 main :: IO ()
 main = do
     s <- readFile "input/21.txt"
-    let input = parse s
+    let input = speedup $ parse s
     print (solve1 input)
     print (solve2 input)

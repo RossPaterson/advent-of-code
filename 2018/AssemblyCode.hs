@@ -19,7 +19,8 @@ instance Functor GenInstruction where
 type Instruction = GenInstruction OpCode
 data OpCode =
     ADDR | ADDI | MULR | MULI | BANR | BANI | BORR | BORI |
-    SETR | SETI | GTIR | GTRI | GTRR | EQIR | EQRI | EQRR
+    SETR | SETI | GTIR | GTRI | GTRR | EQIR | EQRI | EQRR |
+    DIVI -- added for optimization
   deriving (Show, Eq, Ord, Bounded, Enum)
 
 -- parse a string containing a single instruction
@@ -58,6 +59,7 @@ execute s (Instruction GTRR a b c) = Map.insert c (fromEnum (s!a > s!b)) s
 execute s (Instruction EQIR a b c) = Map.insert c (fromEnum (a == s!b)) s
 execute s (Instruction EQRI a b c) = Map.insert c (fromEnum (s!a == b)) s
 execute s (Instruction EQRR a b c) = Map.insert c (fromEnum (s!a == s!b)) s
+execute s (Instruction DIVI a b c) = Map.insert c (s!a `div` b) s
 
 -- Machine with one register designated as the instruction pointer
 
