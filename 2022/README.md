@@ -138,11 +138,13 @@ out a diagonal square lattice abstraction helped, but it's still ugly
 
 ## [Day 16: Proboscidea Volcanium](https://adventofcode.com/2022/day/16) \*\*\*
 
-This is a novel mix of path-finding and optimization, where the challenge
-is finding a feasible implementation.  I got the first part with a direct
-implementation and over half an hour of runtime, but then was fortunate
-to have to stop and commute to work, giving time to step back and devise
-a multistage solution to both parts (which still took 40 seconds to run).
+This is a novel and multi-layered mix of path-finding and optimization,
+where the challenge is finding a feasible implementation.  I got the
+first part with a direct implementation and over half an hour of runtime,
+but then was fortunate to have to stop and commute to work, giving time
+to step back and devise a multistage solution to both parts (which still
+took 40 seconds to run).  Looking at the problem in a different way yields
+an elegant and much faster solution involving bulk manipulation of data.
 
 Often an Advent of Code problem is presented in terms of how the state
 changes on each clock tick, and that can usually be directly implemented,
