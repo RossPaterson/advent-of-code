@@ -47,7 +47,7 @@ solve1 (samples, _code) = length [s | s <- samples, length (possibles s) >= 3]
 -- Possible opcodes for the instruction in a given sample
 possibles :: Sample -> [OpCode]
 possibles (before, instr, after) = [opcode |
-    opcode <- allValues,
+    opcode <- allOpCodes,
     execute before (opcode <$ instr) == after]
 
 tests1 :: [(String, [OpCode])]

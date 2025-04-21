@@ -99,4 +99,4 @@ main = do
     putStr (unlines (failures "solve1" (solveAfter 12 . parse) tests1))
     print (solve1 input)
     putStr (unlines (failures "solve2" (solve2 . parse) tests2))
-    putStr (solve2 input)
+    putStrLn (solve2 input)

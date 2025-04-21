@@ -23,6 +23,10 @@ data OpCode =
     DIVI -- added for optimization
   deriving (Show, Eq, Ord, Bounded, Enum)
 
+-- all the original op codes
+allOpCodes :: [OpCode]
+allOpCodes = [ADDR .. EQRR]
+
 -- parse a string containing a single instruction
 parseInstruction :: String -> Instruction
 parseInstruction = runParser (instruction opcode)
