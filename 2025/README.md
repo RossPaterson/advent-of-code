@@ -6,7 +6,13 @@ each puzzle.
 ## [Day 1: Secret Entrance](https://adventofcode.com/2025/day/1) \*
 
 This was a bit more than previous openers, particularly in the second
-part, but ultimately a small exercise in sequential list processing.
-The second part triggers features of the puzzle input that are not
-present in the test input, but this is clearly signposted in the puzzle
-description.
+part, but ultimately a small exercise in sequential list processing,
+with lots of tricky edge cases.  The second part triggers features of
+the puzzle input that are not present in the test input, but this is
+clearly signposted in the puzzle description.
+
+## [Day 2: Gift Shop](https://adventofcode.com/2025/day/2) \*
+
+This was another small list processing exercise.  There are several
+strategies for doing this efficiently, but the naive brute force approach
+is fast enough.
