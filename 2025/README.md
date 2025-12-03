@@ -16,3 +16,9 @@ clearly signposted in the puzzle description.
 This was another small list processing exercise.  There are several
 strategies for doing this efficiently, but the naive brute force approach
 is fast enough.
+
+## [Day 3: Lobby](https://adventofcode.com/2025/day/3) \*
+
+This was more list processing.  The first part with easy, but using
+the same naive approach for the second part was infeasible.  Dynamic
+programming is needed, and there is a neat way to express it.
