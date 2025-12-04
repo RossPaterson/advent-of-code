@@ -19,11 +19,16 @@ is fast enough.
 
 ## [Day 3: Lobby](https://adventofcode.com/2025/day/3) \*
 
-This was more list processing.  The first part with easy, but using
-the same naive approach for the second part was infeasible.  Dynamic
-programming works well here, and there is a neat way to express it.
+This was more list processing.  The first part was easy, but using
+the same naive approach for the second part was infeasible.  I used
+dynamic programming, and there is a neat way to express it.
 
 As pointed out on the
 [Reddit thread](https://www.reddit.com/r/adventofcode/comments/1pcvaj4/2025_day_3_solutions/),
 the problem has properties that also permit a greedy solution.  This can
 also be expressed neatly.
+
+## [Day 4: Printing Department](https://adventofcode.com/2025/day/4) \*
+
+This was a small two-dimensional grid problem, with the second part an
+iteration of the first.
