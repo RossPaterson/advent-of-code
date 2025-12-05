@@ -30,5 +30,10 @@ also be expressed neatly.
 
 ## [Day 4: Printing Department](https://adventofcode.com/2025/day/4) \*
 
-This was a small two-dimensional grid problem, with the second part an
-iteration of the first.
+This was a straightforward two-dimensional grid problem, with the second
+part an iteration of the first.
+
+## [Day 5: Cafeteria](https://adventofcode.com/2025/day/5) \*
+
+More list processing.  The first part is trivial, but the second obviously
+needs a different approach.  The final code is small and neat.
