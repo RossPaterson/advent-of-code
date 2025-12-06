@@ -37,3 +37,9 @@ part an iteration of the first.
 
 More list processing.  The first part is trivial, but the second obviously
 needs a different approach.  The final code is small and neat.
+
+## [Day 6: Trash Compactor](https://adventofcode.com/2025/day/6) \*
+
+In this problem, main challenge in the second part is parsing the input
+in a different way.  It was a little fiddly, but there is little choice
+in method.
