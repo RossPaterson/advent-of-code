@@ -1,7 +1,11 @@
 # Notes on each day's solutions
 
+From this year, there are only 12 days of puzzles, and no more global
+leaderboard (ruined by AI abuse).  Thus there is no easy comparison
+of relative difficulty.
+
 I have added difficulty ratings based on how long I took to solve
-each puzzle.
+each puzzle.  The most fun so far have been days 3 and 5.
 
 ## [Day 1: Secret Entrance](https://adventofcode.com/2025/day/1) \*
 
@@ -43,3 +47,10 @@ needs a different approach.  The final code is small and neat.
 In this problem, main challenge in the second part is parsing the input
 in a different way.  It was a little fiddly, but there is little choice
 in method.
+
+## [Day 7: Laboratories](https://adventofcode.com/2025/day/7) \*
+
+The straightforward first part sets up the problem, but naively
+implementing the description of the second part is clearly infeasible.
+Instead, the return of an idea seen previously (e.g. 2021 days 6 and 14,
+2024 day 11) yields a solution that is a simple variation on part one.
