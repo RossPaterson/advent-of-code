@@ -60,6 +60,10 @@ solve2 ps =
       where
         interior = growBox (-1) rect
 
+-- General optimization (useful if p is expensive):
+--
+-- maximum . map f . filter p = f . head . filter p . sortOn (Down . f)
+
 -- a thin bounding box for each of the edges of the path, which are
 -- specified as being either horizontal or vertical
 edges :: [Position] -> [AABox Position]
