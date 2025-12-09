@@ -55,7 +55,10 @@ solve2 :: Input -> Int
 solve2 ps =
     boxSize $ head $ filter whole $ sortOn (Down . boxSize) $ rectangles ps
   where
-    es = edges ps
+    -- longer edges are more likely to eliminate boxes
+    es = sortOn (Down . boxSize) $ edges ps
+
+    -- rectangle doesn't have an edge going into or across it
     whole rect = and [isNothing (intersectBox interior e) | e <- es]
       where
         interior = growBox (-1) rect
