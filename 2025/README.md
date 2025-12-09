@@ -54,3 +54,17 @@ The straightforward first part sets up the problem, but naively
 implementing the description of the second part is clearly infeasible.
 Instead, the return of an idea seen previously (e.g. 2021 days 6 and 14,
 2024 day 11) yields a solution that is a simple variation on part one.
+
+## [Day 8: Playground](https://adventofcode.com/2025/day/8) \*
+
+The two parts are variants of the same computation.  I was confused by
+the ambiguity of "nothing happens", as were many people commenting on
+Reddit.  This hints at Kruskal's algorithm for minimal spanning trees,
+but a naive implementation is sufficient.
+
+## [Day 9: Playground](https://adventofcode.com/2025/day/9) \*\*
+
+One of those with an easy first part to set things up and a much more
+difficult second part.  It took me several false starts and much discarded
+code to discover the simplicity of this one, though my solution does
+rely on the input not containing a particular special case.
