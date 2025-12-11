@@ -68,3 +68,18 @@ One of those with an easy first part to set things up and a much more
 difficult second part.  It took me several false starts and much discarded
 code to discover the simplicity of this one, though my solution does
 rely on the input not containing a particular special case.
+
+## [Day 10: Factory](https://adventofcode.com/2025/day/10) \*\*\*\*
+
+This was a striking increase in difficulty from previous days.  The two
+parts are Boolean and integer versions of a linear system.  Although we
+have seen something similar previously (2023 day 24), this system was
+not fully determined.
+
+## [Day 11: Reactor](https://adventofcode.com/2025/day/11) \*\*
+
+This is a graph problem where the naive method for the first part is
+correct but infeasible for the second.  It wasn't clear what kind of graph
+we were dealing with, and the description has a red herring "in any order".
+Visualizing the graph showed that this was a problem of familiar type,
+for which there is a standard approach.
