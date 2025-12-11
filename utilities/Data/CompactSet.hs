@@ -11,7 +11,7 @@ module Data.CompactSet (
     -- * Relationships
     isSubsetOf, isProperSubsetOf, disjoint,
     -- * Combinations
-    union, intersection, difference
+    union, unions, intersection, difference
     ) where
 
 import Data.Bits
@@ -81,6 +81,10 @@ disjoint xs ys = null (intersection xs ys)
 -- | The union of two sets.
 union :: Set a -> Set a -> Set a
 union (BitSet xs) (BitSet ys) = BitSet (xs .|. ys)
+
+-- | The union of a list of sets.
+unions :: [Set a] -> Set a
+unions = foldr union empty
 
 -- | The intersection of two sets.
 intersection :: Set a -> Set a -> Set a
