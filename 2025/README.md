@@ -5,7 +5,7 @@ leaderboard (ruined by AI abuse).  Thus there is no easy comparison
 of relative difficulty.
 
 I have added difficulty ratings based on how long I took to solve
-each puzzle.  The most fun so far have been days 3 and 5.
+each puzzle.  The most fun were days 3, 5 and 9.
 
 ## [Day 1: Secret Entrance](https://adventofcode.com/2025/day/1) \*
 
@@ -72,9 +72,9 @@ rely on the input not containing a particular special case.
 ## [Day 10: Factory](https://adventofcode.com/2025/day/10) \*\*\*\*
 
 This was a striking increase in difficulty from previous days.  The two
-parts are Boolean and integer versions of a linear system.  Although we
-have seen something similar previously (2023 day 24), this system was
-not fully determined.
+parts are Boolean and natural number versions of a linear system.
+Although we have seen something similar previously (2023 day 24), this
+system was not fully determined.
 
 ## [Day 11: Reactor](https://adventofcode.com/2025/day/11) \*\*
 
@@ -83,3 +83,9 @@ correct but infeasible for the second.  It wasn't clear what kind of graph
 we were dealing with, and the description has a red herring "in any order".
 Visualizing the graph showed that this was a problem of familiar type,
 for which there is a standard approach.
+
+## [Day 12: Christmas Tree Farm](https://adventofcode.com/2025/day/12) \*
+
+This was quite sneaky.  The problem looks completely infeasible, so
+before trying an exhaustive search, I checked whether how much of the
+actual input was trivial.
