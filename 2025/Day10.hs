@@ -3,7 +3,6 @@ module Main where
 import Parser
 import Utilities
 import Control.Applicative (some, (<|>))
-import Data.Either (partitionEithers)
 import Data.List (subsequences, unfoldr)
 import Data.Maybe (mapMaybe)
 import Data.Map (Map)
@@ -150,18 +149,8 @@ solveConstraints bounds (c:cs) m =
 
 -- Apply a partial substitution to a constraint
 substitute :: Map Variable Int -> Constraint -> Constraint
-substitute m (t, vs) = (t - sum values, Map.fromList vars)
-  where
-    (vars, values) =
-        partitionEithers [applyCoefficient (substituteVar m v) a |
-            (v, a) <- Map.assocs vs]
-
-substituteVar :: (Ord k) => Map k a -> k -> Either k a
-substituteVar m k = maybe (Left k) Right (Map.lookup k m)
-
-applyCoefficient :: Either Variable Int -> Int -> Either (Variable, Int) Int
-applyCoefficient (Left v) a = Left (v, a)
-applyCoefficient (Right n) a = Right (a*n)
+substitute s (t, vs) =
+    (t - sum (Map.intersectionWith (*) vs s), Map.difference vs s)
 
 -- Generate possible values for each variable in the linear equation.
 solveConstraint ::
