@@ -91,17 +91,17 @@ linearSystem (_, bs, levels) =
 -- All possible non-negative solutions of the linear system
 solveLinearSystem :: LinearSystem -> [Map Variable Int]
 solveLinearSystem cs =
-    solveConstraints (upperBound cs) (reverse (upperTriangular cs)) Map.empty
+    solveConstraints (upperBound cs) (reverse (echelonForm cs)) Map.empty
 
 -- maximum possible value for each variable
 upperBound :: LinearSystem -> Map Variable Int
 upperBound cs =
     Map.fromListWith min [(v, t) | (t, vs) <- cs, v <- Map.keys vs]
 
--- Convert the linear system to an equivalent upper triangular form
--- using an integer version of Gaussian elimination.
-upperTriangular :: LinearSystem -> LinearSystem
-upperTriangular = unfoldr elimVariable
+-- Convert the linear system to an equivalent (unreduced) row echelon
+-- form using an integer version of Gaussian elimination.
+echelonForm :: LinearSystem -> LinearSystem
+echelonForm = unfoldr elimVariable
 
 -- Eliminate a variable constrained by the first equation from all
 -- following constraints, removing any constraints that become trivial.
@@ -135,15 +135,14 @@ addConstraint (t1, m1) (t2, m2)
   where
     m = Map.filter (/= 0) (Map.unionWith (+) m1 m2)
 
--- Given a linear system in lower triangular form, find possible values
+-- Given a linear system in reversed echelon form, find possible values
 -- for the variables it contains.
 solveConstraints ::
     Map Variable Int -> LinearSystem -> Map Variable Int -> [Map Variable Int]
 solveConstraints _ [] m = [m]
 solveConstraints bounds (c:cs) m =
-    [m'' |
-        m' <- solveConstraint bounds t (Map.assocs vs) m,
-        m'' <- solveConstraints bounds cs m']
+    concatMap (solveConstraints bounds cs) $
+        solveConstraint bounds t (Map.assocs vs) m
   where
     (t, vs) = substitute m c
 
@@ -163,10 +162,10 @@ solveConstraint _ t [(v, a)] m =
   where
     n = t `div` a
 -- Other variables range up to their bounds from the original system.
-solveConstraint bounds t ((v, a):vns) m =
-    [ m' |
+solveConstraint bounds t ((v, a):vas) m =
+    [m' |
         n <- [0..Map.findWithDefault 0 v bounds],
-        m' <- solveConstraint bounds (t - n*a) vns (Map.insert v n m)]
+        m' <- solveConstraint bounds (t - n*a) vas (Map.insert v n m)]
 
 tests2 :: [(String, Int)]
 tests2 = [(testInput, 33)]
